@@ -1,0 +1,856 @@
+@example
+@group
+Ready PO files       af am ar az be bg bs ca cs cy da de el en en_GB eo
+                   +----------------------------------------------------+
+Compendium         |                      []       [] []        []      |
+a2ps               |             []                [] [] []     []      |
+aegis              |                                  ()                |
+ant-phone          |                                  ()                |
+anubis             |                                  []                |
+ap-utils           |                                                    |
+aspell             |                      [] []    [] []        []      |
+bash               |                                                 [] |
+bfd                |                                                    |
+bibshelf           |                                  []                |
+binutils           |                                                    |
+bison              |                               [] []                |
+bison-runtime      |                                  []                |
+bluez-pin          | []                      []       [] []          [] |
+cflow              |                               []                   |
+clisp              |                               [] []    []          |
+console-tools      |                         []       []                |
+coreutils          |                []    [] []       []                |
+cpio               |                                                    |
+cpplib             |                      []       [] []                |
+cryptonit          |                                  []                |
+dialog             |                                                    |
+diffutils          |                      [] []    [] [] []          [] |
+doodle             |                                  []                |
+e2fsprogs          |                         []       []                |
+enscript           |                      []       [] []        []      |
+fetchmail          |                      []       [] () []     []      |
+findutils          |                []                                  |
+findutils_stable   |                []    []       []                   |
+flex               |                      []       [] []                |
+fslint             |                                                    |
+gas                |                                                    |
+gawk               |                      []       [] []                |
+gcal               |                      []                            |
+gcc                |                                  []                |
+gettext-examples   | []                   []          [] []          [] |
+gettext-runtime    |             []       []       [] []             [] |
+gettext-tools      |                      []          []                |
+gip                |                []                                  |
+gliv               |                []                []                |
+glunarclock        |                []                                  |
+gmult              | []                               []                |
+gnubiff            |                                  ()                |
+gnucash            |                      [] []       () ()     []      |
+gnuedu             |                                                    |
+gnulib             |                []                                  |
+gnunet             |                                                    |
+gnunet-gtk         |                                                    |
+gnutls             |                                  []                |
+gpe-aerial         |                         []       []                |
+gpe-beam           |                         []       []                |
+gpe-calendar       |                                                    |
+gpe-clock          |                         []       []                |
+gpe-conf           |                         []       []                |
+gpe-contacts       |                                                    |
+gpe-edit           |                         []                         |
+gpe-filemanager    |                                                    |
+gpe-go             |                         []                         |
+gpe-login          |                         []       []                |
+gpe-ownerinfo      |                         []       []                |
+gpe-package        |                                                    |
+gpe-sketchbook     |                         []       []                |
+gpe-su             |                         []       []                |
+gpe-taskmanager    |                         []       []                |
+gpe-timesheet      |                         []                         |
+gpe-today          |                         []       []                |
+gpe-todo           |                                                    |
+gphoto2            |                         []    [] []        []      |
+gprof              |                               [] []                |
+gpsdrive           |                                                    |
+gramadoir          | []                               []                |
+grep               |                         []                      [] |
+gretl              |                                  ()                |
+gsasl              |                                                    |
+gss                |                                                    |
+gst-plugins-bad    |                []             []                   |
+gst-plugins-base   |                []             []                   |
+gst-plugins-good   |                []    []       []                   |
+gst-plugins-ugly   |                []             []                   |
+gstreamer          | []             []    [] []    [] []        []      |
+gtick              |                                  ()                |
+gtkam              |             []          []    [] []                |
+gtkorphan          |                []                []                |
+gtkspell           |             []                   [] []          [] |
+gutenprint         |                               []                   |
+hello              |                []    []       [] []             [] |
+herrie             |                                  []                |
+hylafax            |                                                    |
+idutils            |                               [] []                |
+indent             |                      [] []       []             [] |
+iso_15924          |                                                    |
+iso_3166           |       []    [] [] [] [] [] [] [] [] []          [] |
+iso_3166_2         |                                                    |
+iso_4217           |                         []    [] []                |
+iso_639            |                         []    [] []             [] |
+jpilot             |                         []                         |
+jtag               |                                                    |
+jwhois             |                                                    |
+kbd                |                         []    [] [] []             |
+keytouch           |                      []          []                |
+keytouch-editor    |                                  []                |
+keytouch-keyboa... |                      []                            |
+latrine            |                                  ()                |
+ld                 |                               []                   |
+leafpad            |                []    [] []       [] []             |
+libc               |                      [] []    [] []                |
+libexif            |                                  []                |
+libextractor       |                                  []                |
+libgpewidget       |                         []    [] []                |
+libgpg-error       |                                  []                |
+libgphoto2         |                               [] []                |
+libgphoto2_port    |                               [] []                |
+libgsasl           |                                                    |
+libiconv           |                                  []             [] |
+libidn             |                         []    []                [] |
+lifelines          |                               [] ()                |
+lilypond           |                                  []                |
+lingoteach         |                                                    |
+lprng              |                                                    |
+lynx               |                      [] []    [] []                |
+m4                 |                         []    [] [] []             |
+mailfromd          |                                                    |
+mailutils          |                      []                            |
+make               |                               [] []                |
+man-db             |                      []       [] []                |
+minicom            |                         []    [] []                |
+nano               |                []    []          []                |
+opcodes            |                                  []                |
+parted             |                         []       []                |
+pilot-qof          |                                                    |
+popt               |                         []    [] []                |
+psmisc             |                []                                  |
+pwdutils           |                                                    |
+qof                |                                                    |
+radius             |                      []                            |
+recode             |             []       []       [] [] []          [] |
+rpm                |                               []                   |
+screem             |                                                    |
+scrollkeeper       |          [] []       [] [] [] [] []        []      |
+sed                |                      []          []             [] |
+shared-mime-info   |                []    [] []    [] () []     []   [] |
+sharutils          |                []    [] []    [] [] []             |
+shishi             |                                                    |
+skencil            |                               [] ()                |
+solfege            |                                                    |
+soundtracker       |                               [] []                |
+sp                 |                                  []                |
+system-tools-ba... |       []       [] [] [] []    [] [] []     []      |
+tar                |                []                []                |
+texinfo            |                               [] []             [] |
+tin                |                                  ()        ()      |
+tuxpaint           | []             []             [] []        []   [] |
+unicode-han-tra... |                                                    |
+unicode-transla... |                                                    |
+util-linux         |                      [] []    [] []                |
+util-linux-ng      |                      [] []    [] []                |
+vorbis-tools       |                         []                         |
+wastesedge         |                                  ()                |
+wdiff              |                      []       [] []        []      |
+wget               |                      [] []       []                |
+xchat              |             [] []    [] []       [] []     []      |
+xkeyboard-config   |                []                                  |
+xpad               |                []             []           []      |
+                   +----------------------------------------------------+
+                     af am ar az be bg bs ca cs cy da de el en en_GB eo
+                      6  0  2  1  8 26  2 40 48  2 56 88 15  1  15   18
+@end group
+
+@group
+                     es et eu fa fi fr  ga gl gu he hi hr hu id is it
+                   +--------------------------------------------------+
+Compendium         | []          [] []  []                []          |
+a2ps               |    []       [] []                             () |
+aegis              |                                                  |
+ant-phone          |                []                                |
+anubis             |                []                                |
+ap-utils           |             [] []                                |
+aspell             |                []  []                         [] |
+bash               | []                                               |
+bfd                | []          []                                   |
+bibshelf           | []                 []                         [] |
+binutils           | []          [] []                                |
+bison              | [] []          []  []                   []    [] |
+bison-runtime      |    []          []  []                   []    [] |
+bluez-pin          |             [] []  []                [] []       |
+cflow              |                    []                            |
+clisp              | []             []                                |
+console-tools      |                                                  |
+coreutils          | [] []       [] []  []                []          |
+cpio               | []             []  []                            |
+cpplib             | []             []                                |
+cryptonit          |                []                                |
+dialog             |       []           []                         [] |
+diffutils          | []          [] []  [] []    []       [] []    [] |
+doodle             |                    []                         [] |
+e2fsprogs          | []             []                             [] |
+enscript           |                []  []             []             |
+fetchmail          | []                                               |
+findutils          |    []              []                []          |
+findutils_stable   |    []          []  []                []          |
+flex               | []             []  []                            |
+fslint             |                                                  |
+gas                | []             []                                |
+gawk               | []             []  []       []                () |
+gcal               | []             []                                |
+gcc                | []                                               |
+gettext-examples   | []          [] []  []                [] []    [] |
+gettext-runtime    | []          [] []  []                   []    [] |
+gettext-tools      | []    []       []                             [] |
+gip                | []    []       []  []                            |
+gliv               |                ()                                |
+glunarclock        |             []     []                []          |
+gmult              |       []       []                             [] |
+gnubiff            |                ()                             () |
+gnucash            | ()             ()                    ()          |
+gnuedu             | []                                               |
+gnulib             | [] []              []                            |
+gnunet             |                                                  |
+gnunet-gtk         |                                                  |
+gnutls             |                                                  |
+gpe-aerial         | []             []                                |
+gpe-beam           | []             []                                |
+gpe-calendar       |                                                  |
+gpe-clock          | []          [] []                    []          |
+gpe-conf           |                []                                |
+gpe-contacts       | []             []                                |
+gpe-edit           | []             []                    [] []       |
+gpe-filemanager    | []                                               |
+gpe-go             | []             []                    []          |
+gpe-login          | []             []                    []          |
+gpe-ownerinfo      | []          [] []                    [] []       |
+gpe-package        | []                                               |
+gpe-sketchbook     | []             []                                |
+gpe-su             | []          [] []                    []          |
+gpe-taskmanager    | []          [] []                                |
+gpe-timesheet      | []             []  []                   []       |
+gpe-today          | []          [] []  []                            |
+gpe-todo           | []                                               |
+gphoto2            | []          [] []                    []       [] |
+gprof              | []          [] []  []                   []       |
+gpsdrive           |    []                                            |
+gramadoir          |                []  []                            |
+grep               | []          []     []                            |
+gretl              | []    []       []                             () |
+gsasl              |                    []                   []       |
+gss                |                []  []                            |
+gst-plugins-bad    | []          []                       []       [] |
+gst-plugins-base   | []          []                       []       [] |
+gst-plugins-good   | []    []    []                       []       [] |
+gst-plugins-ugly   | []          []                       []       [] |
+gstreamer          |             []                       []       [] |
+gtick              |             []     []                         [] |
+gtkam              | []             []                    []       [] |
+gtkorphan          |                []                             [] |
+gtkspell           | []    []    [] []  []                []       [] |
+gutenprint         |                                      []          |
+hello              | [] [] [] [] [] []  [] []    []    [] [] []    [] |
+herrie             |                    []                            |
+hylafax            |                                                  |
+idutils            |                []  []                [] []    [] |
+indent             | [] [] []    [] []  [] []             [] []    [] |
+iso_15924          |                []                                |
+iso_3166           | [] [] []    [] []     [] [] [] [] [] [] []    [] |
+iso_3166_2         |                []                                |
+iso_4217           | [] []       [] []                    []       [] |
+iso_639            | []       [] [] []  []                []          |
+jpilot             | []             []                                |
+jtag               |                []                                |
+jwhois             | []             []                    [] []    [] |
+kbd                | []             []                                |
+keytouch           |                []  []                         [] |
+keytouch-editor    |                    []                            |
+keytouch-keyboa... |                    []                         [] |
+latrine            |                    []                         [] |
+ld                 | []          [] []  []                            |
+leafpad            | []             []  []       []       []       [] |
+libc               | []          [] []     []             []          |
+libexif            | []                                               |
+libextractor       |                    []                            |
+libgpewidget       | []             []  []                [] []       |
+libgpg-error       |                []                                |
+libgphoto2         | []             []                             [] |
+libgphoto2_port    |                []                             [] |
+libgsasl           |                []  []                            |
+libiconv           |    []       []     []                            |
+libidn             |                []                             [] |
+lifelines          |                ()                                |
+lilypond           | []          [] []                                |
+lingoteach         |                []                       []    [] |
+lprng              |                                                  |
+lynx               |    []                                []       [] |
+m4                 |                []  [] []                []       |
+mailfromd          |                                                  |
+mailutils          | []             []                                |
+make               | []          [] []  [] []    []    []    []       |
+man-db             |                                               [] |
+minicom            | []          [] []                    []          |
+nano               | []    []       []  [] []             []       [] |
+opcodes            | []          [] []  []                            |
+parted             |                []                       []    [] |
+pilot-qof          |                                                  |
+popt               |                []  [] []                   []    |
+psmisc             |                                      []       [] |
+pwdutils           |                                                  |
+qof                |                                         []       |
+radius             | []             []                                |
+recode             | []             []  [] []    []       [] []    [] |
+rpm                |                []                       []       |
+screem             |                                                  |
+scrollkeeper       | []          []                       []          |
+sed                | [] []          []  []                []          |
+shared-mime-info   | []    []    [] []                    []       [] |
+sharutils          | [] []       [] []  [] []             []       [] |
+shishi             |                []                                |
+skencil            | []             []                                |
+solfege            |                                               [] |
+soundtracker       | []             []                             [] |
+sp                 |                []                                |
+system-tools-ba... | []    []    [] []  []             [] [] []    [] |
+tar                |    [] []    []     []                []          |
+texinfo            |                []           []       []          |
+tin                |    []          ()                                |
+tuxpaint           |                    []                []          |
+unicode-han-tra... |                                                  |
+unicode-transla... |                []  []                            |
+util-linux         | [] []       [] []                    [] []    [] |
+util-linux-ng      | [] []       [] []                    [] []    [] |
+vorbis-tools       |                                                  |
+wastesedge         |                ()                                |
+wdiff              | [] []          []  [] []             [] []    [] |
+wget               |    []       [] []  []             [] [] []    [] |
+xchat              | []          [] []        []    []    []       [] |
+xkeyboard-config   | []          [] []                    []          |
+xpad               | []                 []                []          |
+                   +--------------------------------------------------+
+                     es et eu fa fi fr  ga gl gu he hi hr hu id is it
+                     85 22 14  2 48 101 61 12  2  8  2  6 53 29  1 52
+@end group
+
+@group
+                     ja ka ko ku ky lg lt lv mk mn ms mt nb ne nl  nn
+                   +--------------------------------------------------+
+Compendium         |                                           []     |
+a2ps               |       ()                      []          []     |
+aegis              |                                           ()     |
+ant-phone          |                                           []     |
+anubis             |                               []    []    []     |
+ap-utils           |                               []                 |
+aspell             |                            []             []     |
+bash               |                                           []     |
+bfd                |                                                  |
+bibshelf           |                               []                 |
+binutils           |                                                  |
+bison              |                               []    []    []     |
+bison-runtime      |                               []    []    []     |
+bluez-pin          |          []                   []          []     |
+cflow              |                                                  |
+clisp              |                                           []     |
+console-tools      |                                                  |
+coreutils          |                                           []     |
+cpio               |                                           []     |
+cpplib             |                                           []     |
+cryptonit          |                                           []     |
+dialog             |                               []          []     |
+diffutils          | []                            []          []     |
+doodle             |                                                  |
+e2fsprogs          |                                           []     |
+enscript           |                                           []     |
+fetchmail          | []                                        []     |
+findutils          |                                           []     |
+findutils_stable   |                                           []     |
+flex               |       []                                  []     |
+fslint             |                                                  |
+gas                |                                                  |
+gawk               | []                                        []     |
+gcal               |                                                  |
+gcc                |                                                  |
+gettext-examples   | []                            []          []     |
+gettext-runtime    | []    []                                  []     |
+gettext-tools      | []    []                                         |
+gip                |                               []          []     |
+gliv               |                                           []     |
+glunarclock        |                               []          []     |
+gmult              | []                            []          []     |
+gnubiff            |                                                  |
+gnucash            | ()                                  () ()        |
+gnuedu             |                                                  |
+gnulib             | []                                        []     |
+gnunet             |                                                  |
+gnunet-gtk         |                                                  |
+gnutls             |                               []                 |
+gpe-aerial         |                                           []     |
+gpe-beam           |                                           []     |
+gpe-calendar       | []                                               |
+gpe-clock          | []    []                                  []     |
+gpe-conf           | []    []                                  []     |
+gpe-contacts       |       []                                         |
+gpe-edit           | []    []                                  []     |
+gpe-filemanager    | []    []                                         |
+gpe-go             | []    []                                  []     |
+gpe-login          | []    []                                  []     |
+gpe-ownerinfo      | []                                        []     |
+gpe-package        | []    []                                         |
+gpe-sketchbook     |       []                                  []     |
+gpe-su             | []    []                                  []     |
+gpe-taskmanager    | []    [] []                               []     |
+gpe-timesheet      |                                           []     |
+gpe-today          | []                                        []     |
+gpe-todo           | []                                               |
+gphoto2            | []                                        []     |
+gprof              |                               []                 |
+gpsdrive           |                                           []     |
+gramadoir          |                                           ()     |
+grep               |             []                            []     |
+gretl              |                                                  |
+gsasl              |                                           []     |
+gss                |                                                  |
+gst-plugins-bad    |                                           []     |
+gst-plugins-base   |                                           []     |
+gst-plugins-good   |                                           []     |
+gst-plugins-ugly   |                                           []     |
+gstreamer          |                                           []     |
+gtick              |                                           []     |
+gtkam              | []                                        []     |
+gtkorphan          |                                           []     |
+gtkspell           |                            []             []     |
+gutenprint         |                                           []     |
+hello              | [] [] []                      []    []    []  [] |
+herrie             |                                           []     |
+hylafax            |                                                  |
+idutils            |                                           []     |
+indent             | []                                        []     |
+iso_15924          |                                           []     |
+iso_3166           | []    [] []       []    []          []    []  [] |
+iso_3166_2         |                                           []     |
+iso_4217           | []                []                      []     |
+iso_639            | []                []                      []  [] |
+jpilot             | ()                                        ()     |
+jtag               |                                                  |
+jwhois             |                                           []     |
+kbd                |                                           []     |
+keytouch           |                                           []     |
+keytouch-editor    |                                           []     |
+keytouch-keyboa... |                                                  |
+latrine            |                                           []     |
+ld                 |                                                  |
+leafpad            | []                []                             |
+libc               | []    []                                  []     |
+libexif            |                                                  |
+libextractor       |                                                  |
+libgpewidget       |                                           []     |
+libgpg-error       |                                                  |
+libgphoto2         | []                                               |
+libgphoto2_port    | []                                               |
+libgsasl           |                                           []     |
+libiconv           |                                           []     |
+libidn             | []                                        []     |
+lifelines          |                                           []     |
+lilypond           |                                           []     |
+lingoteach         |                                           []     |
+lprng              |                                                  |
+lynx               | []                                        []     |
+m4                 | []                                        []     |
+mailfromd          |                                                  |
+mailutils          |                                                  |
+make               | []    []                                  []     |
+man-db             |                                                  |
+minicom            | []                                               |
+nano               |                               []    []    []     |
+opcodes            |                                           []     |
+parted             | []                                        []     |
+pilot-qof          |                                                  |
+popt               | []    []                                  []     |
+psmisc             | []                                  []    []     |
+pwdutils           |                                                  |
+qof                |                                                  |
+radius             |                                                  |
+recode             |                                           []     |
+rpm                | []    []                                         |
+screem             | []                                               |
+scrollkeeper       |                                     [] [] []  [] |
+sed                | []                                        []     |
+shared-mime-info   | []    []          []          []    []    []  [] |
+sharutils          | []                                        []     |
+shishi             |                                                  |
+skencil            |                                                  |
+solfege            |                                     ()        () |
+soundtracker       |                                                  |
+sp                 | ()                                               |
+system-tools-ba... | []    []          []                      []     |
+tar                | []          []                            []     |
+texinfo            |                                     []    []     |
+tin                |                                                  |
+tuxpaint           |                                     ()    []  [] |
+unicode-han-tra... |                                                  |
+unicode-transla... |                                                  |
+util-linux         | []                                        []     |
+util-linux-ng      | []                                        []     |
+vorbis-tools       |                                                  |
+wastesedge         |                                           []     |
+wdiff              |                               []    []           |
+wget               | []                                        []     |
+xchat              | []    []                []                []     |
+xkeyboard-config   |    [] []                                  []     |
+xpad               |       []                      []          []     |
+                   +--------------------------------------------------+
+                     ja ka ko ku ky lg lt lv mk mn ms mt nb ne nl  nn
+                     51  2 25  3  2  0  6  0  2  2 20  0 11  1 103  6
+@end group
+
+@group
+                     or pa pl pt pt_BR rm ro ru rw sk sl sq sr sv  ta
+                   +--------------------------------------------------+
+Compendium         |          []  []      []       []          []     |
+a2ps               |       ()     []      [] []       []    [] []     |
+aegis              |                      () ()                       |
+ant-phone          |                      []                   []     |
+anubis             |       []             [] []                       |
+ap-utils           |       ()                                         |
+aspell             |                      [] []    []                 |
+bash               |       []                      []                 |
+bfd                |                                                  |
+bibshelf           |                                           []     |
+binutils           |                         []    []                 |
+bison              |       []     []      [] []                []     |
+bison-runtime      |       []     []      []          []       []     |
+bluez-pin          |       []     []   [] [] []    [] []    [] []     |
+cflow              |       []                                         |
+clisp              |                         []                       |
+console-tools      |                         []                       |
+coreutils          |       []                []       []       []     |
+cpio               |       []                []                []     |
+cpplib             |                                           []     |
+cryptonit          |              []                           []     |
+dialog             |                                           []     |
+diffutils          |       []     []      [] []             [] []     |
+doodle             |                                     []    []     |
+e2fsprogs          |       []                                  []     |
+enscript           |              []      [] []       []       []     |
+fetchmail          |       []                []          []           |
+findutils          |       [] []                               []     |
+findutils_stable   |       [] []          []       [] []       []     |
+flex               |       []     []      [] []                []     |
+fslint             |                                           []     |
+gas                |                                                  |
+gawk               |       []     []      []                   []     |
+gcal               |                                           []     |
+gcc                |                                        [] []     |
+gettext-examples   |       [] []          [] []    [] []    [] []     |
+gettext-runtime    |       [] []          [] []    [] []    [] []     |
+gettext-tools      |       []             [] []    [] []    [] []     |
+gip                |                   []          []       [] []     |
+gliv               |       []     []      [] []    []          []     |
+glunarclock        |              []      [] []    []       [] []     |
+gmult              |                   [] []                [] []     |
+gnubiff            |                      ()                   []     |
+gnucash            |       ()                                  []     |
+gnuedu             |                                                  |
+gnulib             |       []                         []       []     |
+gnunet             |                                                  |
+gnunet-gtk         |                                           []     |
+gnutls             |       []                                  []     |
+gpe-aerial         |          []  []      [] []       []    [] []     |
+gpe-beam           |          []  []      [] []       []    [] []     |
+gpe-calendar       |                         []       []    [] []     |
+gpe-clock          |          []  []      [] []    [] []    [] []     |
+gpe-conf           |          []  []      [] []    [] []       []     |
+gpe-contacts       |                      [] []       []    [] []     |
+gpe-edit           |       [] []  []      [] []    [] []    [] []     |
+gpe-filemanager    |                                  []       []     |
+gpe-go             |       []     []      [] []    [] []    [] []     |
+gpe-login          |          []  []      [] []    [] []    [] []     |
+gpe-ownerinfo      |          []  []      [] []    [] []    [] []     |
+gpe-package        |                                  []       []     |
+gpe-sketchbook     |          []  []      [] []    [] []    [] []     |
+gpe-su             |          []  []      [] []    [] []    [] []     |
+gpe-taskmanager    |          []  []      [] []    [] []    [] []     |
+gpe-timesheet      |          []  []      [] []    [] []    [] []     |
+gpe-today          |          []  []      [] []    [] []    [] []     |
+gpe-todo           |                         []       []    [] []     |
+gphoto2            |    [] []             []       []       [] []     |
+gprof              |              []      []                   []     |
+gpsdrive           |                         []                []     |
+gramadoir          |                               []          []     |
+grep               |       []                      [] []       []     |
+gretl              |       [] []  []                                  |
+gsasl              |       []                               [] []     |
+gss                |       []             []       []          []     |
+gst-plugins-bad    |       []     []                           []     |
+gst-plugins-base   |       []                                  []     |
+gst-plugins-good   |       []                                  []     |
+gst-plugins-ugly   |       []     []                           []     |
+gstreamer          |       []                            [] [] []     |
+gtick              |                         []                       |
+gtkam              |    [] []     []         []                []     |
+gtkorphan          |                                           []     |
+gtkspell           |              []   [] [] []    [] []    [] []     |
+gutenprint         |                                           []     |
+hello              |       []     []      [] []    [] []    [] []     |
+herrie             |       []                []                []     |
+hylafax            |                                                  |
+idutils            |       []     []      [] []                []     |
+indent             |       []     []      [] []    []       [] []     |
+iso_15924          |                                                  |
+iso_3166           |    [] [] []  []      [] [] [] [] [] [] [] []  [] |
+iso_3166_2         |                                                  |
+iso_4217           |       [] []             [] []    []    [] []     |
+iso_639            |       []                [] [] [] []    [] []     |
+jpilot             |                                                  |
+jtag               |                               []                 |
+jwhois             |       []     []      []                   []     |
+kbd                |       []             []                   []     |
+keytouch           |                                           []     |
+keytouch-editor    |                                           []     |
+keytouch-keyboa... |                                           []     |
+latrine            |                                                  |
+ld                 |                                           []     |
+leafpad            |       [] []             []    []          []  [] |
+libc               |       []                []    []          []     |
+libexif            |       []                      []                 |
+libextractor       |                      []                   []     |
+libgpewidget       |       [] []  []      []       [] []    [] []     |
+libgpg-error       |       []             []                   []     |
+libgphoto2         |       []                                         |
+libgphoto2_port    |       []                []                []     |
+libgsasl           |       []             []                [] []     |
+libiconv           |                                  []    [] []     |
+libidn             |       []                               [] ()     |
+lifelines          |       []                                  []     |
+lilypond           |                                                  |
+lingoteach         |              []                                  |
+lprng              |       []                                         |
+lynx               |              []         []                []     |
+m4                 |       []     []      [] []                []     |
+mailfromd          |       []                                         |
+mailutils          |       []                []                []     |
+make               |       []     []         []                []     |
+man-db             |       []             [] []                []     |
+minicom            |       []     []      [] []                []     |
+nano               |              []      [] []                []     |
+opcodes            |                      []                   []     |
+parted             |       []                                         |
+pilot-qof          |                                                  |
+popt               |       [] []             []                []     |
+psmisc             |       []                                  []     |
+pwdutils           |       []                                  []     |
+qof                |              []                           []     |
+radius             |       []                []                       |
+recode             |       [] []  []      [] []       []       []     |
+rpm                |       [] []             []                []     |
+screem             |                                                  |
+scrollkeeper       |       []             [] []    []    [] [] []     |
+sed                |       [] []  []      [] []    [] []    [] []     |
+shared-mime-info   |       [] []  []                     [] [] []     |
+sharutils          |       []                []             [] []     |
+shishi             |       []                                         |
+skencil            |          []  []                           []     |
+solfege            |              []                                  |
+soundtracker       |                               []          []     |
+sp                 |                                                  |
+system-tools-ba... |    [] [] []  []      []             [] [] []  [] |
+tar                |       []                []       []       []     |
+texinfo            |       []             [] []                []     |
+tin                |                         ()                       |
+tuxpaint           |       [] []                      [] [] [] []     |
+unicode-han-tra... |                                                  |
+unicode-transla... |                                                  |
+util-linux         |              []         []       []       []     |
+util-linux-ng      |              []         []       []       []     |
+vorbis-tools       |                         []                       |
+wastesedge         |                                                  |
+wdiff              |       []     []      [] []    [] []       []     |
+wget               |          []             []    []          []     |
+xchat              |    []                   []    [] [] [] [] []     |
+xkeyboard-config   |                               [] []       []     |
+xpad               |                               [] []       []     |
+                   +--------------------------------------------------+
+                     or pa pl pt pt_BR rm ro ru rw sk sl sq sr sv  ta
+                      0  5 77 31  53    4 58 72  3 45 46  9 45 122  3
+@end group
+
+@group
+                     tg th tk tr uk ven vi  wa xh zh_CN zh_HK zh_TW zu
+                   +---------------------------------------------------+
+Compendium         |          []        []         []          []      | 19
+a2ps               |          [] []     []                             | 19
+aegis              |                    []                             |  1
+ant-phone          |          []        []                             |  6
+anubis             |          [] []     []                             | 11
+ap-utils           |             ()     []                             |  4
+aspell             |             []     []  []                         | 16
+bash               |          []                                       |  6
+bfd                |                                                   |  2
+bibshelf           |                    []                             |  7
+binutils           |          [] []     []                     []      |  9
+bison              |          [] []     []                     []      | 20
+bison-runtime      |             []     []         []          []      | 18
+bluez-pin          |          [] []     []  []     []          []      | 28
+cflow              |             []     []                             |  5
+clisp              |                                                   |  9
+console-tools      |          []        []                             |  5
+coreutils          |          [] []     []                             | 18
+cpio               |          [] []     []         []                  | 11
+cpplib             |          [] []     []         []          []      | 12
+cryptonit          |                    []                             |  6
+dialog             |                    []  []     []                  |  9
+diffutils          |          [] []     []         []          []      | 29
+doodle             |                    []                             |  6
+e2fsprogs          |          []        []                             | 10
+enscript           |          [] []     []                             | 16
+fetchmail          |          []        []                             | 12
+findutils          |          [] []     []                             | 11
+findutils_stable   |          [] []     []                     []      | 18
+flex               |          []        []                             | 15
+fslint             |                    []                             |  2
+gas                |          []                                       |  3
+gawk               |          []        []         []                  | 16
+gcal               |          []                                       |  5
+gcc                |          []                   []          []      |  7
+gettext-examples   |          [] []     []         []    []    []      | 29
+gettext-runtime    |          [] []     []         []    []    []      | 28
+gettext-tools      |          [] []     []         []          []      | 20
+gip                |                    []                     []      | 13
+gliv               |          []        []                             | 11
+glunarclock        |                    []  []                 []      | 15
+gmult              |          []        []         []          []      | 16
+gnubiff            |                    []                             |  2
+gnucash            |          () []                                    |  5
+gnuedu             |                    []                             |  2
+gnulib             |                    []                             | 10
+gnunet             |                                                   |  0
+gnunet-gtk         |          []        []                             |  3
+gnutls             |                                                   |  4
+gpe-aerial         |                    []         []                  | 14
+gpe-beam           |                    []         []                  | 14
+gpe-calendar       |                    []  []                         |  7
+gpe-clock          |          []        []  []     []                  | 21
+gpe-conf           |                    []  []     []                  | 16
+gpe-contacts       |                    []         []                  | 10
+gpe-edit           |          []        []  []     []          []      | 22
+gpe-filemanager    |                    []  []                         |  7
+gpe-go             |          []        []  []     []                  | 19
+gpe-login          |          []        []  []     []          []      | 21
+gpe-ownerinfo      |          []        []         []          []      | 21
+gpe-package        |                    []                             |  6
+gpe-sketchbook     |          []        []                             | 16
+gpe-su             |          []        []  []     []                  | 21
+gpe-taskmanager    |          []        []  []     []                  | 21
+gpe-timesheet      |          []        []         []          []      | 18
+gpe-today          |          []        []  []     []          []      | 21
+gpe-todo           |                    []  []                         |  8
+gphoto2            |             []     []         []          []      | 21
+gprof              |          []        []                             | 13
+gpsdrive           |                    []                             |  5
+gramadoir          |                    []                             |  7
+grep               |                    []                             | 12
+gretl              |                                                   |  6
+gsasl              |                    []         []          []      |  9
+gss                |                    []                             |  7
+gst-plugins-bad    |             []     []         []                  | 13
+gst-plugins-base   |             []     []                             | 11
+gst-plugins-good   |             []     []         []    []    []      | 16
+gst-plugins-ugly   |             []     []         []                  | 13
+gstreamer          |          [] []     []                             | 18
+gtick              |             []     []                             |  7
+gtkam              |                    []                             | 16
+gtkorphan          |                    []                             |  7
+gtkspell           |             []     []  []     []    []    []      | 27
+gutenprint         |                                                   |  4
+hello              |          [] []     []         []          []      | 38
+herrie             |          []        []                             |  8
+hylafax            |                                                   |  0
+idutils            |          []        []                             | 15
+indent             |          [] []     []         []          []      | 28
+iso_15924          |                    []         []                  |  4
+iso_3166           |    [] [] [] []     []  []     []    []    []      | 54
+iso_3166_2         |                    []         []                  |  4
+iso_4217           |    []    []        []         []    []            | 24
+iso_639            |             []     []  []     []    []            | 26
+jpilot             |          [] []     []         []                  |  7
+jtag               |                    []                             |  3
+jwhois             |          []        []                     []      | 13
+kbd                |          [] []     []                             | 13
+keytouch           |                    []                             |  8
+keytouch-editor    |                    []                             |  5
+keytouch-keyboa... |                    []                             |  5
+latrine            |          []        []                             |  5
+ld                 |          []        []         []          []      | 10
+leafpad            |          [] []     []         []          []      | 24
+libc               |          []                   []          []      | 19
+libexif            |                    []                             |  5
+libextractor       |                    []                             |  5
+libgpewidget       |                    []  []     []                  | 20
+libgpg-error       |                    []                             |  6
+libgphoto2         |             []     []                             |  9
+libgphoto2_port    |             []     []                     []      | 11
+libgsasl           |                    []                             |  8
+libiconv           |                    []  []                         | 11
+libidn             |                    []         []                  | 11
+lifelines          |                                                   |  4
+lilypond           |                    []                             |  6
+lingoteach         |                    []                             |  6
+lprng              |                    []                             |  2
+lynx               |          [] []     []                             | 15
+m4                 |                    []         []          []      | 18
+mailfromd          |             []     []                             |  3
+mailutils          |             []     []                             |  8
+make               |          []        []         []                  | 20
+man-db             |                    []                             |  9
+minicom            |                    []                             | 14
+nano               |                    []         []          []      | 20
+opcodes            |          []        []                             | 10
+parted             |          [] []                            []      | 11
+pilot-qof          |                    []                             |  1
+popt               |          []        []         []          []      | 18
+psmisc             |                    []         []                  | 10
+pwdutils           |                    []                             |  3
+qof                |                    []                             |  4
+radius             |             []     []                             |  7
+recode             |          []        []         []                  | 25
+rpm                |          [] []     []                     []      | 13
+screem             |                    []                             |  2
+scrollkeeper       |          [] []     []                     []      | 26
+sed                |          []        []         []          []      | 23
+shared-mime-info   |             []     []         []                  | 29
+sharutils          |          []        []                     []      | 23
+shishi             |                    []                             |  3
+skencil            |                    []                             |  7
+solfege            |                    []                             |  3
+soundtracker       |          []        []                             |  9
+sp                 |          []                                       |  3
+system-tools-ba... |    []    [] []     []     []  []          []      | 38
+tar                |          [] []     []                             | 17
+texinfo            |          []        []         []                  | 15
+tin                |                                                   |  1
+tuxpaint           |                    []  []                 []      | 19
+unicode-han-tra... |                                                   |  0
+unicode-transla... |                                                   |  2
+util-linux         |          [] []     []                             | 20
+util-linux-ng      |          [] []     []                             | 20
+vorbis-tools       |             []     []                             |  4
+wastesedge         |                                                   |  1
+wdiff              |          []        []                             | 23
+wget               |          []        []                     []      | 20
+xchat              |             []     []         []          []      | 29
+xkeyboard-config   |          [] []     []                             | 14
+xpad               |                    []         []          []      | 15
+                   +---------------------------------------------------+
+  76 teams           tg th tk tr uk ven vi  wa xh zh_CN zh_HK zh_TW zu
+ 163 domains          0  3  1 74 51  0  143 21  1  57     7    45    0  2036
+@end group
+@end example
