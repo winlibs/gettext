@@ -169,6 +169,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ProgramDataBaseFileName>$(IntDir)libintl.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <OutputFile>x64\Release\libintl.dll</OutputFile>
@@ -179,6 +180,7 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
+      <ImportLibrary>$(IntDir)libintl.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
