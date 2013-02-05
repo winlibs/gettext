@@ -1,4 +1,4 @@
-# gettext
+# gettext - GNU Translation Project
 
 Libintl is actually the runtime portion of the gettext package 
 
@@ -10,12 +10,35 @@ PHP only builds the runtime libs, since mingw builds of the utilities work just 
 
 The source required quite a few changes though, including a forgotten IO.h include for windows, some posix to ansi renames an inline to make wmemcpy cooperate on vc6 (7, and 7.1), and export fixes - diff should be pushed upstream at some point.
 
-## Building with VC9
+## Building for PHP
 
-- Open MSVC9\gettext.sln and build the libintl_dll project
+### Available prebuilt libraries
 
-## Building with VC11
+All prebuilt libraries are available as part of the [PHP
+SDK](http://windows.php.net/downloads/php-sdk/)
 
-- Open MSVC11\gettext.sln and build the libintl_dll project
+### VC9/x86
+
+- Open MSVC9\gettext.sln
+- Set solution config to Release and Platform to Win32
+- Bild the libintl_dll project
+
+### VC9/x64
+
+- Open MSVC9\gettext.sln
+- Set solution config to Release and Platform to x64
+- Bild the libintl_dll project
+
+### VC11/x86
+
+- Open MSVC1\gettext.sln
+- Set solution config to Release and Platform to Win32
+- Bild the libintl_dll project
+
+### VC11/x64
+
+- Open MSVC11\gettext.sln
+- Set solution config to Release and Platform to x64
+- Bild the libintl_dll project
 
  [1]: http://ftp.gnu.org/pub/gnu/gettext/ "http://ftp.gnu.org/pub/gnu/gettext/"  
