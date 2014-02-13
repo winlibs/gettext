@@ -1,5 +1,5 @@
 /* GNU gettext - internationalization aids
-   Copyright (C) 1995-1998, 2000-2007 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2009 Free Software Foundation, Inc.
 
    This file was written by Peter Miller <millerp@canb.auug.org.au>
 
@@ -34,54 +34,64 @@
 
 const char *const format_language[NFORMATS] =
 {
-  /* format_c */		"c",
-  /* format_objc */		"objc",
-  /* format_sh */		"sh",
-  /* format_python */		"python",
-  /* format_lisp */		"lisp",
-  /* format_elisp */		"elisp",
-  /* format_librep */		"librep",
-  /* format_scheme */		"scheme",
-  /* format_smalltalk */	"smalltalk",
-  /* format_java */		"java",
-  /* format_csharp */		"csharp",
-  /* format_awk */		"awk",
-  /* format_pascal */		"object-pascal",
-  /* format_ycp */		"ycp",
-  /* format_tcl */		"tcl",
-  /* format_perl */		"perl",
-  /* format_perl_brace */	"perl-brace",
-  /* format_php */		"php",
-  /* format_gcc_internal */	"gcc-internal",
-  /* format_qt */		"qt",
-  /* format_kde */		"kde",
-  /* format_boost */		"boost"
+  /* format_c */                "c",
+  /* format_objc */             "objc",
+  /* format_sh */               "sh",
+  /* format_python */           "python",
+  /* format_python_brace */     "python-brace",
+  /* format_lisp */             "lisp",
+  /* format_elisp */            "elisp",
+  /* format_librep */           "librep",
+  /* format_scheme */           "scheme",
+  /* format_smalltalk */        "smalltalk",
+  /* format_java */             "java",
+  /* format_csharp */           "csharp",
+  /* format_awk */              "awk",
+  /* format_pascal */           "object-pascal",
+  /* format_ycp */              "ycp",
+  /* format_tcl */              "tcl",
+  /* format_perl */             "perl",
+  /* format_perl_brace */       "perl-brace",
+  /* format_php */              "php",
+  /* format_gcc_internal */     "gcc-internal",
+  /* format_gfc_internal */     "gfc-internal",
+  /* format_qt */               "qt",
+  /* format_qt_plursl */        "qt-plural",
+  /* format_kde */              "kde",
+  /* format_boost */            "boost",
+  /* format_lua */              "lua",
+  /* format_javascript */       "javascript"
 };
 
 const char *const format_language_pretty[NFORMATS] =
 {
-  /* format_c */		"C",
-  /* format_objc */		"Objective C",
-  /* format_sh */		"Shell",
-  /* format_python */		"Python",
-  /* format_lisp */		"Lisp",
-  /* format_elisp */		"Emacs Lisp",
-  /* format_librep */		"librep",
-  /* format_scheme */		"Scheme",
-  /* format_smalltalk */	"Smalltalk",
-  /* format_java */		"Java",
-  /* format_csharp */		"C#",
-  /* format_awk */		"awk",
-  /* format_pascal */		"Object Pascal",
-  /* format_ycp */		"YCP",
-  /* format_tcl */		"Tcl",
-  /* format_perl */		"Perl",
-  /* format_perl_brace */	"Perl brace",
-  /* format_php */		"PHP",
-  /* format_gcc_internal */	"GCC internal",
-  /* format_qt */		"Qt",
-  /* format_kde */		"KDE",
-  /* format_boost */		"Boost"
+  /* format_c */                "C",
+  /* format_objc */             "Objective C",
+  /* format_sh */               "Shell",
+  /* format_python */           "Python",
+  /* format_python_brace */     "Python brace",
+  /* format_lisp */             "Lisp",
+  /* format_elisp */            "Emacs Lisp",
+  /* format_librep */           "librep",
+  /* format_scheme */           "Scheme",
+  /* format_smalltalk */        "Smalltalk",
+  /* format_java */             "Java",
+  /* format_csharp */           "C#",
+  /* format_awk */              "awk",
+  /* format_pascal */           "Object Pascal",
+  /* format_ycp */              "YCP",
+  /* format_tcl */              "Tcl",
+  /* format_perl */             "Perl",
+  /* format_perl_brace */       "Perl brace",
+  /* format_php */              "PHP",
+  /* format_gcc_internal */     "GCC internal",
+  /* format_gfc_internal */     "GFC internal",
+  /* format_qt */               "Qt",
+  /* format_qt_plural */        "Qt plural",
+  /* format_kde */              "KDE",
+  /* format_boost */            "Boost",
+  /* format_lua */              "Lua",
+  /* format_javascript */       "JavaScript"
 };
 
 
@@ -89,16 +99,16 @@ bool
 possible_format_p (enum is_format is_format)
 {
   return is_format == possible
-	 || is_format == yes_according_to_context
-	 || is_format == yes;
+         || is_format == yes_according_to_context
+         || is_format == yes;
 }
 
 
 message_ty *
 message_alloc (const char *msgctxt,
-	       const char *msgid, const char *msgid_plural,
-	       const char *msgstr, size_t msgstr_len,
-	       const lex_pos_ty *pp)
+               const char *msgid, const char *msgid_plural,
+               const char *msgstr, size_t msgstr_len,
+               const lex_pos_ty *pp)
 {
   message_ty *mp;
   size_t i;
@@ -117,6 +127,8 @@ message_alloc (const char *msgctxt,
   mp->is_fuzzy = false;
   for (i = 0; i < NFORMATS; i++)
     mp->is_format[i] = undecided;
+  mp->range.min = -1;
+  mp->range.max = -1;
   mp->do_wrap = undecided;
   mp->prev_msgctxt = NULL;
   mp->prev_msgid = NULL;
@@ -184,7 +196,7 @@ message_comment_filepos (message_ty *mp, const char *name, size_t line)
     {
       pp = &mp->filepos[j];
       if (strcmp (pp->file_name, name) == 0 && pp->line_number == line)
-	return;
+        return;
     }
 
   /* Extend the list so that we can add a position to it.  */
@@ -205,22 +217,23 @@ message_copy (message_ty *mp)
   size_t j, i;
 
   result = message_alloc (mp->msgctxt != NULL ? xstrdup (mp->msgctxt) : NULL,
-			  xstrdup (mp->msgid), mp->msgid_plural,
-			  mp->msgstr, mp->msgstr_len, &mp->pos);
+                          xstrdup (mp->msgid), mp->msgid_plural,
+                          mp->msgstr, mp->msgstr_len, &mp->pos);
 
   if (mp->comment)
     {
       for (j = 0; j < mp->comment->nitems; ++j)
-	message_comment_append (result, mp->comment->item[j]);
+        message_comment_append (result, mp->comment->item[j]);
     }
   if (mp->comment_dot)
     {
       for (j = 0; j < mp->comment_dot->nitems; ++j)
-	message_comment_dot_append (result, mp->comment_dot->item[j]);
+        message_comment_dot_append (result, mp->comment_dot->item[j]);
     }
   result->is_fuzzy = mp->is_fuzzy;
   for (i = 0; i < NFORMATS; i++)
     result->is_format[i] = mp->is_format[i];
+  result->range = mp->range;
   result->do_wrap = mp->do_wrap;
   for (j = 0; j < mp->filepos_count; ++j)
     {
@@ -320,7 +333,7 @@ message_list_append (message_list_ty *mlp, message_ty *mp)
   if (mlp->use_hashtable)
     if (message_list_hash_insert_entry (&mlp->htable, mp))
       /* A message list has duplicates, although it was allocated with the
-	 assertion that it wouldn't have duplicates.  It is a bug.  */
+         assertion that it wouldn't have duplicates.  It is a bug.  */
       abort ();
 }
 
@@ -346,7 +359,7 @@ message_list_prepend (message_list_ty *mlp, message_ty *mp)
   if (mlp->use_hashtable)
     if (message_list_hash_insert_entry (&mlp->htable, mp))
       /* A message list has duplicates, although it was allocated with the
-	 assertion that it wouldn't have duplicates.  It is a bug.  */
+         assertion that it wouldn't have duplicates.  It is a bug.  */
       abort ();
 }
 
@@ -372,7 +385,7 @@ message_list_insert_at (message_list_ty *mlp, size_t n, message_ty *mp)
   if (mlp->use_hashtable)
     if (message_list_hash_insert_entry (&mlp->htable, mp))
       /* A message list has duplicates, although it was allocated with the
-	 assertion that it wouldn't have duplicates.  It is a bug.  */
+         assertion that it wouldn't have duplicates.  It is a bug.  */
       abort ();
 }
 
@@ -402,7 +415,7 @@ message_list_delete_nth (message_list_ty *mlp, size_t n)
 
 void
 message_list_remove_if_not (message_list_ty *mlp,
-			    message_predicate_ty *predicate)
+                            message_predicate_ty *predicate)
 {
   size_t i, j;
 
@@ -431,19 +444,19 @@ message_list_msgids_changed (message_list_ty *mlp)
       hash_init (&mlp->htable, size);
 
       for (j = 0; j < mlp->nitems; j++)
-	{
-	  message_ty *mp = mlp->item[j];
+        {
+          message_ty *mp = mlp->item[j];
 
-	  if (message_list_hash_insert_entry (&mlp->htable, mp))
-	    /* A message list has duplicates, although it was allocated with
-	       the assertion that it wouldn't have duplicates, and before the
-	       msgids changed it indeed didn't have duplicates.  */
-	    {
-	      hash_destroy (&mlp->htable);
-	      mlp->use_hashtable = false;
-	      return true;
-	    }
-	}
+          if (message_list_hash_insert_entry (&mlp->htable, mp))
+            /* A message list has duplicates, although it was allocated with
+               the assertion that it wouldn't have duplicates, and before the
+               msgids changed it indeed didn't have duplicates.  */
+            {
+              hash_destroy (&mlp->htable);
+              mlp->use_hashtable = false;
+              return true;
+            }
+        }
     }
   return false;
 }
@@ -469,7 +482,7 @@ message_list_copy (message_list_ty *mlp, int copy_level)
 
 message_ty *
 message_list_search (message_list_ty *mlp,
-		     const char *msgctxt, const char *msgid)
+                     const char *msgctxt, const char *msgid)
 {
   if (mlp->use_hashtable)
     {
@@ -478,35 +491,35 @@ message_list_search (message_list_ty *mlp,
       size_t keylen;
 
       if (msgctxt != NULL)
-	{
-	  /* Concatenate the msgctxt and msgid, to form the hash table key.  */
-	  size_t msgctxt_len = strlen (msgctxt);
-	  size_t msgid_len = strlen (msgid);
-	  keylen = msgctxt_len + 1 + msgid_len + 1;
-	  alloced_key = (char *) xmalloca (keylen);
-	  memcpy (alloced_key, msgctxt, msgctxt_len);
-	  alloced_key[msgctxt_len] = MSGCTXT_SEPARATOR;
-	  memcpy (alloced_key + msgctxt_len + 1, msgid, msgid_len + 1);
-	  key = alloced_key;
-	}
+        {
+          /* Concatenate the msgctxt and msgid, to form the hash table key.  */
+          size_t msgctxt_len = strlen (msgctxt);
+          size_t msgid_len = strlen (msgid);
+          keylen = msgctxt_len + 1 + msgid_len + 1;
+          alloced_key = (char *) xmalloca (keylen);
+          memcpy (alloced_key, msgctxt, msgctxt_len);
+          alloced_key[msgctxt_len] = MSGCTXT_SEPARATOR;
+          memcpy (alloced_key + msgctxt_len + 1, msgid, msgid_len + 1);
+          key = alloced_key;
+        }
       else
-	{
-	  alloced_key = NULL;
-	  key = msgid;
-	  keylen = strlen (msgid) + 1;
-	}
+        {
+          alloced_key = NULL;
+          key = msgid;
+          keylen = strlen (msgid) + 1;
+        }
 
       {
-	void *htable_value;
-	int found = !hash_find_entry (&mlp->htable, key, keylen, &htable_value);
+        void *htable_value;
+        int found = !hash_find_entry (&mlp->htable, key, keylen, &htable_value);
 
-	if (msgctxt != NULL)
-	  freea (alloced_key);
+        if (msgctxt != NULL)
+          freea (alloced_key);
 
-	if (found)
-	  return (message_ty *) htable_value;
-	else
-	  return NULL;
+        if (found)
+          return (message_ty *) htable_value;
+        else
+          return NULL;
       }
     }
   else
@@ -514,16 +527,16 @@ message_list_search (message_list_ty *mlp,
       size_t j;
 
       for (j = 0; j < mlp->nitems; ++j)
-	{
-	  message_ty *mp;
+        {
+          message_ty *mp;
 
-	  mp = mlp->item[j];
-	  if ((msgctxt != NULL
-	       ? mp->msgctxt != NULL && strcmp (msgctxt, mp->msgctxt) == 0
-	       : mp->msgctxt == NULL)
-	      && strcmp (msgid, mp->msgid) == 0)
-	    return mp;
-	}
+          mp = mlp->item[j];
+          if ((msgctxt != NULL
+               ? mp->msgctxt != NULL && strcmp (msgctxt, mp->msgctxt) == 0
+               : mp->msgctxt == NULL)
+              && strcmp (msgid, mp->msgid) == 0)
+            return mp;
+        }
       return NULL;
     }
 }
@@ -531,29 +544,44 @@ message_list_search (message_list_ty *mlp,
 
 double
 fuzzy_search_goal_function (const message_ty *mp,
-			    const char *msgctxt, const char *msgid)
+                            const char *msgctxt, const char *msgid,
+                            double lower_bound)
 {
-  /* The use of 'volatile' guarantees that excess precision bits are dropped
-     before the addition and before the following comparison at the caller's
-     site.  It is necessary on x86 systems where double-floats are not IEEE
-     compliant by default, to avoid that msgmerge results become platform and
-     compiler option dependent.  'volatile' is a portable alternative to gcc's
-     -ffloat-store option.  */
-  volatile double weight = fstrcmp (msgid, mp->msgid);
+  double bonus = 0.0;
   /* A translation for a context is a good proposal also for another.  But
      give mp a small advantage if mp is valid regardless of any context or
      has the same context as the one being looked up.  */
   if (mp->msgctxt == NULL
       || (msgctxt != NULL && strcmp (msgctxt, mp->msgctxt) == 0))
-    weight += 0.00001;
-  return weight;
+    {
+      bonus = 0.00001;
+      /* Since we will consider (weight + bonus) at the end, we are only
+         interested in weights that are >= lower_bound - bonus.  Subtract
+         a little more than the bonus, in order to avoid trouble due to
+         rounding errors.  */
+      lower_bound -= bonus * 1.01;
+    }
+
+  {
+    /* The use of 'volatile' guarantees that excess precision bits are dropped
+       before the addition and before the following comparison at the caller's
+       site.  It is necessary on x86 systems where double-floats are not IEEE
+       compliant by default, to avoid that msgmerge results become platform and
+       compiler option dependent.  'volatile' is a portable alternative to
+       gcc's -ffloat-store option.  */
+    volatile double weight = fstrcmp_bounded (msgid, mp->msgid, lower_bound);
+
+    weight += bonus;
+
+    return weight;
+  }
 }
 
 
 static message_ty *
 message_list_search_fuzzy_inner (message_list_ty *mlp,
-				 const char *msgctxt, const char *msgid,
-				 double *best_weight_p)
+                                 const char *msgctxt, const char *msgid,
+                                 double *best_weight_p)
 {
   size_t j;
   message_ty *best_mp;
@@ -566,14 +594,15 @@ message_list_search_fuzzy_inner (message_list_ty *mlp,
       mp = mlp->item[j];
 
       if (mp->msgstr != NULL && mp->msgstr[0] != '\0')
-	{
-	  double weight = fuzzy_search_goal_function (mp, msgctxt, msgid);
-	  if (weight > *best_weight_p)
-	    {
-	      *best_weight_p = weight;
-	      best_mp = mp;
-	    }
-	}
+        {
+          double weight =
+            fuzzy_search_goal_function (mp, msgctxt, msgid, *best_weight_p);
+          if (weight > *best_weight_p)
+            {
+              *best_weight_p = weight;
+              best_mp = mp;
+            }
+        }
     }
   return best_mp;
 }
@@ -581,7 +610,7 @@ message_list_search_fuzzy_inner (message_list_ty *mlp,
 
 message_ty *
 message_list_search_fuzzy (message_list_ty *mlp,
-			   const char *msgctxt, const char *msgid)
+                           const char *msgctxt, const char *msgid)
 {
   double best_weight;
 
@@ -634,7 +663,7 @@ message_list_list_append (message_list_list_ty *mllp, message_list_ty *mlp)
 
 void
 message_list_list_append_list (message_list_list_ty *mllp,
-			       message_list_list_ty *mllp2)
+                               message_list_list_ty *mllp2)
 {
   size_t j;
 
@@ -645,7 +674,7 @@ message_list_list_append_list (message_list_list_ty *mllp,
 
 message_ty *
 message_list_list_search (message_list_list_ty *mllp,
-			  const char *msgctxt, const char *msgid)
+                          const char *msgctxt, const char *msgid)
 {
   message_ty *best_mp;
   int best_weight; /* 0: not found, 1: found without msgstr, 2: translated */
@@ -661,14 +690,14 @@ message_list_list_search (message_list_list_ty *mllp,
       mlp = mllp->item[j];
       mp = message_list_search (mlp, msgctxt, msgid);
       if (mp)
-	{
-	  int weight = (mp->msgstr_len == 1 && mp->msgstr[0] == '\0' ? 1 : 2);
-	  if (weight > best_weight)
-	    {
-	      best_mp = mp;
-	      best_weight = weight;
-	    }
-	}
+        {
+          int weight = (mp->msgstr_len == 1 && mp->msgstr[0] == '\0' ? 1 : 2);
+          if (weight > best_weight)
+            {
+              best_mp = mp;
+              best_weight = weight;
+            }
+        }
     }
   return best_mp;
 }
@@ -677,7 +706,7 @@ message_list_list_search (message_list_list_ty *mllp,
 #if 0 /* unused */
 message_ty *
 message_list_list_search_fuzzy (message_list_list_ty *mllp,
-				const char *msgctxt, const char *msgid)
+                                const char *msgctxt, const char *msgid)
 {
   size_t j;
   double best_weight;
@@ -693,7 +722,7 @@ message_list_list_search_fuzzy (message_list_list_ty *mllp,
       mlp = mllp->item[j];
       mp = message_list_search_fuzzy_inner (mlp, msgctxt, msgid, &best_weight);
       if (mp)
-	best_mp = mp;
+        best_mp = mp;
     }
   return best_mp;
 }
@@ -780,7 +809,7 @@ msgdomain_list_append_list (msgdomain_list_ty *mdlp, msgdomain_list_ty *mdlp2)
 
 message_list_ty *
 msgdomain_list_sublist (msgdomain_list_ty *mdlp, const char *domain,
-			bool create)
+                        bool create)
 {
   size_t j;
 
@@ -820,16 +849,16 @@ msgdomain_list_copy (msgdomain_list_ty *mdlp, int copy_level)
       msgdomain_ty *mdp = mdlp->item[j];
 
       if (copy_level < 2)
-	{
-	  msgdomain_ty *result_mdp = XMALLOC (msgdomain_ty);
+        {
+          msgdomain_ty *result_mdp = XMALLOC (msgdomain_ty);
 
-	  result_mdp->domain = mdp->domain;
-	  result_mdp->messages = message_list_copy (mdp->messages, copy_level);
+          result_mdp->domain = mdp->domain;
+          result_mdp->messages = message_list_copy (mdp->messages, copy_level);
 
-	  msgdomain_list_append (result, result_mdp);
-	}
+          msgdomain_list_append (result, result_mdp);
+        }
       else
-	msgdomain_list_append (result, mdp);
+        msgdomain_list_append (result, mdp);
     }
 
   return result;
@@ -839,7 +868,7 @@ msgdomain_list_copy (msgdomain_list_ty *mdlp, int copy_level)
 #if 0 /* unused */
 message_ty *
 msgdomain_list_search (msgdomain_list_ty *mdlp,
-		       const char *msgctxt, const char *msgid)
+                       const char *msgctxt, const char *msgid)
 {
   size_t j;
 
@@ -851,7 +880,7 @@ msgdomain_list_search (msgdomain_list_ty *mdlp,
       mdp = mdlp->item[j];
       mp = message_list_search (mdp->messages, msgctxt, msgid);
       if (mp)
-	return mp;
+        return mp;
     }
   return NULL;
 }
@@ -861,7 +890,7 @@ msgdomain_list_search (msgdomain_list_ty *mdlp,
 #if 0 /* unused */
 message_ty *
 msgdomain_list_search_fuzzy (msgdomain_list_ty *mdlp,
-			     const char *msgctxt, const char *msgid)
+                             const char *msgctxt, const char *msgid)
 {
   size_t j;
   double best_weight;
@@ -876,9 +905,9 @@ msgdomain_list_search_fuzzy (msgdomain_list_ty *mdlp,
 
       mdp = mdlp->item[j];
       mp = message_list_search_fuzzy_inner (mdp->messages, msgctxt, msgid,
-					    &best_weight);
+                                            &best_weight);
       if (mp)
-	best_mp = mp;
+        best_mp = mp;
     }
   return best_mp;
 }

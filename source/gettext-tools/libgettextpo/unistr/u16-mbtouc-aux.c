@@ -1,5 +1,5 @@
 /* Conversion UTF-16 to UCS-4.
-   Copyright (C) 2001-2002, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2006-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify it
@@ -10,7 +10,7 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
@@ -20,7 +20,7 @@
 /* Specification.  */
 #include "unistr.h"
 
-#if HAVE_INLINE
+#if defined IN_LIBUNISTRING || HAVE_INLINE
 
 int
 u16_mbtouc_aux (ucs4_t *puc, const uint16_t *s, size_t n)
@@ -30,18 +30,18 @@ u16_mbtouc_aux (ucs4_t *puc, const uint16_t *s, size_t n)
   if (c < 0xdc00)
     {
       if (n >= 2)
-	{
-	  if (s[1] >= 0xdc00 && s[1] < 0xe000)
-	    {
-	      *puc = 0x10000 + ((c - 0xd800) << 10) + (s[1] - 0xdc00);
-	      return 2;
-	    }
-	  /* invalid multibyte character */
-	}
+        {
+          if (s[1] >= 0xdc00 && s[1] < 0xe000)
+            {
+              *puc = 0x10000 + ((c - 0xd800) << 10) + (s[1] - 0xdc00);
+              return 2;
+            }
+          /* invalid multibyte character */
+        }
       else
-	{
-	  /* incomplete multibyte character */
-	}
+        {
+          /* incomplete multibyte character */
+        }
     }
   /* invalid multibyte character */
   *puc = 0xfffd;

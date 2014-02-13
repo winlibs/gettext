@@ -1,5 +1,5 @@
 /* Output stream that converts the output to another encoding.
-   Copyright (C) 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -69,70 +69,71 @@ iconv_ostream::write_mem (iconv_ostream_t stream, const void *data, size_t len)
 
       inbufcount = stream->buflen;
       if (inbufcount > 0)
-	memcpy (inbuffer, stream->buf, inbufcount);
+        memcpy (inbuffer, stream->buf, inbufcount);
       for (;;)
-	{
-	  /* At this point, inbuffer[0..inbufcount-1] is filled.  */
-	  {
-	    /* Combine the previous rest with a chunk of new input.  */
-	    size_t n =
-	      (len <= BUFFERSIZE - inbufcount ? len : BUFFERSIZE - inbufcount);
+        {
+          /* At this point, inbuffer[0..inbufcount-1] is filled.  */
+          {
+            /* Combine the previous rest with a chunk of new input.  */
+            size_t n =
+              (len <= BUFFERSIZE - inbufcount ? len : BUFFERSIZE - inbufcount);
 
-	    if (n > 0)
-	      {
-		memcpy (inbuffer + inbufcount, data, n);
-		data = (char *) data + n;
-		inbufcount += n;
-		len -= n;
-	      }
-	  }
-	  {
-	    /* Attempt to convert the combined input.  */
-	    char outbuffer[8*BUFFERSIZE];
+            if (n > 0)
+              {
+                memcpy (inbuffer + inbufcount, data, n);
+                data = (char *) data + n;
+                inbufcount += n;
+                len -= n;
+              }
+          }
+          {
+            /* Attempt to convert the combined input.  */
+            char outbuffer[8*BUFFERSIZE];
 
-	    const char *inptr = inbuffer;
-	    size_t insize = inbufcount;
-	    char *outptr = outbuffer;
-	    size_t outsize = sizeof (outbuffer);
+            const char *inptr = inbuffer;
+            size_t insize = inbufcount;
+            char *outptr = outbuffer;
+            size_t outsize = sizeof (outbuffer);
 
-	    size_t res = iconv (stream->cd,
-				(ICONV_CONST char **) &inptr, &insize,
-				&outptr, &outsize);
-	    #if !defined _LIBICONV_VERSION && !defined __GLIBC__
-	    /* Irix iconv() inserts a NUL byte if it cannot convert.
-	       NetBSD iconv() inserts a question mark if it cannot convert.
-	       Only GNU libiconv and GNU libc are known to prefer to fail rather
-	       than doing a lossy conversion.  */
-	    if (res > 0)
-	      {
-		errno = EILSEQ;
-		res = -1;
-	      }
-	    #endif
-	    if (res == (size_t)(-1) && errno != EINVAL)
-	      error (EXIT_FAILURE, 0, _("%s: cannot convert from %s to %s"),
-		     "iconv_ostream",
-		     stream->from_encoding, stream->to_encoding);
-	    /* Output the converted part.  */
-	    if (sizeof (outbuffer) - outsize > 0)
-	      ostream_write_mem (stream->destination,
-				 outbuffer, sizeof (outbuffer) - outsize);
-	    /* Put back the unconverted part.  */
-	    if (insize > BUFSIZE)
-	      error (EXIT_FAILURE, 0, _("%s: shift sequence too long"),
-		     "iconv_ostream");
-	    if (len == 0)
-	      {
-		if (insize > 0)
-		  memcpy (stream->buf, inptr, insize);
-		stream->buflen = insize;
-		break;
-	      }
-	    if (insize > 0)
-	      memmove (inbuffer, inptr, insize);
-	    inbufcount = insize;
-	  }
-	}
+            size_t res = iconv (stream->cd,
+                                (ICONV_CONST char **) &inptr, &insize,
+                                &outptr, &outsize);
+            #if !defined _LIBICONV_VERSION \
+                && !(defined __GLIBC__ && !defined __UCLIBC__)
+            /* Irix iconv() inserts a NUL byte if it cannot convert.
+               NetBSD iconv() inserts a question mark if it cannot convert.
+               Only GNU libiconv and GNU libc are known to prefer to fail rather
+               than doing a lossy conversion.  */
+            if (res > 0)
+              {
+                errno = EILSEQ;
+                res = -1;
+              }
+            #endif
+            if (res == (size_t)(-1) && errno != EINVAL)
+              error (EXIT_FAILURE, 0, _("%s: cannot convert from %s to %s"),
+                     "iconv_ostream",
+                     stream->from_encoding, stream->to_encoding);
+            /* Output the converted part.  */
+            if (sizeof (outbuffer) - outsize > 0)
+              ostream_write_mem (stream->destination,
+                                 outbuffer, sizeof (outbuffer) - outsize);
+            /* Put back the unconverted part.  */
+            if (insize > BUFSIZE)
+              error (EXIT_FAILURE, 0, _("%s: shift sequence too long"),
+                     "iconv_ostream");
+            if (len == 0)
+              {
+                if (insize > 0)
+                  memcpy (stream->buf, inptr, insize);
+                stream->buflen = insize;
+                break;
+              }
+            if (insize > 0)
+              memmove (inbuffer, inptr, insize);
+            inbufcount = insize;
+          }
+        }
       #undef BUFFERSIZE
     }
 }
@@ -152,7 +153,9 @@ iconv_ostream::free (iconv_ostream_t stream)
 
   /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
   #if defined _LIBICONV_VERSION \
-      || !((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) || defined __sun)
+      || !(((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) \
+            && !defined __UCLIBC__) \
+           || defined __sun)
   {
     char outbuffer[2048];
     char *outptr = outbuffer;
@@ -160,11 +163,11 @@ iconv_ostream::free (iconv_ostream_t stream)
     size_t res = iconv (stream->cd, NULL, NULL, &outptr, &outsize);
     if (res == (size_t)(-1))
       error (EXIT_FAILURE, 0, _("%s: cannot convert from %s to %s"),
-	     "iconv_ostream", stream->from_encoding, stream->to_encoding);
+             "iconv_ostream", stream->from_encoding, stream->to_encoding);
     /* Output the converted part.  */
     if (sizeof (outbuffer) - outsize > 0)
       ostream_write_mem (stream->destination,
-			 outbuffer, sizeof (outbuffer) - outsize);
+                         outbuffer, sizeof (outbuffer) - outsize);
   }
   #endif
 
@@ -178,7 +181,7 @@ iconv_ostream::free (iconv_ostream_t stream)
 
 iconv_ostream_t
 iconv_ostream_create (const char *from_encoding, const char *to_encoding,
-		      ostream_t destination)
+                      ostream_t destination)
 {
   iconv_ostream_t stream = XMALLOC (struct iconv_ostream_representation);
 
@@ -188,7 +191,9 @@ iconv_ostream_create (const char *from_encoding, const char *to_encoding,
   stream->to_encoding = xstrdup (to_encoding);
 
   /* Avoid glibc-2.1 bug with EUC-KR.  */
-  #if  (__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) && !defined _LIBICONV_VERSION
+  #if ((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) \
+       && !defined __UCLIBC__) \
+      && !defined _LIBICONV_VERSION
   if (c_strcasecmp (from_encoding, "EUC-KR") == 0
       || c_strcasecmp (to_encoding, "EUC-KR") == 0)
     stream->cd = (iconv_t)(-1):
@@ -198,15 +203,15 @@ iconv_ostream_create (const char *from_encoding, const char *to_encoding,
   if (stream->cd == (iconv_t)(-1))
     {
       if (iconv_open ("UTF-8", from_encoding) == (iconv_t)(-1))
-	error (EXIT_FAILURE, 0, _("%s does not support conversion from %s"),
-	       "iconv", from_encoding);
+        error (EXIT_FAILURE, 0, _("%s does not support conversion from %s"),
+               "iconv", from_encoding);
       else if (iconv_open (to_encoding, "UTF-8") == (iconv_t)(-1))
-	error (EXIT_FAILURE, 0, _("%s does not support conversion to %s"),
-	       "iconv", to_encoding);
+        error (EXIT_FAILURE, 0, _("%s does not support conversion to %s"),
+               "iconv", to_encoding);
       else
-	error (EXIT_FAILURE, 0,
-	       _("%s does not support conversion from %s to %s"),
-	       "iconv", from_encoding, to_encoding);
+        error (EXIT_FAILURE, 0,
+               _("%s does not support conversion from %s to %s"),
+               "iconv", from_encoding, to_encoding);
     }
 
   stream->buflen = 0;

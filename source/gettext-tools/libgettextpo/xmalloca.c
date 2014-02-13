@@ -1,5 +1,5 @@
 /* Safe automatic memory allocation with out of memory checking.
-   Copyright (C) 2003, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2006-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -22,6 +22,8 @@
 
 #include "xalloc.h"
 
+#if HAVE_ALLOCA
+
 void *
 xmmalloca (size_t n)
 {
@@ -32,3 +34,5 @@ xmmalloca (size_t n)
     xalloc_die ();
   return p;
 }
+
+#endif

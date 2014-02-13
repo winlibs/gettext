@@ -61,7 +61,7 @@ tmpfiles="$tmpfiles mm-test6.tmp mm-test6.out"
 LC_MESSAGES=C LC_ALL= \
 ${MSGMERGE} -q -o mm-test6.tmp mm-test6.in1.po mm-test6.in2.po
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
-tr -d '\r' < mm-test6.tmp > mm-test6.out
+LC_ALL=C tr -d '\r' < mm-test6.tmp > mm-test6.out
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
 
 tmpfiles="$tmpfiles mm-test6.ok"
@@ -77,6 +77,7 @@ msgstr ""
 "PO-Revision-Date: 2001-04-29 21:19+02:00\n"
 "Last-Translator: Felix Natter <fnatter@gmx.net>\n"
 "Language-Team: German <de@li.org>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"

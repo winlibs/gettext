@@ -1,15 +1,17 @@
 # Translation of `gettext-runtime' messages to Japanese.
-# Copyright (C) 1999, 2002, 2003, 2006, 2007 Free Software Foundation, Inc.
-# Masahito Yamaga <ma@yama-ga.com>, 2007.
+# Copyright (C) 1999, 2002, 2003, 2006, 2007, 2010, 2013 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gettext package.
+# Masahito Yamaga <ma@yama-ga.com>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: GNU gettext-runtime 0.16.2-pre5\n"
+"Project-Id-Version: GNU gettext-runtime 0.18.2\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
-"POT-Creation-Date: 2007-11-02 03:22+0100\n"
-"PO-Revision-Date: 2007-10-16 10:29+0900\n"
+"POT-Creation-Date: 2013-07-07 18:18+0900\n"
+"PO-Revision-Date: 2013-02-27 06:08+0900\n"
 "Last-Translator: Masahito Yamaga <ma@yama-ga.com>\n"
 "Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=EUC-JP\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -19,66 +21,65 @@ msgstr ""
 msgid "write error"
 msgstr "書き込みエラー"
 
-#: gnulib-lib/error.c:125
+#: gnulib-lib/error.c:188
 msgid "Unknown system error"
 msgstr "未知のシステムエラー"
 
-#: gnulib-lib/getopt.c:530 gnulib-lib/getopt.c:546
+#: gnulib-lib/getopt.c:547 gnulib-lib/getopt.c:576
 #, c-format
-msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: オプション `%s' は曖昧です\n"
+msgid "%s: option '%s' is ambiguous; possibilities:"
+msgstr "%s: オプション '%s' が曖昧. 指定可能なもの:"
 
-#: gnulib-lib/getopt.c:579 gnulib-lib/getopt.c:583
+#: gnulib-lib/getopt.c:624 gnulib-lib/getopt.c:628
 #, c-format
-msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: オプション `--%s' には引数はありません\n"
+msgid "%s: option '--%s' doesn't allow an argument\n"
+msgstr "%s: オプション '--%s' に引数はありません\n"
 
-#: gnulib-lib/getopt.c:592 gnulib-lib/getopt.c:597
+#: gnulib-lib/getopt.c:637 gnulib-lib/getopt.c:642
 #, c-format
-msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: オプション `%c%s' には引数はありません\n"
+msgid "%s: option '%c%s' doesn't allow an argument\n"
+msgstr "%s: オプション '%c%s' に引数はありません\n"
 
-#: gnulib-lib/getopt.c:640 gnulib-lib/getopt.c:659 gnulib-lib/getopt.c:975
-#: gnulib-lib/getopt.c:994
+#: gnulib-lib/getopt.c:685 gnulib-lib/getopt.c:704
 #, c-format
-msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: オプション `%s' には引数が必要です\n"
+msgid "%s: option '--%s' requires an argument\n"
+msgstr "%s: オプション '--%s' には引数が必要です\n"
 
-#: gnulib-lib/getopt.c:697 gnulib-lib/getopt.c:700
+#: gnulib-lib/getopt.c:742 gnulib-lib/getopt.c:745
 #, c-format
-msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: オプション `--%s' は認識されません\n"
+msgid "%s: unrecognized option '--%s'\n"
+msgstr "%s: オプション '--%s' は不可\n"
 
-#: gnulib-lib/getopt.c:708 gnulib-lib/getopt.c:711
+#: gnulib-lib/getopt.c:753 gnulib-lib/getopt.c:756
 #, c-format
-msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: オプション `%c%s' は認識されません\n"
+msgid "%s: unrecognized option '%c%s'\n"
+msgstr "%s: オプション '%c%s' は不可\n"
 
-#: gnulib-lib/getopt.c:763 gnulib-lib/getopt.c:766
+#: gnulib-lib/getopt.c:805 gnulib-lib/getopt.c:808
 #, c-format
-msgid "%s: illegal option -- %c\n"
-msgstr "%s: 不正なオプション -- %c\n"
+msgid "%s: invalid option -- '%c'\n"
+msgstr "%s: 無効なオプション -- '%c'\n"
 
-#: gnulib-lib/getopt.c:772 gnulib-lib/getopt.c:775
+#: gnulib-lib/getopt.c:861 gnulib-lib/getopt.c:878 gnulib-lib/getopt.c:1088
+#: gnulib-lib/getopt.c:1106
 #, c-format
-msgid "%s: invalid option -- %c\n"
-msgstr "%s: 無効なオプション -- %c\n"
+msgid "%s: option requires an argument -- '%c'\n"
+msgstr "%s: 引数が必要なオプション -- '%c'\n"
 
-#: gnulib-lib/getopt.c:827 gnulib-lib/getopt.c:843 gnulib-lib/getopt.c:1047
-#: gnulib-lib/getopt.c:1065
+#: gnulib-lib/getopt.c:934 gnulib-lib/getopt.c:950
 #, c-format
-msgid "%s: option requires an argument -- %c\n"
-msgstr "%s: 引数が必要なオプション -- %c\n"
+msgid "%s: option '-W %s' is ambiguous\n"
+msgstr "%s: オプション '-W %s' は曖昧です\n"
 
-#: gnulib-lib/getopt.c:896 gnulib-lib/getopt.c:912
+#: gnulib-lib/getopt.c:974 gnulib-lib/getopt.c:992
 #, c-format
-msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: オプション `-W %s' は曖昧です\n"
+msgid "%s: option '-W %s' doesn't allow an argument\n"
+msgstr "%s: オプション '-W %s' に引数はありません\n"
 
-#: gnulib-lib/getopt.c:936 gnulib-lib/getopt.c:954
+#: gnulib-lib/getopt.c:1013 gnulib-lib/getopt.c:1031
 #, c-format
-msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: オプション `-W %s' には引数はありません\n"
+msgid "%s: option '-W %s' requires an argument\n"
+msgstr "%s: オプション '-W %s' には引数が必要です\n"
 
 #: gnulib-lib/xmalloc.c:37
 #, c-format
@@ -125,8 +126,8 @@ msgstr "引数がありません"
 
 #: src/envsubst.c:171 src/gettext.c:238 src/ngettext.c:207
 #, c-format
-msgid "Try `%s --help' for more information.\n"
-msgstr "より多くの情報を得るためには `%s --help' と入力してください.\n"
+msgid "Try '%s --help' for more information.\n"
+msgstr "より多くの情報を得るためには '%s --help' と入力してください.\n"
 
 #: src/envsubst.c:176
 #, c-format, no-wrap
@@ -251,7 +252,7 @@ msgid ""
 "environment variable TEXTDOMAIN.  If the message catalog is not found in the\n"
 "regular directory, another location can be specified with the environment\n"
 "variable TEXTDOMAINDIR.\n"
-"When used with the -s option the program behaves like the `echo' command.\n"
+"When used with the -s option the program behaves like the 'echo' command.\n"
 "But it does not simply copy its arguments to stdout.  Instead those messages\n"
 "found in the selected catalog are translated.\n"
 "Standard search directory: %s\n"
@@ -259,7 +260,7 @@ msgstr ""
 "もし TEXTDOMAIN パラメータが指定されなければ, 環境変数 TEXTDOMAIN から\n"
 "ドメインが決まります. もし標準のディレクトリにメッセージカタログが\n"
 "見つからなければ, 環境変数 TEXTDOMAINDIR で指定された場所から探します.\n"
-"-s オプションをつけて使うとプログラムは `echo' コマンドのように動作します.\n"
+"-s オプションをつけて使うとプログラムは 'echo' コマンドのように動作します.\n"
 "しかしその引数を単にそのまま標準出力にコピーするわけではありません.\n"
 "選択されたカタログ中に指定されたメッセージがあれば, そのメッセージの代わりに\n"
 "翻訳されたものを表示します.\n"
@@ -311,3 +312,6 @@ msgstr ""
 "ドメインが決まります. もし標準のディレクトリにメッセージカタログが\n"
 "見つからなければ, 環境変数 TEXTDOMAINDIR で指定された場所から探します.\n"
 "標準の検索ディレクトリ: %s\n"
+
+#~ msgid "%s: illegal option -- %c\n"
+#~ msgstr "%s: 不正なオプション -- %c\n"

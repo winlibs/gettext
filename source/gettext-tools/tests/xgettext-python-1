@@ -22,13 +22,22 @@ _(u"abc\
 # interpret_ansic = false, interpret_unicode = true
 _(ur"abc\
 \\def\'ghi\"jkl\a\b\f\n\r\t\v x\040x\x7ey\u0142\U00010123\N{LATIN SMALL LETTER Z}");
+
+# This will not be extracted.
+_(CATEGORIES["default"]["name"]);
+
+# string concatenation
+_("abc" "def" + "ghi"
+"jkl" + mno)
 EOF
 
 tmpfiles="$tmpfiles xg-py-1.err xg-py-1.tmp xg-py-1.pot"
 : ${XGETTEXT=xgettext}
 ${XGETTEXT} --add-comments --no-location -o xg-py-1.tmp xg-py-1.py 2>xg-py-1.err
 test $? = 0 || { cat xg-py-1.err; rm -fr $tmpfiles; exit 1; }
-grep -v 'POT-Creation-Date' < xg-py-1.tmp | tr -d '\r' > xg-py-1.pot
+# Don't simplify this to "grep ... < xg-py-1.tmp", otherwise OpenBSD 4.0 grep
+# only outputs "Binary file (standard input) matches".
+cat xg-py-1.tmp | grep -v 'POT-Creation-Date' | LC_ALL=C tr -d '\r' > xg-py-1.pot
 
 tmpfiles="$tmpfiles xg-py-1.ok"
 cat <<\EOF > xg-py-1.ok
@@ -45,6 +54,7 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,8 +68,8 @@ msgstr ""
 #. interpret_ansic = false, interpret_unicode = false
 msgid ""
 "abc\\\n"
-"\\\\def\\'ghi\\\"jkl\\a\\b\\f\\n\\r\\t\\v x\\040x\\x7ey\\u0142\\U00010123\\N"
-"{LATIN SMALL LETTER Z}"
+"\\\\def\\'ghi\\\"jkl\\a\\b\\f\\n\\r\\t\\v x\\040x\\x7ey"
+"\\u0142\\U00010123\\N{LATIN SMALL LETTER Z}"
 msgstr ""
 
 #. interpret_ansic = true, interpret_unicode = true
@@ -73,6 +83,10 @@ msgid ""
 "abc\\\n"
 "\\\\def\\'ghi\\\"jkl\\a\\b\\f\\n\\r\\t\\v x\\040x\\x7eył\\U00010123\\N{LATIN "
 "SMALL LETTER Z}"
+msgstr ""
+
+#. string concatenation
+msgid "abcdefghijkl"
 msgstr ""
 EOF
 

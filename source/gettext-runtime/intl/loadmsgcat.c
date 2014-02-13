@@ -1,20 +1,18 @@
 /* Load needed message catalogs.
-   Copyright (C) 1995-1999, 2000-2007 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000-2008, 2010 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* Tell glibc's <string.h> to provide a prototype for mempcpy().
    This must come before <config.h> because <config.h> may include
@@ -40,7 +38,6 @@
 #else
 # ifdef _MSC_VER
 #  include <malloc.h>
-#  include <io.h> /* open() doesn't magically appear, people */
 #  define alloca _alloca
 # else
 #  if defined HAVE_ALLOCA_H || defined _LIBC
@@ -761,10 +758,12 @@ get_sysdep_segment_value (const char *name)
   /* Test for a glibc specific printf() format directive flag.  */
   if (name[0] == 'I' && name[1] == '\0')
     {
-#if defined _LIBC || __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)
+#if defined _LIBC \
+    || ((__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 2)) \
+        && !defined __UCLIBC__)
       /* The 'I' flag, in numeric format directives, replaces ASCII digits
 	 with the 'outdigits' defined in the LC_CTYPE locale facet.  This is
-	 used for Farsi (Persian) and maybe Arabic.  */
+	 used for Farsi (Persian), some Indic languages, and maybe Arabic.  */
       return "I";
 #else
       return "";
@@ -826,7 +825,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
     goto out;
 
   /* Try to open the addressed file.  */
-  fd = _open (domain_file->filename, O_RDONLY | O_BINARY);
+  fd = open (domain_file->filename, O_RDONLY | O_BINARY);
   if (fd == -1)
     goto out;
 
@@ -837,7 +836,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 #else
       __builtin_expect (fstat (fd, &st) != 0, 0)
 #endif
-      || __builtin_expect ((size = (size_t) st.st_size) != (size_t) st.st_size, 0)
+      || __builtin_expect ((size = (size_t) st.st_size) != st.st_size, 0)
       || __builtin_expect (size < sizeof (struct mo_file_header), 0))
     /* Something went wrong.  */
     goto out;
@@ -872,7 +871,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
       read_ptr = (char *) data;
       do
 	{
-	  long int nb = (long int) _read (fd, read_ptr, to_read);
+	  long int nb = (long int) read (fd, read_ptr, to_read);
 	  if (nb <= 0)
 	    {
 #ifdef EINTR
@@ -886,7 +885,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 	}
       while (to_read > 0);
 
-      _close (fd);
+      close (fd);
       fd = -1;
     }
 
@@ -1260,8 +1259,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
       /* This is an invalid revision.  */
     invalid:
       /* This is an invalid .mo file.  */
-      if (domain->malloced)
-	free (domain->malloced);
+      free (domain->malloced);
 #ifdef HAVE_MMAP
       if (use_mmap)
 	munmap ((caddr_t) data, size);
@@ -1289,7 +1287,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 
  out:
   if (fd != -1)
-    _close (fd);
+    close (fd);
 
   domain_file->decided = 1;
 
@@ -1318,12 +1316,10 @@ _nl_unload_domain (struct loaded_domain *domain)
       if (convd->conv != (__gconv_t) -1)
 	__gconv_close (convd->conv);
     }
-  if (domain->conversions != NULL)
-    free (domain->conversions);
+  free (domain->conversions);
   __libc_rwlock_fini (domain->conversions_lock);
 
-  if (domain->malloced)
-    free (domain->malloced);
+  free (domain->malloced);
 
 # ifdef _POSIX_MAPPED_FILES
   if (domain->use_mmap)

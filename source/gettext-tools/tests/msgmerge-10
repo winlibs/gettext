@@ -58,7 +58,7 @@ tmpfiles="$tmpfiles mm-test10.tmp mm-test10.out"
 : ${MSGMERGE=msgmerge}
 ${MSGMERGE} -q -o mm-test10.tmp mm-test10.po mm-test10.pot
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
-tr -d '\r' < mm-test10.tmp > mm-test10.out
+LC_ALL=C tr -d '\r' < mm-test10.tmp > mm-test10.out
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
 
 tmpfiles="$tmpfiles mm-test10.ok"
@@ -74,6 +74,7 @@ msgstr ""
 "PO-Revision-Date: 2001-04-29 21:19+02:00\n"
 "Last-Translator: Felix N. <xyz@zyx.uucp>\n"
 "Language-Team: German <de@li.org>\n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"

@@ -1,5 +1,5 @@
 dnl Configuration for the gettext-tools directory of GNU gettext
-dnl Copyright (C) 1995-1999, 2000-2007 Free Software Foundation, Inc.
+dnl Copyright (C) 1995-1999, 2000-2011 Free Software Foundation, Inc.
 dnl
 dnl This program is free software: you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -16,13 +16,14 @@ dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ([2.59])
+AC_PREREQ([2.62])
 AC_INIT
-AC_CONFIG_SRCDIR(src/msgfmt.c)
-AC_CONFIG_AUX_DIR(../build-aux)
+AC_CONFIG_SRCDIR([src/msgfmt.c])
+AC_CONFIG_AUX_DIR([../build-aux])
 . $srcdir/../version.sh
-AM_INIT_AUTOMAKE(gettext-tools, $VERSION_NUMBER)
-AM_CONFIG_HEADER(config.h)
+gl_INIT_PACKAGE([gettext-tools], [$VERSION_NUMBER])
+AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
+AC_CONFIG_HEADERS([config.h])
 
 dnl Installation directories.
 test "$docdir" != '${datarootdir}/doc/${PACKAGE}' || docdir='${datarootdir}/doc/gettext'
@@ -40,23 +41,23 @@ if test -n "$HAVE_GCJ" && test "$JAVA_CHOICE" = yes; then
 else
   BUILDJAVAEXE=no
 fi
-AC_SUBST(BUILDJAVAEXE)
+AC_SUBST([BUILDJAVAEXE])
 
 gt_JAVAEXEC
 gt_JAVACOMP([1.3])
-AC_CHECK_PROG(JAR, jar, jar)
+AC_CHECK_PROG([JAR], [jar], [jar])
 if test -n "$HAVE_JAVACOMP" && test -n "$JAR" && test "$JAVA_CHOICE" != no; then
   BUILDJAVA=yes
 else
   BUILDJAVA=no
 fi
-AC_SUBST(BUILDJAVA)
+AC_SUBST([BUILDJAVA])
 if test -n "$HAVE_JAVAEXEC" && test $BUILDJAVA = yes; then
   TESTJAVA=yes
 else
   TESTJAVA=no
 fi
-AC_SUBST(TESTJAVA)
+AC_SUBST([TESTJAVA])
 
 gt_CSHARPCOMP
 if test -n "$HAVE_CSHARPCOMP" && test "$CSHARP_CHOICE" != no; then
@@ -64,7 +65,7 @@ if test -n "$HAVE_CSHARPCOMP" && test "$CSHARP_CHOICE" != no; then
 else
   BUILDCSHARP=no
 fi
-AC_SUBST(BUILDCSHARP)
+AC_SUBST([BUILDCSHARP])
 
 gt_CSHARPEXEC([csharpexec-test.exe], [$srcdir/m4])
 if test -n "$HAVE_CSHARPEXEC" && test $BUILDCSHARP = yes; then
@@ -72,7 +73,7 @@ if test -n "$HAVE_CSHARPEXEC" && test $BUILDCSHARP = yes; then
 else
   TESTCSHARP=no
 fi
-AC_SUBST(TESTCSHARP)
+AC_SUBST([TESTCSHARP])
 
 dnl Check for host type.
 AC_CANONICAL_HOST
@@ -83,20 +84,18 @@ AC_EXEEXT
 
 dnl Make sure we see all GNU and Solaris extensions.
 gl_EARLY
+grgl_EARLY
 gtpo_EARLY
 
 dnl Check for build configuration.
 
 gl_WOE32_DLL
-AC_LIBTOOL_WIN32_DLL
-AC_PROG_LIBTOOL
-case "$host_os" in
-  # On Cygwin, without -no-undefined, a warning is emitted and only a static
-  # library is built.
-  beos* | mingw* | cygwin*) LTNOUNDEF='-no-undefined' ;;
-  *) LTNOUNDEF='' ;;
-esac
-AC_SUBST([LTNOUNDEF])
+
+LT_INIT([win32-dll])
+
+dnl Prepares the libtool configuration for handling of Windows resources, and
+dnl sets the RC variable to a program that compiles Windows resource files.
+LT_LANG([Windows Resource])
 
 dnl On mingw and Cygwin, we can activate special Makefile rules which add
 dnl version information to the shared libraries and executables.
@@ -106,11 +105,18 @@ case "$host_os" in
 esac
 AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
 
+dnl On Cygwin 1.7.10-1 or later, error_* variables are defined in the
+dnl Cygwin DLL.  To avoid any conflict with gettext DLLs, always link
+dnl to gnulib's error.c.  See GETTEXTLIB_EXPORTS_FLAGS setting below.
+case "$host_os" in
+  cygwin*) ac_cv_lib_error_at_line=no ;;
+esac
+
 dnl Checks for libraries.
 
 dnl These are the only lines required to internationalize the package.
 dnl (OK, not quite, the AC_CONFIG_FILES has also some parts.)
-AM_GNU_GETTEXT(use-libtool, need-ngettext)
+AM_GNU_GETTEXT([use-libtool], [need-ngettext])
 
 dnl This line internationalizes the bison generated parsers.
 BISON_I18N
@@ -147,16 +153,17 @@ AC_SUBST([MSGMERGE_LIBM])
 
 dnl Checks for header files, functions and declarations.
 gl_INIT
+grgl_INIT
 gtpo_INIT
 
 dnl Checks for header files.
-AC_CHECK_HEADERS(pwd.h)
+AC_CHECK_HEADERS([pwd.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
-gl_AC_TYPE_UNSIGNED_LONG_LONG
+AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_SIZE_T
-AC_CHECK_TYPES(ptrdiff_t)
+AC_CHECK_TYPES([ptrdiff_t])
 gt_TYPE_SSIZE_T
 AC_TYPE_PID_T
 gl_GLIBC21
@@ -169,13 +176,28 @@ AC_CHECK_FUNCS([select])
 AC_FUNC_VFORK
 gt_SIGINFO
 gt_SETLOCALE
-gt_LIBGREP
+
 AC_C_BIGENDIAN([endianness=1], [endianness=0],
   [echo "AC-C-BIGENDIAN fails to work on your system." | sed -e 's,-,_,g' 1>&2
    echo "Please report this as a bug to bug-autoconf@gnu.org" 1>&2
-   exit 1])
-AC_DEFINE_UNQUOTED([ENDIANNESS], [$endianness],
-  [Define according to the byte order of the target machine: 1 for big endian, 0 for little endian.])
+   exit 1],
+  [endianness=universal])
+if test $endianness != universal; then
+  AC_DEFINE_UNQUOTED([ENDIANNESS], [$endianness],
+    [Define according to the byte order of the target machine: 1 for big endian, 0 for little endian.])
+fi
+dnl For possibly universal binaries, it's not possible to determine the
+dnl endianness at configure time. So determine it at compile time.
+AH_BOTTOM([
+#ifndef ENDIANNESS
+# if defined __BIG_ENDIAN__
+#  define ENDIANNESS 1
+# endif
+# if defined __LITTLE_ENDIAN__
+#  define ENDIANNESS 0
+# endif
+#endif
+])
 
 gt_PREREQ_HOSTNAME
 
@@ -196,8 +218,37 @@ else
 fi
 AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
 if test $is_woe32dll = yes; then
-  AC_DEFINE([WOE32DLL], 1,
+  AC_DEFINE([WOE32DLL], [1],
     [Define when --enable-shared is used on mingw or Cygwin.])
+fi
+
+GETTEXTLIB_EXPORTS_FLAGS=
+dnl woe32dll/gettextlib-exports.c needs to know whether the getopt facility
+dnl is replaced by gnulib. GETOPT_H is set by gl_FUNC_GETOPT_POSIX, inside
+dnl gl_INIT.
+if test -n "$GETOPT_H"; then
+  GETTEXTLIB_EXPORTS_FLAGS="-DGNULIB_DEFINED_GETOPT $GETTEXTLIB_EXPORTS_FLAGS"
+fi
+dnl woe32dll/gettextlib-exports.c needs to know whether the error
+dnl facility is replaced by gnulib. ac_cv_lib_error_at_line is set by
+dnl gl_ERROR, inside gl_INIT.
+if test "$ac_cv_lib_error_at_line" = no; then
+  GETTEXTLIB_EXPORTS_FLAGS="-DGNULIB_DEFINED_ERROR $GETTEXTLIB_EXPORTS_FLAGS"
+fi
+
+dnl 64-bit mingw does not prepend an underscore to C symbols.
+dnl USER_LABEL_PREFIX is set by gl_ASM_SYMBOL_PREFIX, inside gl_INIT.
+if test "$USER_LABEL_PREFIX" = _; then
+  GETTEXTLIB_EXPORTS_FLAGS="-DUSER_LABEL_PREFIX_UNDERSCORE $GETTEXTLIB_EXPORTS_FLAGS"
+fi
+AC_SUBST([GETTEXTLIB_EXPORTS_FLAGS])
+
+dnl Tell the source files that the error facility is replaced by
+dnl gnulib, to make sure to prepend "rpl_" prefix to the error_*
+dnl symbols.
+if test "$ac_cv_lib_error_at_line" = no; then
+  AC_DEFINE([GNULIB_REPLACE_ERROR], [1],
+    [Define when the error facility is replaced by gnulib.])
 fi
 
 dnl Put some default definitions into config.h.
@@ -206,9 +257,6 @@ AH_TOP([
 #define DEFAULT_OUTPUT_ALIGNMENT 1
 ])
 AH_BOTTOM([
-/* Indicator for intl/ that it is compiled for testing purposes only.  */
-#define USE_IN_GETTEXT_TESTS
-
 /* A file name cannot consist of any character possible.  INVALID_PATH_CHAR
    contains the characters not allowed.  */
 #if defined _MSC_VER || defined __MINGW32__
@@ -249,12 +297,12 @@ dnl ship both gettext and expat, we use dynamic loading to avoid a hard
 dnl dependency from gettext to expat.
 case "$host_os" in
   linux*)
-    AC_DEFINE([DYNLOAD_LIBEXPAT], 1,
+    AC_DEFINE([DYNLOAD_LIBEXPAT], [1],
       [Define to 1 if libexpat shall be dynamically loaded via dlopen().])
     LIBEXPAT="-ldl"
     LTLIBEXPAT="-ldl"
-    AC_SUBST(LIBEXPAT)
-    AC_SUBST(LTLIBEXPAT)
+    AC_SUBST([LIBEXPAT])
+    AC_SUBST([LTLIBEXPAT])
     ;;
   *)
     AC_LIB_HAVE_LINKFLAGS([expat], [],
@@ -263,23 +311,9 @@ case "$host_os" in
 esac
 
 dnl Check for nm output filter that yields the exported symbols.
-AC_DEFUN([gt_GLOBAL_SYMBOL_PIPE], [
-  AC_REQUIRE([AC_PROG_NM]) dnl provided by libtool.m4
-  AC_SUBST([NM])
-  AC_REQUIRE([AC_LIBTOOL_SYS_GLOBAL_SYMBOL_PIPE]) dnl provided by libtool.m4
-  GLOBAL_SYMBOL_PIPE=$lt_cv_sys_global_symbol_pipe
-  AC_SUBST([GLOBAL_SYMBOL_PIPE])
-  if test -n "$GLOBAL_SYMBOL_PIPE"; then
-    HAVE_GLOBAL_SYMBOL_PIPE=1
-  else
-    HAVE_GLOBAL_SYMBOL_PIPE=
-  fi
-  AC_SUBST([HAVE_GLOBAL_SYMBOL_PIPE])
-])
 gt_GLOBAL_SYMBOL_PIPE
 
 dnl Check for Emacs and where to install .elc files.
-AM_PATH_LISPDIR
 dnl Sometimes Emacs is badly installed. Allow the user to work around it.
 AC_ARG_WITH([emacs],
   [  --without-emacs         do not use Emacs, don't install po-mode],
@@ -292,25 +326,159 @@ if test "$EMACS" != no; then
     EMACS=no
   fi
 fi
+dnl If $EMACS = no, we won't install any Emacs Lisp (*.el) files,
+dnl therefore it's useless to determine $(lispdir).
+if test "$EMACS" != no; then
+  AM_PATH_LISPDIR
+fi
 
 aclocaldir='${datadir}/aclocal'
-AC_SUBST(aclocaldir)
+AC_SUBST([aclocaldir])
+
+dnl Check how to install the set of previous versions, for autopoint.
+AC_ARG_WITH([git],
+  [  --without-git           don't use git to compress the infrastructure archive],
+  [gt_use_git=$withval],
+  [gt_use_git=maybe])
+AC_ARG_WITH([cvs],
+  [  --with-cvs              use cvs to compress the infrastructure archive
+                          (deprecated)],
+  [gt_use_cvs=$withval],
+  [gt_use_cvs=no])
+AC_ARG_WITH([bzip2],
+  [  --without-bzip2         don't use bzip2 to compress the infrastructure archive],
+  [gt_use_bzip2=$withval],
+  [gt_use_bzip2=maybe])
+AC_ARG_WITH([xz],
+  [  --without-xz            don't use xz to compress the infrastructure archive],
+  [gt_use_xz=$withval],
+  [gt_use_xz=maybe])
+# The CVS format is deprecated, because "cvs init" does not work in all
+# circumstances
+# (see <http://lists.gnu.org/archive/html/bug-cvs/2010-05/msg00003.html>)
+# and we are not allowed to distribute the cvs infrastructure files ourselves
+# (see <http://lists.gnu.org/archive/html/bug-cvs/2010-06/msg00011.html>).
+#
+# With the archive from version 0.18.1, we can observe the following
+# compression rates:
+#    Size           File
+#  16916480   archive.dir.tar
+#   3528757   archive.dir.tar.gz
+#   2621440   archive.cvs.tar
+#   2082492   archive.dir.tar.bz2
+#    696320   archive.git.tar
+#    599046   archive.git.tar.bz2
+#    592989   archive.git.tar.gz
+#    588124   archive.git.tar.xz
+#    457190   archive.cvs.tar.gz
+#    335808   archive.cvs.tar.bz2
+#    308880   archive.dir.tar.xz
+#    299124   archive.cvs.tar.xz
+# Among these:
+#   - We don't offer the uncompressed ones, because at least gzip can be
+#     assumed to be present everywhere.
+#   - Among archive.git.tar.*, all have approximately the same size, because
+#     git already compresses most of its repository data. Offer only .gz here.
+#   - Among archive.cvs.tar.*, offer only .gz, for simplicity, since --with-cvs
+#     is deprecated.
+# The remaining ones are:
+#    Size           File            ARCHIVE_FORMAT
+#   3528757   archive.dir.tar.gz      dirgz
+#   2082492   archive.dir.tar.bz2     dirbz2
+#    592989   archive.git.tar.gz      git
+#    457190   archive.cvs.tar.gz      cvs
+#    308880   archive.dir.tar.xz      dirxz
+if test "$gt_use_xz" != no && test "$gt_use_xz" != maybe; then
+  # --with-xz is specified. Even if --with-git or --with-cvs or --with-bzip2 is
+  # also specified, we use the dirxz format.
+  ARCHIVE_FORMAT=dirxz
+else
+  if test "$gt_use_git" != no && test "$gt_use_git" != maybe; then
+    # --with-git is specified. Even if --with-cvs or --with-bzip2 is also
+    # specified, we use the git format.
+    ARCHIVE_FORMAT=git
+  else
+    if test "$gt_use_cvs" != no; then
+      # --with-cvs is specified. Even if --with-bzip2 is also specified, we use
+      # the cvs format.
+      ARCHIVE_FORMAT=cvs
+    else
+      if test "$gt_use_bzip2" != no && test "$gt_use_bzip2" != maybe; then
+        # --with-bzip2 is specified. We use the dirbz2 format.
+        ARCHIVE_FORMAT=dirbz2
+      else
+        # Neither --with-git nor --with-cvs nor --with-bzip2 nor --with-xz is
+        # specified. Determine which programs are present.
+        if test "$gt_use_xz" != no \
+           && (xz --version) >/dev/null 2>&1 \
+           && xz --version | grep lzma >/dev/null; then
+          # --without-xz is not specified, and the xz program exists.
+          ARCHIVE_FORMAT=dirxz
+        else
+          # --without-xz is specified, or the xz program is missing.
+changequote(,)dnl
+          if test "$gt_use_git" != no \
+             && (git --version) >/dev/null 2>&1 \
+             && { case `git --version | sed -e 's/^[^0-9]*//'` in
+                    0.* | 1.[0-5].*) false ;;
+                    *) true ;;
+                  esac
+                }; then
+changequote([,])dnl
+            # --without-git is not specified, and the git program exists
+            # in version 1.6 or newer. Use git format.
+            ARCHIVE_FORMAT=git
+          else
+            # --without-git is specified, or the git program is missing.
+changequote(,)dnl
+            if test "$gt_use_bzip2" != no \
+               && (: | bzip2 --version) >/dev/null 2>&1 \
+               && { sed_bzip2_version1='s/ \([0-9][0-9.]*\).*/ \1/'
+                    sed_bzip2_version2='s/^.* //'
+                    case `(: | bzip2 --version) 2>&1 \
+                          | sed -e 1q \
+                          | sed -e "$sed_bzip2_version1" -e "$sed_bzip2_version2"` in
+                      0.*) false ;;
+                      *) true ;;
+                    esac
+                  }; then
+changequote([,])dnl
+              # --without-bzip2 is not specified, and the bzip2 program exists
+              # in version 1.0 or newer. Use dirbz2 format.
+              ARCHIVE_FORMAT=dirbz2
+            else
+              # --without-bzip2 is specified, or the bzip2 program is missing.
+              ARCHIVE_FORMAT=dirgz
+            fi
+          fi
+        fi
+      fi
+    fi
+  fi
+fi
+AC_SUBST([ARCHIVE_FORMAT])
 
 dnl Check for tools needed for formatting the documentation.
 ac_aux_dir_abs=`cd $ac_aux_dir && pwd`
-AC_PATH_PROG(DVIPS, dvips, $ac_aux_dir_abs/missing dvips)
-AC_PATH_PROG(TEXI2PDF, texi2pdf, $ac_aux_dir_abs/missing texi2pdf)
-AC_PATH_PROG(PERL, perl, $ac_aux_dir_abs/missing perl)
+AC_PATH_PROG([DVIPS], [dvips], [$ac_aux_dir_abs/missing dvips])
+AC_PATH_PROG([TEXI2PDF], [texi2pdf], [$ac_aux_dir_abs/missing texi2pdf])
+AC_PATH_PROG([PERL], [perl], [$ac_aux_dir_abs/missing perl])
 
 dnl Check for tools needed for formatting man pages.
 CROSS_COMPILING=$cross_compiling
-AC_SUBST(CROSS_COMPILING)
+AC_SUBST([CROSS_COMPILING])
 
 dnl Checks for optional programs for the tests/lang-*, tests/recode-* tests.
-gt_PROG_ANSI_CXX
+gl_PROG_ANSI_CXX([CXX], [ANSICXX])
 gt_LOCALE_FR
 gt_LOCALE_FR_UTF8
 gt_LOCALE_JA
+
+dnl Checks for functions for the tests/*.c tests.
+AC_CHECK_FUNCS_ONCE([getrlimit setrlimit uselocale])
+
+dnl Prepares the libtool configuration for languages used by the tests.
+LT_LANG([C++])
 
 dnl Check whether to execute tests that rely on libasprintf.
 dnl This test must be consistent with gettext-runtime/configure.ac.
@@ -323,10 +491,10 @@ if test "${enable_libasprintf+set}" = set; then
 else
   TESTLIBASPRINTF=yes
 fi
-if test "$CXX" = ":"; then
+if test "$CXX" = no; then
   TESTLIBASPRINTF=no
 fi
-AC_SUBST(TESTLIBASPRINTF)
+AC_SUBST([TESTLIBASPRINTF])
 
 dnl Generate the version information file in the intl/ directory.
 test -d intl || mkdir intl
@@ -338,14 +506,11 @@ $RELEASE_DATE  GNU  <bug-gnu-gettext@gnu.org>
 
 EOF
 
-AC_CONFIG_SUBDIRS(examples)
+AC_CONFIG_SUBDIRS([examples])
 
 AC_CONFIG_FILES([Makefile])
 
-AC_CONFIG_FILES([doc/Makefile],
-                [FIX_MAKEFILE_COMPILE
-                 FIX_MAKEFILE_DISTRIB
-                 FIX_MAKEFILE_INFO])
+AC_CONFIG_FILES([doc/Makefile])
 
 AC_CONFIG_FILES([intl/Makefile:../gettext-runtime/intl/Makefile.in], [
   # Change srcdir variable so that it points to ../gettext-runtime/intl.
@@ -355,18 +520,14 @@ AC_CONFIG_FILES([intl/Makefile:../gettext-runtime/intl/Makefile.in], [
   mv intl/Makefile.tmp intl/Makefile
   ])
 
-AC_CONFIG_FILES([gnulib-lib/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([gnulib-lib/Makefile])
 
-AC_CONFIG_FILES([libgrep/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([libgrep/Makefile])
 
-AC_CONFIG_FILES([src/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([src/user-email:src/user-email.sh.in])
 
-AC_CONFIG_FILES([libgettextpo/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([libgettextpo/Makefile])
 AC_CONFIG_FILES([libgettextpo/exported.sh])
 
 AC_CONFIG_FILES([po/Makefile.in])
@@ -378,6 +539,7 @@ AC_CONFIG_FILES([styles/Makefile])
 AC_CONFIG_FILES([misc/Makefile])
 AC_CONFIG_FILES([misc/gettextize], [chmod a+x misc/gettextize])
 AC_CONFIG_FILES([misc/autopoint], [chmod a+x misc/autopoint])
+AC_CONFIG_FILES([misc/convert-archive], [chmod a+x misc/convert-archive])
 
 AC_CONFIG_FILES([man/Makefile],
                 [FIX_MAKEFILE_DISTRIB])
@@ -385,10 +547,8 @@ AC_CONFIG_FILES([man/x-to-1])
 
 AC_CONFIG_FILES([m4/Makefile])
 
-AC_CONFIG_FILES([tests/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([tests/Makefile])
 
-AC_CONFIG_FILES([gnulib-tests/Makefile],
-                [FIX_MAKEFILE_COMPILE])
+AC_CONFIG_FILES([gnulib-tests/Makefile])
 
 AC_OUTPUT

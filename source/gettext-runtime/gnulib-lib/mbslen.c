@@ -1,5 +1,5 @@
 /* Counting the multibyte characters in a string.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2007.
 
    This program is free software: you can redistribute it and/or modify
@@ -22,15 +22,12 @@
 
 #include <stdlib.h>
 
-#if HAVE_MBRTOWC
-# include "mbuiter.h"
-#endif
+#include "mbuiter.h"
 
 /* Return the number of multibyte characters in the character string STRING.  */
 size_t
 mbslen (const char *string)
 {
-#if HAVE_MBRTOWC
   if (MB_CUR_MAX > 1)
     {
       size_t count;
@@ -38,11 +35,10 @@ mbslen (const char *string)
 
       count = 0;
       for (mbui_init (iter, string); mbui_avail (iter); mbui_advance (iter))
-	count++;
+        count++;
 
       return count;
     }
   else
-#endif
     return strlen (string);
 }

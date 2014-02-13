@@ -1,5 +1,5 @@
 ## Makefile for the gettext-tools/examples subdirectory of GNU gettext
-## Copyright (C) 2001-2007 Free Software Foundation, Inc.
+## Copyright (C) 2001-2007, 2009-2012 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 ## Process this file with automake to produce Makefile.in.
 
 AUTOMAKE_OPTIONS = 1.2 foreign
-ACLOCAL = ../../build-aux/fixaclocal @ACLOCAL@
 ACLOCAL_AMFLAGS = -I ../../gettext-runtime/m4 -I ../../m4
 SUBDIRS = po
 EXTRA_DIST =
@@ -394,7 +393,11 @@ EXAMPLESDIRS = \
 EXAMPLESPOFILES = \
   LINGUAS \
   af.po \
+  ast.po \
+  bg.po \
   ca.po \
+  cs.po \
+  da.po \
   de.po \
   el.po \
   eo.po \
@@ -402,11 +405,17 @@ EXAMPLESPOFILES = \
   fi.po \
   fr.po \
   ga.po \
+  gl.po \
+  hr.po \
   hu.po \
   id.po \
   it.po \
   ja.po \
+  ky.po \
+  lv.po \
   ms.po \
+  mt.po \
+  nb.po \
   nl.po \
   pl.po \
   pt.po \
@@ -424,10 +433,10 @@ EXAMPLESPOFILES = \
   zh_TW.po
 
 install-data-local: $(EXAMPLESFILES)
-	$(mkdir_p) $(DESTDIR)$(examplesdir)
+	$(MKDIR_P) $(DESTDIR)$(examplesdir)
 	for f in $(EXAMPLESFILES); do \
 	  d=`echo /$$f | sed -e 's,/[^/]*$$,,'`; \
-	  test -z "$$d" || $(mkdir_p) $(DESTDIR)$(examplesdir)$$d || exit 1; \
+	  test -z "$$d" || $(MKDIR_P) $(DESTDIR)$(examplesdir)$$d || exit 1; \
 	  b=`echo $$f | sed -e 's,^.*/,,'`; \
 	  if test $$b = autogen.sh || test $$b = autoclean.sh; then \
 	    echo "$(INSTALL_SCRIPT) $(srcdir)/$$f $(DESTDIR)$(examplesdir)/$$f"; \
@@ -441,7 +450,7 @@ install-data-local: $(EXAMPLESFILES)
 	  for f2 in $(EXAMPLESPOFILES); do \
 	    f=$$f1/po/$$f2; \
 	    d=`echo /$$f | sed -e 's,/[^/]*$$,,'`; \
-	    test -z "$$d" || $(mkdir_p) $(DESTDIR)$(examplesdir)$$d || exit 1; \
+	    test -z "$$d" || $(MKDIR_P) $(DESTDIR)$(examplesdir)$$d || exit 1; \
 	    b=`echo $$f | sed -e 's,^.*/,,'`; \
 	    echo "$(INSTALL_DATA) $(srcdir)/$$f $(DESTDIR)$(examplesdir)/$$f"; \
 	    $(INSTALL_DATA) $(srcdir)/$$f $(DESTDIR)$(examplesdir)/$$f; \
@@ -449,16 +458,16 @@ install-data-local: $(EXAMPLESFILES)
 	done
 
 installdirs-local:
-	$(mkdir_p) $(DESTDIR)$(examplesdir)
+	$(MKDIR_P) $(DESTDIR)$(examplesdir)
 	for f in $(EXAMPLESFILES); do \
 	  d=`echo /$$f | sed -e 's,/[^/]*$$,,'`; \
-	  test -z "$$d" || $(mkdir_p) $(DESTDIR)$(examplesdir)$$d || exit 1; \
+	  test -z "$$d" || $(MKDIR_P) $(DESTDIR)$(examplesdir)$$d || exit 1; \
 	done
 	for f1 in $(EXAMPLESDIRS); do \
 	  for f2 in $(EXAMPLESPOFILES); do \
 	    f=$$f1/po/$$f2; \
 	    d=`echo /$$f | sed -e 's,/[^/]*$$,,'`; \
-	    test -z "$$d" || $(mkdir_p) $(DESTDIR)$(examplesdir)$$d || exit 1; \
+	    test -z "$$d" || $(MKDIR_P) $(DESTDIR)$(examplesdir)$$d || exit 1; \
 	  done; \
 	done
 
@@ -480,7 +489,7 @@ distdir1:
 	  if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	  dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
 	  if test "$$dir" != "$$file" && test "$$dir" != "."; then \
-	    $(mkdir_p) "$(distdir)/$$dir"; \
+	    $(MKDIR_P) "$(distdir)/$$dir"; \
 	  fi; \
 	  cp -p $$d/$$file $(distdir)/$$file || exit 1; \
 	done
@@ -490,11 +499,12 @@ distdir1:
 	    if test -f $$file; then d=.; else d=$(srcdir); fi; \
 	    dir=`echo "$$file" | sed -e 's,/[^/]*$$,,'`; \
 	    if test "$$dir" != "$$file" && test "$$dir" != "."; then \
-	      $(mkdir_p) "$(distdir)/$$dir"; \
+	      $(MKDIR_P) "$(distdir)/$$dir"; \
 	    fi; \
 	    cp -p $$d/$$file $(distdir)/$$file || exit 1; \
 	  done; \
 	done
 
 # Temporary directories created by po/Makefile.
-CLEANFILES = tmp-hello-*
+clean-local:
+	-rm -rf tmp-hello-*

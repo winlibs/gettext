@@ -1,5 +1,5 @@
 /* GNU gettext - internationalization aids
-   Copyright (C) 1995, 1998, 2000-2004, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1995, 1998, 2000-2004, 2006, 2009 Free Software Foundation, Inc.
 
    This file was written by Peter Miller <millerp@canb.auug.org.au>
 
@@ -91,8 +91,8 @@ string_list_append_unique (string_list_ty *slp, const char *s)
     {
       slp->nitems_max = slp->nitems_max * 2 + 4;
       slp->item = (const char **) xrealloc (slp->item,
-					    slp->nitems_max
-					    * sizeof (slp->item[0]));
+                                            slp->nitems_max
+                                            * sizeof (slp->item[0]));
     }
 
   /* Add a copy of the string to the end of the list.  */
@@ -176,14 +176,15 @@ string_list_concat_destroy (string_list_ty *slp)
 
 
 /* Return a freshly allocated string obtained by concatenating all the
-   strings in the list, separated by the separator character, terminated
+   strings in the list, separated by the separator string, terminated
    by the terminator character.  The terminator character is not added if
    drop_redundant_terminator is true and the last string already ends with
    the terminator. */
 char *
-string_list_join (const string_list_ty *slp, char separator,
-		  char terminator, bool drop_redundant_terminator)
+string_list_join (const string_list_ty *slp, const char *separator,
+                  char terminator, bool drop_redundant_terminator)
 {
+  size_t separator_len = strlen (separator);
   size_t len;
   size_t j;
   char *result;
@@ -192,8 +193,8 @@ string_list_join (const string_list_ty *slp, char separator,
   len = 1;
   for (j = 0; j < slp->nitems; ++j)
     {
-      if (separator && j > 0)
-	++len;
+      if (j > 0)
+        len += separator_len;
       len += strlen (slp->item[j]);
     }
   if (terminator)
@@ -202,17 +203,20 @@ string_list_join (const string_list_ty *slp, char separator,
   pos = 0;
   for (j = 0; j < slp->nitems; ++j)
     {
-      if (separator && j > 0)
-	result[pos++] = separator;
+      if (j > 0)
+        {
+          memcpy (result + pos, separator, separator_len);
+          pos += separator_len;
+        }
       len = strlen (slp->item[j]);
       memcpy (result + pos, slp->item[j], len);
       pos += len;
     }
   if (terminator
       && !(drop_redundant_terminator
-	   && slp->nitems > 0
-	   && (len = strlen (slp->item[slp->nitems - 1])) > 0
-	   && slp->item[slp->nitems - 1][len - 1] == terminator))
+           && slp->nitems > 0
+           && (len = strlen (slp->item[slp->nitems - 1])) > 0
+           && slp->item[slp->nitems - 1][len - 1] == terminator))
     result[pos++] = terminator;
   result[pos] = '\0';
   return result;

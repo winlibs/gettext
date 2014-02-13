@@ -1,5 +1,5 @@
-# libxml.m4 serial 4 (gettext-0.17)
-dnl Copyright (C) 2006 Free Software Foundation, Inc.
+# libxml.m4 serial 6 (gettext-0.18.2)
+dnl Copyright (C) 2006, 2008 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -36,10 +36,16 @@ AC_DEFUN([gl_LIBXML],
       dnl Don't use xml2-config nor pkg-config, since it doesn't work when
       dnl cross-compiling or when the C compiler in use is different from the
       dnl one that built the library.
+      dnl Use a test program that tries to invoke xmlFree. On Cygwin 1.7.x,
+      dnl libxml2 is built in such a way that uses of xmlFree work fine with
+      dnl -Wl,--enable-auto-import but lead to a link error with
+      dnl -Wl,--disable-auto-import.
       AC_LIB_LINKFLAGS_BODY([xml2])
       LIBS="$gl_save_LIBS $LIBXML2 $LIBICONV"
-      AC_TRY_LINK([#include <libxml/xmlversion.h>],
-        [xmlCheckVersion (0);],
+      AC_TRY_LINK([#include <libxml/xmlversion.h>
+                   #include <libxml/xmlmemory.h>
+                  ],
+        [xmlCheckVersion (0); xmlFree ((void *) 0);],
         [gl_cv_libxml=yes
          gl_cv_LIBXML="$LIBXML2 $LIBICONV"
          gl_cv_LTLIBXML="$LTLIBXML2 $LTLIBICONV"
@@ -47,8 +53,10 @@ AC_DEFUN([gl_LIBXML],
       if test "$gl_cv_libxml" != yes; then
         gl_save_CPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $INCXML2"
-        AC_TRY_LINK([#include <libxml/xmlversion.h>],
-          [xmlCheckVersion (0);],
+        AC_TRY_LINK([#include <libxml/xmlversion.h>
+                     #include <libxml/xmlmemory.h>
+                    ],
+          [xmlCheckVersion (0); xmlFree ((void *) 0);],
           [gl_cv_libxml=yes
            gl_cv_LIBXML="$LIBXML2 $LIBICONV"
            gl_cv_LTLIBXML="$LTLIBXML2 $LTLIBICONV"
@@ -56,17 +64,32 @@ AC_DEFUN([gl_LIBXML],
           ])
         if test "$gl_cv_libxml" != yes; then
           dnl Often the include files are installed in /usr/include/libxml2.
-          AC_TRY_LINK([#include <libxml2/libxml/xmlversion.h>],
-            [xmlCheckVersion (0);],
-            [gl_ABSOLUTE_HEADER([libxml2/libxml/xmlversion.h])
-             libxml2_include_dir=`echo "$gl_cv_absolute_libxml2_libxml_xmlversion_h" | sed -e 's,.libxml.xmlversion\.h$,,'`
-             if test -d "$libxml2_include_dir"; then
-               gl_cv_libxml=yes
+          dnl In libxml2-2.5, <libxml/xmlversion.h> is self-contained.
+          dnl In libxml2-2.6, it includes <libxml/xmlexports.h> which is
+          dnl self-contained.
+          libxml2_include_dir=
+          AC_TRY_CPP([#include <libxml2/libxml/xmlexports.h>],
+            [gl_ABSOLUTE_HEADER([libxml2/libxml/xmlexports.h])
+             libxml2_include_dir=`echo "$gl_cv_absolute_libxml2_libxml_xmlexports_h" | sed -e 's,.libxml.xmlexports\.h$,,'`
+            ])
+          if test -z "$libxml2_include_dir"; then
+            AC_TRY_CPP([#include <libxml2/libxml/xmlversion.h>],
+              [gl_ABSOLUTE_HEADER([libxml2/libxml/xmlversion.h])
+               libxml2_include_dir=`echo "$gl_cv_absolute_libxml2_libxml_xmlversion_h" | sed -e 's,.libxml.xmlversion\.h$,,'`
+              ])
+          fi
+          if test -n "$libxml2_include_dir" && test -d "$libxml2_include_dir"; then
+            CPPFLAGS="$gl_save_CPPFLAGS -I$libxml2_include_dir"
+            AC_TRY_LINK([#include <libxml/xmlversion.h>
+                         #include <libxml/xmlmemory.h>
+                        ],
+              [xmlCheckVersion (0); xmlFree ((void *) 0);],
+              [gl_cv_libxml=yes
                gl_cv_LIBXML="$LIBXML2 $LIBICONV"
                gl_cv_LTLIBXML="$LTLIBXML2 $LTLIBICONV"
                gl_cv_INCXML="-I$libxml2_include_dir"
-             fi
-            ])
+              ])
+          fi
         fi
         CPPFLAGS="$gl_save_CPPFLAGS"
       fi

@@ -1,3 +1,92 @@
+2013-07-07  Daiki Ueno  <ueno@gnu.org>
+
+	* NEWS: Mention setlocale() change on Mac OS X.
+
+2013-05-29  Stefano Lattarini  <stefano.lattarini@gmail.com>  (tiny change)
+
+	* configure.ac (AM_INIT_AUTOMAKE): Add 'parallel-tests' option.
+	Require Automake 1.11.1 or later, so that the 'parallel-tests'
+	will be certainly available.
+	(AC_INIT): Require Autoconf 2.62 or later; that is the minimal
+	version supported by Automake 1.11.1 or later.
+
+2012-12-27  Daiki Ueno  <ueno@gnu.org>
+
+	* configure.ac (WOE32DLL): New conditional.
+	(INTL_EXPORTS_FLAGS): New substituted variable.
+
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2012-12-17  Daiki Ueno  <ueno@unixuser.org>
+
+	* configure.ac: Use AC_CONFIG_HEADERS instead of AM_CONFIG_HEADER.
+	Suggested by Stefano Lattarini <stefano.lattarini@gmail.com>.
+
+2012-01-26  Bruno Haible  <bruno@clisp.org>
+
+	Modernize quoting.
+	* INSTALL: Process through sed -e "s/\`\([^']*\)'/‘\1’/g"
+	* Makefile.am (ABOUT-NLS): Likewise. Use --plaintext instead of
+	--no-header.
+
+2011-06-03  Bruno Haible  <bruno@clisp.org>
+
+	Copyright: Use LGPL 2.1 instead of LGPL 2.0.
+	* COPYING: Update file references.
+
+2010-07-31  Bruno Haible  <bruno@clisp.org>
+
+	Use new ansi-c++.m4 from gnulib.
+	* configure.ac: Invoke gl_PROG_ANSI_CXX instead of gt_PROG_ANSI_CXX.
+	Reported at <https://savannah.gnu.org/bugs/?30607>.
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2010-04-02  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (ACLOCAL_AMFLAGS): Remove "-I ../autoconf-lib-link/m4"
+	option.
+
+2009-12-26  Bruno Haible  <bruno@clisp.org>
+
+	* NEWS: Mention the use of the thread-specific locale on MacOS X.
+
+2009-05-23  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac (AM_INIT_AUTOMAKE): Add 'silent-rules' option.
+
+2009-05-23  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Invoke gl_INIT_PACKAGE. Use the preferred form of
+	AM_INIT_AUTOMAKE.
+
+2009-05-21  Bruno Haible  <bruno@clisp.org>
+
+	Assume automake >= 1.10.2.
+	* configure.ac (AC_CONFIG_FILES): Remove FIX_MAKEFILE_COMPILE
+	invocations.
+
+2009-03-25  Bruno Haible  <bruno@clisp.org>
+
+	Fix the handling of Windows resources in shared libraries.
+	* configure.ac: Invoke LT_LANG for 'Windows Resource'.
+
+2009-01-14  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: More consistent m4 quoting.
+
+2008-04-20  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Use LT_INIT instead of AC_PROG_LIBTOOL.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.

@@ -1,3 +1,81 @@
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Use the newest regex module from gnulib.
+	* libgrep.m4: Remove file.
+	* regex.m4: Remove file.
+	* Makefile.am (EXTRA_DIST): Remove them.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	Do regex matching purely with regex, not regex + dfa + kwset.
+	* libgrep.m4 (gt_LIBGREP): Don't invoke gl_HARD_LOCALE.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2010-04-02  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (aclocal_DATA): Take lib-*.m4 from the
+	gettext-runtime/gnulib-m4/ directory.
+
+2009-12-25  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (aclocal_DATA): Add fcntl-o.m4. Remove fcntl_h.m4.
+
+2009-12-12  Bruno Haible  <bruno@clisp.org>
+
+	* regex.m4: Untabify.
+
+2009-10-18  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (aclocal_DATA): Add fcntl_h.m4.
+
+2009-08-15  Bruno Haible  <bruno@clisp.org>
+
+	Stop using gnulib module 'strdup'.
+	* libgrep.m4 (gt_LIBGREP): Don't invoke gl_FUNC_STRDUP.
+
+2009-08-03  Bruno Haible  <bruno@clisp.org>
+
+	* setlocale.m4 (gt_SETLOCALE): Fix displayed message with
+	autoconf-2.64.
+
+2009-04-11  Bruno Haible  <bruno@clisp.org>
+
+	* exported.m4: New file, extracted from ../configure.ac.
+	* Makefile.am (EXTRA_DIST): Add it.
+
+2009-01-25  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (EXTRA_DIST): Remove locale-ja.m4.
+
+2008-12-18  Bruno Haible  <bruno@clisp.org>
+
+	* locale-ja.m4: Remove file. Moved to gnulib.
+
+2008-12-17  Bruno Haible  <bruno@clisp.org>
+
+	* libgrep.m4 (gt_LIBGREP): Use AC_FUNC_MBRTOWC instead of
+	gl_FUNC_MBRTOWC.
+
+2008-08-17  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (aclocal_DATA): Add threadlib.m4.
+
+2008-01-13  Bruno Haible  <bruno@clisp.org>
+
+	* locale-ja.m4 (gt_LOCALE_JA): Check that the locale encoding is not
+	ASCII. Needed for OpenBSD 4.0.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.

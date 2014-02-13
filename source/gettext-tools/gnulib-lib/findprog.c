@@ -1,5 +1,5 @@
 /* Locating a program in PATH.
-   Copyright (C) 2001-2004, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -26,15 +26,20 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "xalloc.h"
-#include "filename.h"
+/* Avoid collision between findprog.c and findprog-lgpl.c.  */
+#if IN_FINDPROG_LGPL || ! GNULIB_FINDPROG_LGPL
+
+#if !IN_FINDPROG_LGPL
+# include "xalloc.h"
+#endif
+#include "concat-filename.h"
 
 
 const char *
 find_in_path (const char *progname)
 {
 #if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
-  /* Win32, Cygwin, OS/2, DOS */
+  /* Native Windows, Cygwin, OS/2, DOS */
   /* The searching rules with .COM, .EXE, .BAT, .CMD etc. suffixes are
      too complicated.  Leave it to the OS.  */
   return progname;
@@ -56,7 +61,14 @@ find_in_path (const char *progname)
     return progname;
 
   /* Make a copy, to prepare for destructive modifications.  */
+# if !IN_FINDPROG_LGPL
   path = xstrdup (path);
+# else
+  path = strdup (path);
+  if (path == NULL)
+    /* Out of memory.  */
+    return progname;
+# endif
   for (path_rest = path; ; path_rest = cp + 1)
     {
       const char *dir;
@@ -66,45 +78,55 @@ find_in_path (const char *progname)
       /* Extract next directory in PATH.  */
       dir = path_rest;
       for (cp = path_rest; *cp != '\0' && *cp != ':'; cp++)
-	;
+        ;
       last = (*cp == '\0');
       *cp = '\0';
 
       /* Empty PATH components designate the current directory.  */
       if (dir == cp)
-	dir = ".";
+        dir = ".";
 
       /* Concatenate dir and progname.  */
+# if !IN_FINDPROG_LGPL
+      progpathname = xconcatenated_filename (dir, progname, NULL);
+# else
       progpathname = concatenated_filename (dir, progname, NULL);
+      if (progpathname == NULL)
+        {
+          /* Out of memory.  */
+          free (path);
+          return progname;
+        }
+# endif
 
       /* On systems which have the eaccess() system call, let's use it.
-	 On other systems, let's hope that this program is not installed
-	 setuid or setgid, so that it is ok to call access() despite its
-	 design flaw.  */
+         On other systems, let's hope that this program is not installed
+         setuid or setgid, so that it is ok to call access() despite its
+         design flaw.  */
       if (eaccess (progpathname, X_OK) == 0)
-	{
-	  /* Found!  */
-	  if (strcmp (progpathname, progname) == 0)
-	    {
-	      free (progpathname);
+        {
+          /* Found!  */
+          if (strcmp (progpathname, progname) == 0)
+            {
+              free (progpathname);
 
-	      /* Add the "./" prefix for real, that concatenated_filename()
-		 optimized away.  This avoids a second PATH search when the
-		 caller uses execlp/execvp.  */
-	      progpathname = XNMALLOC (2 + strlen (progname) + 1, char);
-	      progpathname[0] = '.';
-	      progpathname[1] = '/';
-	      memcpy (progpathname + 2, progname, strlen (progname) + 1);
-	    }
+              /* Add the "./" prefix for real, that xconcatenated_filename()
+                 optimized away.  This avoids a second PATH search when the
+                 caller uses execlp/execvp.  */
+              progpathname = XNMALLOC (2 + strlen (progname) + 1, char);
+              progpathname[0] = '.';
+              progpathname[1] = '/';
+              memcpy (progpathname + 2, progname, strlen (progname) + 1);
+            }
 
-	  free (path);
-	  return progpathname;
-	}
+          free (path);
+          return progpathname;
+        }
 
       free (progpathname);
 
       if (last)
-	break;
+        break;
     }
 
   /* Not found in PATH.  An error will be signalled at the first call.  */
@@ -112,3 +134,5 @@ find_in_path (const char *progname)
   return progname;
 #endif
 }
+
+#endif

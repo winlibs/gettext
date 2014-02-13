@@ -1,7 +1,7 @@
 #! /bin/sh
 
 # -u, --unique (equivalent to --less-than=2): we are interested in unique
-# entries only (entries occuring less than 2 times).  But don't drop the
+# entries only (entries occurring less than 2 times).  But don't drop the
 # header entry; otherwise msgcomm will fail for multibyte strings.
 
 tmpfiles=""
@@ -72,7 +72,7 @@ ${MSGCOMM} -u \
            -o mcomm-test17.tmp \
            mcomm-test17.in1 mcomm-test17.in2 mcomm-test17.in3
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
-tr -d '\r' < mcomm-test17.tmp > mcomm-test17.out
+LC_ALL=C tr -d '\r' < mcomm-test17.tmp > mcomm-test17.out
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
 
 tmpfiles="$tmpfiles mcomm-test17.ok"

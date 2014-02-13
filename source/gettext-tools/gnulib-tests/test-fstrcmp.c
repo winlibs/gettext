@@ -1,5 +1,5 @@
 /* Test of fuzzy string comparison.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,19 +21,9 @@
 #include "fstrcmp.h"
 
 #include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
 
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-        {								     \
-          fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-          abort ();							     \
-        }								     \
-    }									     \
-  while (0)
+#include "progname.h"
+#include "macros.h"
 
 static bool
 check_fstrcmp (const char *string1, const char *string2, double expected)
@@ -44,13 +34,40 @@ check_fstrcmp (const char *string1, const char *string2, double expected)
      compliant by default, to avoid that msgmerge results become platform and
      compiler option dependent.  'volatile' is a portable alternative to gcc's
      -ffloat-store option.  */
-  volatile double result = fstrcmp (string1, string2);
-  return (result == expected);
+  {
+    volatile double result = fstrcmp (string1, string2);
+    if (!(result == expected))
+      return false;
+  }
+  {
+    volatile double result = fstrcmp_bounded (string1, string2, expected);
+    if (!(result == expected))
+      return false;
+  }
+  {
+    double bound = expected * 0.5; /* implies bound <= expected */
+    volatile double result = fstrcmp_bounded (string1, string2, bound);
+    if (!(result == expected))
+      return false;
+  }
+  {
+    double bound = (1 + expected) * 0.5;
+    if (expected < bound)
+      {
+        volatile double result = fstrcmp_bounded (string1, string2, bound);
+        if (!(result < bound))
+          return false;
+      }
+  }
+
+  return true;
 }
 
 int
-main ()
+main (int argc, char *argv[])
 {
+  set_program_name (argv[0]);
+
   ASSERT (check_fstrcmp ("Langstrumpf", "Langstrumpf", 1.0));
   ASSERT (check_fstrcmp ("Levenshtein", "Levenstein", 20./21.));
   ASSERT (check_fstrcmp ("Levenstein", "Levenshtein", 20./21.));

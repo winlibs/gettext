@@ -1,5 +1,5 @@
 /* xgettext Perl backend.
-   Copyright (C) 2002-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2006, 2010 Free Software Foundation, Inc.
    Written by Guido Flohr <guido@imperia.net>, 2002-2003
 
    This program is free software: you can redistribute it and/or modify
@@ -28,20 +28,21 @@ extern "C" {
 
 
 #define EXTENSIONS_PERL \
-  { "pl",    "perl"   },						\
-  { "PL",    "perl"   },						\
-  { "pm",    "perl"   },						\
-  { "cgi",   "perl"   },						\
+  { "pl",    "perl"   },                                                \
+  { "PL",    "perl"   },                                                \
+  { "pm",    "perl"   },                                                \
+  { "perl",  "perl"   },                                                \
+  { "cgi",   "perl"   },                                                \
 
 #define SCANNERS_PERL \
-  { "perl",		extract_perl,					\
-	    &flag_table_perl, &formatstring_perl, &formatstring_perl_brace }, \
+  { "perl",             extract_perl,                                   \
+            &flag_table_perl, &formatstring_perl, &formatstring_perl_brace }, \
 
 /* Scan a Perl file and add its translatable strings to mdlp.  */
 extern void extract_perl (FILE *fp, const char *real_filename,
-			  const char *logical_filename,
-			  flag_context_list_table_ty *flag_table,
-			  msgdomain_list_ty *mdlp);
+                          const char *logical_filename,
+                          flag_context_list_table_ty *flag_table,
+                          msgdomain_list_ty *mdlp);
 
 extern void x_perl_keyword (const char *keyword);
 extern void x_perl_extract_all (void);

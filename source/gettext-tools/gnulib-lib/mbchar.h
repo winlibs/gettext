@@ -1,5 +1,5 @@
 /* Multibyte character data type.
-   Copyright (C) 2001, 2005-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2005-2007, 2009-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -114,31 +114,31 @@
 
    Here are the function prototypes of the macros.
 
-   extern const char *	mb_ptr (const mbchar_t mbc);
-   extern size_t	mb_len (const mbchar_t mbc);
-   extern bool		mb_iseq (const mbchar_t mbc, char sc);
-   extern bool		mb_isnul (const mbchar_t mbc);
-   extern int		mb_cmp (const mbchar_t mbc1, const mbchar_t mbc2);
-   extern int		mb_casecmp (const mbchar_t mbc1, const mbchar_t mbc2);
-   extern bool		mb_equal (const mbchar_t mbc1, const mbchar_t mbc2);
-   extern bool		mb_caseequal (const mbchar_t mbc1, const mbchar_t mbc2);
-   extern bool		mb_isalnum (const mbchar_t mbc);
-   extern bool		mb_isalpha (const mbchar_t mbc);
-   extern bool		mb_isascii (const mbchar_t mbc);
-   extern bool		mb_isblank (const mbchar_t mbc);
-   extern bool		mb_iscntrl (const mbchar_t mbc);
-   extern bool		mb_isdigit (const mbchar_t mbc);
-   extern bool		mb_isgraph (const mbchar_t mbc);
-   extern bool		mb_islower (const mbchar_t mbc);
-   extern bool		mb_isprint (const mbchar_t mbc);
-   extern bool		mb_ispunct (const mbchar_t mbc);
-   extern bool		mb_isspace (const mbchar_t mbc);
-   extern bool		mb_isupper (const mbchar_t mbc);
-   extern bool		mb_isxdigit (const mbchar_t mbc);
-   extern int		mb_width (const mbchar_t mbc);
-   extern void		mb_putc (const mbchar_t mbc, FILE *stream);
+   extern const char *  mb_ptr (const mbchar_t mbc);
+   extern size_t        mb_len (const mbchar_t mbc);
+   extern bool          mb_iseq (const mbchar_t mbc, char sc);
+   extern bool          mb_isnul (const mbchar_t mbc);
+   extern int           mb_cmp (const mbchar_t mbc1, const mbchar_t mbc2);
+   extern int           mb_casecmp (const mbchar_t mbc1, const mbchar_t mbc2);
+   extern bool          mb_equal (const mbchar_t mbc1, const mbchar_t mbc2);
+   extern bool          mb_caseequal (const mbchar_t mbc1, const mbchar_t mbc2);
+   extern bool          mb_isalnum (const mbchar_t mbc);
+   extern bool          mb_isalpha (const mbchar_t mbc);
+   extern bool          mb_isascii (const mbchar_t mbc);
+   extern bool          mb_isblank (const mbchar_t mbc);
+   extern bool          mb_iscntrl (const mbchar_t mbc);
+   extern bool          mb_isdigit (const mbchar_t mbc);
+   extern bool          mb_isgraph (const mbchar_t mbc);
+   extern bool          mb_islower (const mbchar_t mbc);
+   extern bool          mb_isprint (const mbchar_t mbc);
+   extern bool          mb_ispunct (const mbchar_t mbc);
+   extern bool          mb_isspace (const mbchar_t mbc);
+   extern bool          mb_isupper (const mbchar_t mbc);
+   extern bool          mb_isxdigit (const mbchar_t mbc);
+   extern int           mb_width (const mbchar_t mbc);
+   extern void          mb_putc (const mbchar_t mbc, FILE *stream);
    extern void          mb_setascii (mbchar_t *new, char sc);
-   extern void		mb_copy (mbchar_t *new, const mbchar_t *old);
+   extern void          mb_copy (mbchar_t *new, const mbchar_t *old);
  */
 
 #ifndef _MBCHAR_H
@@ -156,14 +156,19 @@
 #include <wchar.h>
 #include <wctype.h>
 
+_GL_INLINE_HEADER_BEGIN
+#ifndef MBCHAR_INLINE
+# define MBCHAR_INLINE _GL_INLINE
+#endif
+
 #define MBCHAR_BUF_SIZE 24
 
 struct mbchar
 {
-  const char *ptr;	/* pointer to current character */
-  size_t bytes;		/* number of bytes of current character, > 0 */
-  bool wc_valid;	/* true if wc is a valid wide character */
-  wchar_t wc;		/* if wc_valid: the current character */
+  const char *ptr;      /* pointer to current character */
+  size_t bytes;         /* number of bytes of current character, > 0 */
+  bool wc_valid;        /* true if wc is a valid wide character */
+  wchar_t wc;           /* if wc_valid: the current character */
   char buf[MBCHAR_BUF_SIZE]; /* room for the bytes, used for file input only */
 };
 
@@ -180,38 +185,38 @@ typedef struct mbchar mbchar_t;
 #define mb_iseq(mbc, sc) ((mbc).wc_valid && (mbc).wc == (sc))
 #define mb_isnul(mbc) ((mbc).wc_valid && (mbc).wc == 0)
 #define mb_cmp(mbc1, mbc2) \
-  ((mbc1).wc_valid							\
-   ? ((mbc2).wc_valid							\
-      ? (int) (mbc1).wc - (int) (mbc2).wc				\
-      : -1)								\
-   : ((mbc2).wc_valid							\
-      ? 1								\
-      : (mbc1).bytes == (mbc2).bytes					\
-        ? memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes)			\
-        : (mbc1).bytes < (mbc2).bytes					\
+  ((mbc1).wc_valid                                                      \
+   ? ((mbc2).wc_valid                                                   \
+      ? (int) (mbc1).wc - (int) (mbc2).wc                               \
+      : -1)                                                             \
+   : ((mbc2).wc_valid                                                   \
+      ? 1                                                               \
+      : (mbc1).bytes == (mbc2).bytes                                    \
+        ? memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes)                 \
+        : (mbc1).bytes < (mbc2).bytes                                   \
           ? (memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes) > 0 ? 1 : -1) \
           : (memcmp ((mbc1).ptr, (mbc2).ptr, (mbc2).bytes) >= 0 ? 1 : -1)))
 #define mb_casecmp(mbc1, mbc2) \
-  ((mbc1).wc_valid							\
-   ? ((mbc2).wc_valid							\
-      ? (int) towlower ((mbc1).wc) - (int) towlower ((mbc2).wc)		\
-      : -1)								\
-   : ((mbc2).wc_valid							\
-      ? 1								\
-      : (mbc1).bytes == (mbc2).bytes					\
-        ? memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes)			\
-        : (mbc1).bytes < (mbc2).bytes					\
+  ((mbc1).wc_valid                                                      \
+   ? ((mbc2).wc_valid                                                   \
+      ? (int) towlower ((mbc1).wc) - (int) towlower ((mbc2).wc)         \
+      : -1)                                                             \
+   : ((mbc2).wc_valid                                                   \
+      ? 1                                                               \
+      : (mbc1).bytes == (mbc2).bytes                                    \
+        ? memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes)                 \
+        : (mbc1).bytes < (mbc2).bytes                                   \
           ? (memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes) > 0 ? 1 : -1) \
           : (memcmp ((mbc1).ptr, (mbc2).ptr, (mbc2).bytes) >= 0 ? 1 : -1)))
 #define mb_equal(mbc1, mbc2) \
-  ((mbc1).wc_valid && (mbc2).wc_valid					\
-   ? (mbc1).wc == (mbc2).wc						\
-   : (mbc1).bytes == (mbc2).bytes					\
+  ((mbc1).wc_valid && (mbc2).wc_valid                                   \
+   ? (mbc1).wc == (mbc2).wc                                             \
+   : (mbc1).bytes == (mbc2).bytes                                       \
      && memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes) == 0)
 #define mb_caseequal(mbc1, mbc2) \
-  ((mbc1).wc_valid && (mbc2).wc_valid					\
-   ? towlower ((mbc1).wc) == towlower ((mbc2).wc)			\
-   : (mbc1).bytes == (mbc2).bytes					\
+  ((mbc1).wc_valid && (mbc2).wc_valid                                   \
+   ? towlower ((mbc1).wc) == towlower ((mbc2).wc)                       \
+   : (mbc1).bytes == (mbc2).bytes                                       \
      && memcmp ((mbc1).ptr, (mbc2).ptr, (mbc1).bytes) == 0)
 
 /* <ctype.h>, <wctype.h> classification.  */
@@ -235,7 +240,7 @@ typedef struct mbchar mbchar_t;
 /* Unprintable characters appear as a small box of width 1.  */
 #define MB_UNPRINTABLE_WIDTH 1
 
-static inline int
+MBCHAR_INLINE int
 mb_width_aux (wint_t wc)
 {
   int w = wcwidth (wc);
@@ -256,7 +261,7 @@ mb_width_aux (wint_t wc)
    (mbc)->wc = (mbc)->buf[0] = (sc))
 
 /* Copying a character.  */
-static inline void
+MBCHAR_INLINE void
 mb_copy (mbchar_t *new_mbc, const mbchar_t *old_mbc)
 {
   if (old_mbc->ptr == &old_mbc->buf[0])
@@ -304,16 +309,16 @@ mb_copy (mbchar_t *new_mbc, const mbchar_t *old_mbc)
 
 extern const unsigned int is_basic_table[];
 
-static inline bool
+MBCHAR_INLINE bool
 is_basic (char c)
 {
   return (is_basic_table [(unsigned char) c >> 5] >> ((unsigned char) c & 31))
-	 & 1;
+         & 1;
 }
 
 #else
 
-static inline bool
+MBCHAR_INLINE bool
 is_basic (char c)
 {
   switch (c)
@@ -346,5 +351,7 @@ is_basic (char c)
 }
 
 #endif
+
+_GL_INLINE_HEADER_END
 
 #endif /* _MBCHAR_H */

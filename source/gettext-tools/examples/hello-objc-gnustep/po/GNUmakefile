@@ -42,7 +42,17 @@ COPYRIGHT_HOLDER = Yoyodyne, Inc.
 # which the translators can contact you.
 MSGID_BUGS_ADDRESS = bug-gnu-gettext@gnu.org
 
+# These options get passed to msgmerge.
+# Useful options are in particular:
+#   --previous            to keep previous msgids of translated messages,
+#   --quiet               to reduce the verbosity.
+MSGMERGE_OPTIONS = --quiet
+
 -include $(GNUSTEP_MAKEFILES)/rules.make
+
+# Main application
+PACKAGE_NAME = Hello
+PACKAGE_VERSION = 0
 
 XGETTEXT = xgettext
 MSGMERGE = msgmerge
@@ -68,7 +78,7 @@ STRINGSFILES = $(foreach lang, $(LINGUAS), $(top_srcdir)/$(NSLOCALE_$(lang)).lpr
 ENSTRINGSFILES = $(foreach lang, $(ENLINGUAS), $(top_srcdir)/$(NSLOCALE_$(lang)).lproj/Localizable.strings)
 CATALOGS = $(STRINGSFILES) $(ENSTRINGSFILES)
 
-.SUFFIXES: .po .mo .sed .sin .nop .po-update
+.SUFFIXES: .po .mo .sed .sin .nop .po-create .po-update
 
 .sin.sed:
 	sed -e '/^#/d' $< > t-$@
@@ -87,11 +97,30 @@ all-local-no:
 # This target rebuilds $(DOMAIN).pot; it is an expensive operation.
 # Note that $(DOMAIN).pot is not touched if it doesn't need to be changed.
 $(DOMAIN).pot-update: $(POTFILES_DEPS) remove-potcdate.sed
-	$(XGETTEXT) --default-domain=$(DOMAIN) --directory=$(top_srcdir) \
-	  --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) \
-	  --copyright-holder='$(COPYRIGHT_HOLDER)' \
-	  --msgid-bugs-address='$(MSGID_BUGS_ADDRESS)' \
-	  $(POTFILES)
+	if LC_ALL=C grep 'GNU $(PACKAGE_NAME)' ../* 2>/dev/null >/dev/null; then \
+	  package_gnu='GNU '; \
+	else \
+	  package_gnu=''; \
+	fi; \
+	msgid_bugs_address='$(MSGID_BUGS_ADDRESS)'; \
+	case `$(XGETTEXT) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	  '' | 0.[0-9] | 0.[0-9].* | 0.1[0-5] | 0.1[0-5].* | 0.16 | 0.16.[0-1]*) \
+	    $(XGETTEXT) --default-domain=$(DOMAIN) --directory=$(top_srcdir) \
+	      --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) \
+	      --copyright-holder='$(COPYRIGHT_HOLDER)' \
+	      --msgid-bugs-address="$$msgid_bugs_address" \
+	      $(POTFILES) \
+	    ;; \
+	  *) \
+	    $(XGETTEXT) --default-domain=$(DOMAIN) --directory=$(top_srcdir) \
+	      --add-comments=TRANSLATORS: $(XGETTEXT_OPTIONS) \
+	      --copyright-holder='$(COPYRIGHT_HOLDER)' \
+	      --package-name="$${package_gnu}$(PACKAGE_NAME)" \
+	      --package-version='$(VERSION)' \
+	      --msgid-bugs-address="$$msgid_bugs_address" \
+	      $(POTFILES) \
+	    ;; \
+	esac
 	test ! -f $(DOMAIN).po || { \
 	  if test -f $(DOMAIN).pot; then \
 	    sed -f remove-potcdate.sed < $(DOMAIN).pot > $(DOMAIN).1po && \
@@ -117,13 +146,29 @@ $(DOMAIN).pot:
 # Note that a PO file is not touched if it doesn't need to be changed.
 $(POFILES): $(DOMAIN).pot
 	@lang=`echo $@ | sed -e 's,.*/,,' -e 's/\.po$$//'`; \
-	echo "$(MSGMERGE_UPDATE) $${lang}.po $(DOMAIN).pot"; \
-	$(MSGMERGE_UPDATE) $${lang}.po $(DOMAIN).pot
+	if test -f $${lang}.po; then \
+	  echo "$(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot"; \
+	  case `$(MSGMERGE_UPDATE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	    '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	      $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) $${lang}.po $(DOMAIN).pot;; \
+	    *) \
+	      $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot;; \
+	  esac; \
+	else \
+	  $(MAKE) $${lang}.po-create; \
+	fi
 
 update-po:
 	$(MAKE) $(DOMAIN).pot-update
 	test -z "$(UPDATEPOFILES)" || $(MAKE) $(UPDATEPOFILES)
 	$(MAKE) update-strings
+
+# General rule for creating PO files.
+
+.nop.po-create:
+	@lang=`echo $@ | sed -e 's/\.po-create$$//'`; \
+	echo "File $$lang.po does not exist. If you are a translator, you can create it through 'msginit'." 1>&2; \
+	exit 1
 
 # General rule for updating PO files.
 
@@ -131,8 +176,14 @@ update-po:
 	@lang=`echo $@ | sed -e 's/\.po-update$$//'`; \
 	tmpdir=`pwd`; \
 	echo "$$lang:"; \
-	echo "$(MSGMERGE) $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
-	if $(MSGMERGE) $$lang.po $(DOMAIN).pot -o $$tmpdir/$$lang.new.po; then \
+	echo "$(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
+	if { case `$(MSGMERGE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	       '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	       *) \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	     esac; \
+	   }; then \
 	  if cmp $$lang.po $$tmpdir/$$lang.new.po >/dev/null 2>&1; then \
 	    rm -f $$tmpdir/$$lang.new.po; \
 	  else \

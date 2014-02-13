@@ -47,6 +47,7 @@ ostream_write_str (ostream_t stream, const char *string)
 #endif
 
 #line 50 "ostream.c"
+void ostream__write_mem (ostream_t first_arg, const void *data, size_t len);
 void
 ostream__write_mem (ostream_t first_arg, const void *data, size_t len)
 {
@@ -57,6 +58,7 @@ ostream__write_mem (ostream_t first_arg, const void *data, size_t len)
   #endif
 }
 
+void ostream__flush (ostream_t first_arg);
 void
 ostream__flush (ostream_t first_arg)
 {
@@ -67,6 +69,7 @@ ostream__flush (ostream_t first_arg)
   #endif
 }
 
+void ostream__free (ostream_t first_arg);
 void
 ostream__free (ostream_t first_arg)
 {

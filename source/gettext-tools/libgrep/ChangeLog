@@ -1,3 +1,149 @@
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2012-06-03  Jim Meyering  <jim@meyering.net>
+
+	* kwset.c: Spelling fixes.
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Use the newest regex module from gnulib.
+	* regex.h: Remove file.
+	* regex.c: Remove file.
+	* memchr.c: Remove file.
+	* Makefile.am: Include Makefile.gnulib.
+	(BUILT_SOURCES, MOSTLYCLEANFILES, MOSTLYCLEANDIRS, CLEANFILES,
+	DISTCLEANFILES, MAINTAINERCLEANFILES): New variables.
+	(noinst_LIBRARIES): Initialize empty.
+	(libgrep_a_SOURCES): Augment instead of initializing.
+	(LIBADD_SOURCE, libgrep_a_LIBADD, libgrep_a_DEPENDENCIES): Remove
+	variables.
+	* gnulib-lib/Makefile.am: New file.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Code cleanup.
+	* m-regex.c (EGexecute): Write logic in a similar way as
+	m-fgrep.c:Fexecute.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Fix bug: Avoid out-of-bounds access.
+	* m-regex.c (EGexecute): Fix test before second call to
+	IS_WORD_CONSTITUENT.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Cleanup syntax.
+	* m-regex.c (compile, EGexecute): Remove useless parentheses.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	Tiny optimization.
+	* m-fgrep.c (Fexecute): New local variable buflim.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	* m-fgrep.c (Fcompile, Fexecute): Reduce scope of local variables.
+	* m-regex.c (compile, EGexecute): Likewise.
+	* kwset.c (kwsincr, treefails, kwsprep, bmexec, cwexec): Likewise.
+	(kwsexec): Remove useless cast.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	* kwset.c: Use GNU coding style.
+	(kwsalloc): Write NULL, not 0. Remove useless cast.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	msggrep: Fix interpretation of '$' in regular expressions.
+	* m-regex.c (EGexecute): When searching up to the end of a string that
+	does not end in a newline, set not_eol to 0.
+	Reported by Sean Flanigan <sflaniga@redhat.com>.
+
+2010-05-24  Bruno Haible  <bruno@clisp.org>
+
+	* m-fgrep.c: Untabify.
+	* m-regex.c: Likewise.
+	* kwset.h: Likewise.
+	* kwset.c: Likewise.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	Fix bug: A regex was not regonized when it matched the end of the last
+	line and that last line was not terminated with a newline.
+	* m-regex.c (EGexecute): Don't ignore the last byte of the buffer if it
+	is not a newline.
+	* m-fgrep.c (Fexecute): Don't assume that the buffer contains a
+	newline.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	Do regex matching purely with regex, not regex + dfa + kwset.
+	* dfa.h: Remove file.
+	* dfa.c: Remove file.
+	* hard-locale.h: Remove file.
+	* hard-locale.c: Remove file.
+	* m-common.h: Remove file.
+	* m-common.c: Remove file.
+	* m-fgrep.c: Include <limits.h>, <stdbool.h>, not m-common.h.
+	(MBS_SUPPORT): Moved here from m-common.h.
+	Include kwset.h, gettext.h.
+	(_, ISUPPER, TOLOWER): Moved here from m-common.c.
+	(IS_WORD_CONSTITUENT, NCHAR, compiled_kwset): Moved here from
+	m-common.h.
+	(kwsinit, check_multibyte_string): Moved here from m-common.c.
+	* m-regex.c: Include <stdbool.h>, <regex.h>, not m-common.h.
+	(IS_WORD_CONSTITUENT): Moved here from m-common.h.
+	(struct compiled_regex): Remove fields dfa, ckwset,
+	kwset_exact_matches.
+	(dfaerror, kwsmusts): Remove functions.
+	(compile): Simplify accordingly.
+	(Gcompile): Likewise. Invoke compile.
+	(EGexecute): Simplify accordingly.
+	* Makefile.am (libgrep_a_SOURCES): Update.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2009-12-12  Bruno Haible  <bruno@clisp.org>
+
+	* libgrep.h: Untabify.
+	* hard-locale.c: Untabify.
+	* memchr.c: Untabify.
+
+2009-08-15  Bruno Haible  <bruno@clisp.org>
+
+	Stop using gnulib module 'strdup'.
+	* strdup.c: Remove file.
+	* Makefile.am (LIBADD_SOURCE): Remove strdup.c.
+
+2008-04-28  Eric Blake  <ebb9@byu.net>
+
+	* memchr.c (__memchr): Hand-inline the TYPE_MAXIMUM check.
+
+2008-04-27  Bruno Haible  <bruno@clisp.org>
+
+	* memchr.c (__memchr): Change type of 'i'.
+
+2008-04-26  Eric Blake  <ebb9@byu.net>
+	    Bruno Haible  <bruno@clisp.org>
+
+	* memchr.c: Include intprops.h.
+	(__memchr): Optimize parallel detection of matching bytes. Rename local
+	variables. Add explanatory comments.
+
+2008-04-26  Bruno Haible  <bruno@clisp.org>
+
+	Fix module 'memchr', broken since 2000-10-28.
+	* memchr.c: Outside glibc, define memchr, not __memchr.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.

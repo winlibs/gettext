@@ -5,11 +5,11 @@
    <ctype.h> functions' behaviour depends on the current locale set via
    setlocale.
 
-   Copyright (C) 2000-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2006, 2008-2013 Free Software Foundation, Inc.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
+the Free Software Foundation; either version 3 of the License, or
 (at your option) any later version.
 
 This program is distributed in the hope that it will be useful,
@@ -18,8 +18,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software Foundation,
-Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 #ifndef C_CTYPE_H
 #define C_CTYPE_H
@@ -103,26 +102,42 @@ extern "C" {
 
 /* Function declarations. */
 
-extern bool c_isascii (int c); /* not locale dependent */
+/* Unlike the functions in <ctype.h>, which require an argument in the range
+   of the 'unsigned char' type, the functions here operate on values that are
+   in the 'unsigned char' range or in the 'char' range.  In other words,
+   when you have a 'char' value, you need to cast it before using it as
+   argument to a <ctype.h> function:
 
-extern bool c_isalnum (int c);
-extern bool c_isalpha (int c);
-extern bool c_isblank (int c);
-extern bool c_iscntrl (int c);
-extern bool c_isdigit (int c);
-extern bool c_islower (int c);
-extern bool c_isgraph (int c);
-extern bool c_isprint (int c);
-extern bool c_ispunct (int c);
-extern bool c_isspace (int c);
-extern bool c_isupper (int c);
-extern bool c_isxdigit (int c);
+         const char *s = ...;
+         if (isalpha ((unsigned char) *s)) ...
 
-extern int c_tolower (int c);
-extern int c_toupper (int c);
+   but you don't need to cast it for the functions defined in this file:
+
+         const char *s = ...;
+         if (c_isalpha (*s)) ...
+ */
+
+extern bool c_isascii (int c) _GL_ATTRIBUTE_CONST; /* not locale dependent */
+
+extern bool c_isalnum (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isalpha (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isblank (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_iscntrl (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isdigit (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_islower (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isgraph (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isprint (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_ispunct (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isspace (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isupper (int c) _GL_ATTRIBUTE_CONST;
+extern bool c_isxdigit (int c) _GL_ATTRIBUTE_CONST;
+
+extern int c_tolower (int c) _GL_ATTRIBUTE_CONST;
+extern int c_toupper (int c) _GL_ATTRIBUTE_CONST;
 
 
-#if defined __GNUC__ && defined __OPTIMIZE__ && !defined __OPTIMIZE_SIZE__ && !defined NO_C_CTYPE_MACROS
+#if (defined __GNUC__ && !defined __STRICT_ANSI__ && defined __OPTIMIZE__ \
+     && !defined __OPTIMIZE_SIZE__ && !defined NO_C_CTYPE_MACROS)
 
 /* ASCII optimizations. */
 

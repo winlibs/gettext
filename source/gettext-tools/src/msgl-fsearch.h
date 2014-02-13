@@ -1,5 +1,5 @@
 /* Fast fuzzy searching among messages.
-   Copyright (C) 2006 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,6 +20,8 @@
 
 #include "message.h"
 
+#include <stdbool.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,13 +38,24 @@ typedef struct message_fuzzy_index_ty message_fuzzy_index_ty;
    inside it must not be modified while the returned fuzzy index is in use.  */
 extern message_fuzzy_index_ty *
        message_fuzzy_index_alloc (const message_list_ty *mlp,
-				  const char *canon_charset);
+                                  const char *canon_charset);
 
 /* Find a good match for the given msgctxt and msgid in the given fuzzy index.
-   The match does not need to be optimal.  */
+   The match does not need to be optimal.
+   Ignore matches for which the fuzzy_search_goal_function is < LOWER_BOUND.
+   LOWER_BOUND must be >= FUZZY_THRESHOLD.
+   If HEURISTIC is true, only the few best messages among the list - according
+   to a certain heuristic - are considered.  If HEURISTIC is false, all
+   messages with a fuzzy_search_goal_function > FUZZY_THRESHOLD are considered,
+   like in message_list_search_fuzzy (except that in ambiguous cases where
+   several best matches exist, message_list_search_fuzzy chooses the one with
+   the smallest index whereas message_fuzzy_index_search makes a better
+   choice).  */
 extern message_ty *
        message_fuzzy_index_search (message_fuzzy_index_ty *findex,
-				   const char *msgctxt, const char *msgid);
+                                   const char *msgctxt, const char *msgid,
+                                   double lower_bound,
+                                   bool heuristic);
 
 /* Free a fuzzy index.  */
 extern void

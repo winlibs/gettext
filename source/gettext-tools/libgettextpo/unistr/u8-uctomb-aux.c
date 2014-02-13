@@ -1,5 +1,5 @@
 /* Conversion UCS-4 to UTF-8.
-   Copyright (C) 2002, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify it
@@ -10,7 +10,7 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
@@ -33,9 +33,9 @@ u8_uctomb_aux (uint8_t *s, ucs4_t uc, int n)
   else if (uc < 0x10000)
     {
       if (uc < 0xd800 || uc >= 0xe000)
-	count = 3;
+        count = 3;
       else
-	return -1;
+        return -1;
     }
 #if 0
   else if (uc < 0x200000)

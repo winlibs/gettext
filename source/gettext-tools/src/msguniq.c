@@ -1,5 +1,5 @@
 /* Remove, select or merge duplicate translations.
-   Copyright (C) 2001-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2007, 2009-2010, 2012 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -43,6 +43,7 @@
 #include "write-po.h"
 #include "write-properties.h"
 #include "write-stringtable.h"
+#include "color.h"
 #include "msgl-cat.h"
 #include "propername.h"
 #include "gettext.h"
@@ -60,6 +61,7 @@ static const char *to_code;
 static const struct option long_options[] =
 {
   { "add-location", no_argument, &line_comment, 1 },
+  { "color", optional_argument, NULL, CHAR_MAX + 5 },
   { "directory", required_argument, NULL, 'D' },
   { "escape", no_argument, NULL, 'E' },
   { "force-po", no_argument, &force_po, 1 },
@@ -77,6 +79,7 @@ static const struct option long_options[] =
   { "strict", no_argument, NULL, 'S' },
   { "stringtable-input", no_argument, NULL, CHAR_MAX + 3 },
   { "stringtable-output", no_argument, NULL, CHAR_MAX + 4 },
+  { "style", required_argument, NULL, CHAR_MAX + 6 },
   { "to-code", required_argument, NULL, 't' },
   { "unique", no_argument, NULL, 'u' },
   { "use-first", no_argument, NULL, CHAR_MAX + 1 },
@@ -89,7 +92,7 @@ static const struct option long_options[] =
 /* Forward declaration of local functions.  */
 static void usage (int status)
 #if defined __GNUC__ && ((__GNUC__ == 2 && __GNUC_MINOR__ >= 5) || __GNUC__ > 2)
-	__attribute__ ((noreturn))
+        __attribute__ ((noreturn))
 #endif
 ;
 
@@ -136,107 +139,116 @@ main (int argc, char **argv)
   use_first = false;
 
   while ((optchar = getopt_long (argc, argv, "dD:eEFhino:pPst:uVw:",
-				 long_options, NULL)) != EOF)
+                                 long_options, NULL)) != EOF)
     switch (optchar)
       {
-      case '\0':		/* Long option.  */
-	break;
+      case '\0':                /* Long option.  */
+        break;
 
       case 'd':
-	more_than = 1;
-	less_than = INT_MAX;
-	break;
+        more_than = 1;
+        less_than = INT_MAX;
+        break;
 
       case 'D':
-	dir_list_append (optarg);
-	break;
+        dir_list_append (optarg);
+        break;
 
       case 'e':
-	message_print_style_escape (false);
-	break;
+        message_print_style_escape (false);
+        break;
 
       case 'E':
-	message_print_style_escape (true);
-	break;
+        message_print_style_escape (true);
+        break;
 
       case 'F':
-	sort_by_filepos = true;
-	break;
+        sort_by_filepos = true;
+        break;
 
       case 'h':
-	do_help = true;
-	break;
+        do_help = true;
+        break;
 
       case 'i':
-	message_print_style_indent ();
-	break;
+        message_print_style_indent ();
+        break;
 
       case 'n':
-	line_comment = 1;
-	break;
+        line_comment = 1;
+        break;
 
       case 'o':
-	output_file = optarg;
-	break;
+        output_file = optarg;
+        break;
 
       case 'p':
-	output_syntax = &output_format_properties;
-	break;
+        output_syntax = &output_format_properties;
+        break;
 
       case 'P':
-	input_syntax = &input_format_properties;
-	break;
+        input_syntax = &input_format_properties;
+        break;
 
       case 's':
-	sort_by_msgid = true;
-	break;
+        sort_by_msgid = true;
+        break;
 
       case 'S':
-	message_print_style_uniforum ();
-	break;
+        message_print_style_uniforum ();
+        break;
 
       case 't':
-	to_code = optarg;
-	break;
+        to_code = optarg;
+        break;
 
       case 'u':
-	more_than = 0;
-	less_than = 2;
-	break;
+        more_than = 0;
+        less_than = 2;
+        break;
 
       case 'V':
-	do_version = true;
-	break;
+        do_version = true;
+        break;
 
       case 'w':
-	{
-	  int value;
-	  char *endp;
-	  value = strtol (optarg, &endp, 10);
-	  if (endp != optarg)
-	    message_page_width_set (value);
-	}
-	break;
+        {
+          int value;
+          char *endp;
+          value = strtol (optarg, &endp, 10);
+          if (endp != optarg)
+            message_page_width_set (value);
+        }
+        break;
 
       case CHAR_MAX + 1:
-	use_first = true;
-	break;
+        use_first = true;
+        break;
 
       case CHAR_MAX + 2: /* --no-wrap */
-	message_page_width_ignore ();
-	break;
+        message_page_width_ignore ();
+        break;
 
       case CHAR_MAX + 3: /* --stringtable-input */
-	input_syntax = &input_format_stringtable;
-	break;
+        input_syntax = &input_format_stringtable;
+        break;
 
       case CHAR_MAX + 4: /* --stringtable-output */
-	output_syntax = &output_format_stringtable;
-	break;
+        output_syntax = &output_format_stringtable;
+        break;
+
+      case CHAR_MAX + 5: /* --color */
+        if (handle_color_option (optarg) || color_test_mode)
+          usage (EXIT_FAILURE);
+        break;
+
+      case CHAR_MAX + 6: /* --style */
+        handle_style_option (optarg);
+        break;
 
       default:
-	usage (EXIT_FAILURE);
-	/* NOTREACHED */
+        usage (EXIT_FAILURE);
+        /* NOTREACHED */
       }
 
   /* Version information requested.  */
@@ -249,7 +261,7 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 "),
-	      "2001-2007");
+              "2001-2010");
       printf (_("Written by %s.\n"), proper_name ("Bruno Haible"));
       exit (EXIT_SUCCESS);
     }
@@ -272,11 +284,11 @@ There is NO WARRANTY, to the extent permitted by law.\n\
   /* Verify selected options.  */
   if (!line_comment && sort_by_filepos)
     error (EXIT_FAILURE, 0, _("%s and %s are mutually exclusive"),
-	   "--no-location", "--sort-by-file");
+           "--no-location", "--sort-by-file");
 
   if (sort_by_msgid && sort_by_filepos)
     error (EXIT_FAILURE, 0, _("%s and %s are mutually exclusive"),
-	   "--sort-output", "--sort-by-file");
+           "--sort-output", "--sort-by-file");
 
   /* Determine list of files we have to process: a single file.  */
   file_list = string_list_alloc ();
@@ -306,8 +318,8 @@ static void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
-    fprintf (stderr, _("Try `%s --help' for more information.\n"),
-	     program_name);
+    fprintf (stderr, _("Try '%s --help' for more information.\n"),
+             program_name);
   else
     {
       printf (_("\
@@ -368,6 +380,12 @@ Output details:\n"));
       --use-first             use first available translation for each\n\
                               message, don't merge several translations\n"));
       printf (_("\
+      --color                 use colors and other text attributes always\n\
+      --color=WHEN            use colors and other text attributes if WHEN.\n\
+                              WHEN may be 'always', 'never', 'auto', or 'html'.\n"));
+      printf (_("\
+      --style=STYLEFILE       specify CSS style rule file for --color\n"));
+      printf (_("\
   -e, --no-escape             do not use C escapes in output (default)\n"));
       printf (_("\
   -E, --escape                use C escapes in output, no extended chars\n"));
@@ -407,7 +425,7 @@ Informative output:\n"));
          "Report translation bugs to <...>\n" with the address for translation
          bugs (typically your translation team's web or email address).  */
       fputs (_("Report bugs to <bug-gnu-gettext@gnu.org>.\n"),
-	     stdout);
+             stdout);
     }
 
   exit (status);

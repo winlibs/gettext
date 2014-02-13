@@ -79,7 +79,7 @@ This file provides documentation for GNU @code{gettext} utilities.
 It also serves as a reference for the free Translation Project.
 
 @copying
-Copyright (C) 1995-1998, 2001-2007 Free Software Foundation, Inc.
+Copyright (C) 1995-1998, 2001-2012 Free Software Foundation, Inc.
 
 This manual is free documentation.  It is dually licensed under the
 GNU FDL and the GNU GPL.  This means that you can redistribute this
@@ -114,7 +114,7 @@ A copy of the license is included in @ref{GNU GPL}.
 @page
 @vskip 0pt plus 1filll
 @c @insertcopying
-Copyright (C) 1995-1998, 2001-2007 Free Software Foundation, Inc.
+Copyright (C) 1995-1998, 2001-2012 Free Software Foundation, Inc.
 
 This manual is free documentation.  It is dually licensed under the
 GNU FDL and the GNU GPL.  This means that you can redistribute this
@@ -136,10 +136,8 @@ A copy of the license is included in @ref{GNU GPL}.
 @end ifnothtml
 @end titlepage
 
-@ifnottex
 @c Table of Contents
 @contents
-@end ifnottex
 
 @ifset makeinfo
 @node Top, Introduction, (dir), (dir)
@@ -322,6 +320,7 @@ The Translator's View
 * Discussions::                 Discussions
 * Organization::                Organization
 * Information Flow::            Information Flow
+* Translating plural forms::    How to fill in @code{msgstr[0]}, @code{msgstr[1]}
 * Prioritizing messages::       How to find which messages to translate first
 
 Organization
@@ -405,9 +404,13 @@ The Translator's View
 * perl-format::                 Perl Format Strings
 * php-format::                  PHP Format Strings
 * gcc-internal-format::         GCC internal Format Strings
+* gfc-internal-format::         GFC internal Format Strings
 * qt-format::                   Qt Format Strings
+* qt-plural-format::            Qt Plural Format Strings
 * kde-format::                  KDE Format Strings
 * boost-format::                Boost Format Strings
+* lua-format::                  Lua Format Strings
+* javascript-format::           JavaScript Format Strings
 
 Individual Programming Languages
 
@@ -432,6 +435,8 @@ Individual Programming Languages
 * PHP::                         PHP Hypertext Preprocessor
 * Pike::                        Pike
 * GCC-source::                  GNU Compiler Collection sources
+* Lua::                         Lua
+* JavaScript::                  JavaScript
 
 sh - Shell Script
 
@@ -1215,7 +1220,7 @@ encoding.  These are in use because between 2000 and 2005, most users have
 switched to locales in UTF-8 encoding.  For example, the German locale on
 glibc systems is nowadays @samp{de_DE.UTF-8}.  The older name @samp{de_DE}
 still refers to the German locale as of 2000 that stores characters in
-ISO-8859-1 encoding -- a text encoding that cannot even accomodate the Euro
+ISO-8859-1 encoding -- a text encoding that cannot even accommodate the Euro
 currency sign.
 
 Some locale names use @samp{@var{ll}_@var{CC}.@@@var{variant}} instead of
@@ -1472,16 +1477,16 @@ search only.  @xref{Fuzzy Entries}.
 @kwindex no-c-format@r{ flag}
 These flags should not be added by a human.  Instead only the
 @code{xgettext} program adds them.  In an automated PO file processing
-system as proposed here the user changes would be thrown away again as
+system as proposed here, the user's changes would be thrown away again as
 soon as the @code{xgettext} program generates a new template file.
 
-The @code{c-format} flag tells that the untranslated string and the
+The @code{c-format} flag indicates that the untranslated string and the
 translation are supposed to be C format strings.  The @code{no-c-format}
-flag tells that they are not C format strings, even though the untranslated
+flag indicates that they are not C format strings, even though the untranslated
 string happens to look like a C format string (with @samp{%} directives).
 
-In case the @code{c-format} flag is given for a string the @code{msgfmt}
-does some more tests to check to validity of the translation.
+When the @code{c-format} flag is given for a string the @code{msgfmt}
+program does some more tests to check the validity of the translation.
 @xref{msgfmt Invocation}, @ref{c-format Flag} and @ref{c-format}.
 
 @item objc-format
@@ -1501,6 +1506,12 @@ Likewise for Shell, see @ref{sh-format}.
 @itemx no-python-format
 @kwindex no-python-format@r{ flag}
 Likewise for Python, see @ref{python-format}.
+
+@item python-brace-format
+@kwindex python-brace-format@r{ flag}
+@itemx no-python-brace-format
+@kwindex no-python-brace-format@r{ flag}
+Likewise for Python brace, see @ref{python-format}.
 
 @item lisp-format
 @kwindex lisp-format@r{ flag}
@@ -1592,11 +1603,23 @@ Likewise for PHP, see @ref{php-format}.
 @kwindex no-gcc-internal-format@r{ flag}
 Likewise for the GCC sources, see @ref{gcc-internal-format}.
 
+@item gfc-internal-format
+@kwindex gfc-internal-format@r{ flag}
+@itemx no-gfc-internal-format
+@kwindex no-gfc-internal-format@r{ flag}
+Likewise for the GNU Fortran Compiler sources, see @ref{gfc-internal-format}.
+
 @item qt-format
 @kwindex qt-format@r{ flag}
 @itemx no-qt-format
 @kwindex no-qt-format@r{ flag}
 Likewise for Qt, see @ref{qt-format}.
+
+@item qt-plural-format
+@kwindex qt-plural-format@r{ flag}
+@itemx no-qt-plural-format
+@kwindex no-qt-plural-format@r{ flag}
+Likewise for Qt plural forms, see @ref{qt-plural-format}.
 
 @item kde-format
 @kwindex kde-format@r{ flag}
@@ -1609,6 +1632,18 @@ Likewise for KDE, see @ref{kde-format}.
 @itemx no-boost-format
 @kwindex no-boost-format@r{ flag}
 Likewise for Boost, see @ref{boost-format}.
+
+@item lua-format
+@kwindex lua-format@r{ flag}
+@itemx no-lua-format
+@kwindex no-lua-format@r{ flag}
+Likewise for Lua, see @ref{lua-format}.
+
+@item javascript-format
+@kwindex javascript-format@r{ flag}
+@itemx no-javascript-format
+@kwindex no-javascript-format@r{ flag}
+Likewise for JavaScript, see @ref{javascript-format}.
 
 @end table
 
@@ -1670,6 +1705,18 @@ msgstr[1] "s'han trobat %d errors fatals"
 Here also, a @code{msgctxt} context can be specified before @code{msgid},
 like above.
 
+Here, additional kinds of flags can be used:
+
+@table @code
+@item range:
+@kwindex range:@r{ flag}
+This flag is followed by a range of non-negative numbers, using the syntax
+@code{range: @var{minimum-value}..@var{maximum-value}}.  It designates the
+possible values that the numeric parameter of the message can take.  In some
+languages, translators may produce slightly better translations if they know
+that the value can only take on values between 0 and 10, for example.
+@end table
+
 The @var{previous-untranslated-string} is optionally inserted by the
 @code{msgmerge} program, at the same time when it marks a message fuzzy.
 It helps the translator to see which changes were done by the developers
@@ -1684,6 +1731,12 @@ The remainder of this section may be safely skipped by those using
 a PO file editor, yet it may be interesting for everybody to have a better
 idea of the precise format of a PO file.  On the other hand, those
 wishing to modify PO files by hand should carefully continue reading on.
+
+An empty @var{untranslated-string} is reserved to contain the header
+entry with the meta information (@pxref{Header Entry}).  This header
+entry should be the first entry of the file.  The empty
+@var{untranslated-string} is reserved for this purpose and must
+not be used anywhere else.
 
 Each of @var{untranslated-string} and @var{translated-string} respects
 the C syntax for a character string, including the surrounding quotes
@@ -2214,7 +2267,9 @@ string as sole argument.  It is also possible to define marking functions
 that take it at another argument position.  It is even possible to make
 the marked argument position depend on the total number of arguments of
 the function call; this is useful in C++.  All this is achieved using
-@code{xgettext}'s @samp{--keyword} option.
+@code{xgettext}'s @samp{--keyword} option.  How to pass such an option
+to @code{xgettext}, assuming that @code{gettextize} is used, is described
+in @ref{po/Makevars} and @ref{AM_XGETTEXT_OPTION}.
 
 Note also that long strings can be split across lines, into multiple
 adjacent string tokens.  Automatic string concatenation is performed
@@ -2642,7 +2697,8 @@ read the script the name is originally written in.
 
 As a programmer, you should therefore make sure that names are marked
 for translation, with a special comment telling the translators that it
-is a proper name and how to pronounce it.  Like this:
+is a proper name and how to pronounce it.  In its simple form, it looks
+like this:
 
 @example
 @group
@@ -2656,16 +2712,48 @@ printf (_("Written by %s.\n"),
 @end group
 @end example
 
+@noindent
+The GNU gnulib library offers a module @samp{propername}
+(@url{http://www.gnu.org/software/gnulib/MODULES.html#module=propername})
+which takes care to automatically append the original name, in parentheses,
+to the translated name.  For names that cannot be written in ASCII, it
+also frees the translator from the task of entering the appropriate non-ASCII
+characters if no script change is needed.  In this more comfortable form,
+it looks like this:
+
+@example
+@group
+printf (_("Written by %s and %s.\n"),
+        proper_name ("Ulrich Drepper"),
+        /* TRANSLATORS: This is a proper name.  See the gettext
+           manual, section Names.  Note this is actually a non-ASCII
+           name: The first name is (with Unicode escapes)
+           "Fran\u00e7ois" or (with HTML entities) "Fran&ccedil;ois".
+           Pronunciation is like "fraa-swa pee-nar".  */
+        proper_name_utf8 ("Francois Pinard", "Fran\303\247ois Pinard"));
+@end group
+@end example
+
+@noindent
+You can also write the original name directly in Unicode (rather than with
+Unicode escapes or HTML entities) and denote the pronunciation using the
+International Phonetic Alphabet (see
+@url{http://www.wikipedia.org/wiki/International_Phonetic_Alphabet}).
+
 As a translator, you should use some care when translating names, because
-it is frustrating if people see their names mutilated or distorted.  If
-your language uses the Latin script, all you need to do is to reproduce
+it is frustrating if people see their names mutilated or distorted.
+
+If your language uses the Latin script, all you need to do is to reproduce
 the name as perfectly as you can within the usual character set of your
 language.  In this particular case, this means to provide a translation
 containing the c-cedilla character.  If your language uses a different
 script and the people speaking it don't usually read Latin words, it means
-transliteration; but you should still give, in parentheses, the original
-writing of the name -- for the sake of the people that do read the Latin
-script.  Here is an example, using Greek as the target script:
+transliteration.  If the programmer used the simple case, you should still
+give, in parentheses, the original writing of the name -- for the sake of
+the people that do read the Latin script.  If the programmer used the
+@samp{propername} module mentioned above, you don't need to give the original
+writing of the name in parentheses, because the program will already do so.
+Here is an example, using Greek as the target script:
 
 @example
 @group
@@ -2682,19 +2770,6 @@ msgstr "\phi\rho\alpha\sigma\omicron\alpha \pi\iota\nu\alpha\rho"
 
 Because translation of names is such a sensitive domain, it is a good
 idea to test your translation before submitting it.
-
-The translation project @url{http://sourceforge.net/projects/translation}
-has set up a POT file and translation domain consisting of program author
-names, with better facilities for the translator than those presented here.
-Namely, there the original name is written directly in Unicode (rather
-than with Unicode escapes or HTML entities), and the pronunciation is
-denoted using the International Phonetic Alphabet (see
-@url{http://www.wikipedia.org/wiki/International_Phonetic_Alphabet}).
-
-However, we don't recommend this approach for all POT files in all packages,
-because this would force translators to use PO files in UTF-8 encoding,
-which is - in the current state of software (as of 2003) - a major hassle
-for translators using GNU Emacs or XEmacs with po-mode.
 
 @node Libraries,  , Names, Sources
 @section Preparing Library Sources
@@ -2913,6 +2988,58 @@ list.  The up-to-date list of teams can be found at the Free Translation
 Project's homepage, @uref{http://translationproject.org/}, in the "Teams"
 area.
 
+@item Language
+@c The purpose of this field is to make it possible to automatically
+@c - convert PO files to translation memory,
+@c - initialize a spell checker based on the PO file,
+@c - perform language specific checks.
+Fill in the language code of the language.  This can be in one of three
+forms:
+
+@itemize -
+@item
+@samp{@var{ll}}, an @w{ISO 639} two-letter language code (lowercase).
+See @ref{Language Codes} for the list of codes.
+
+@item
+@samp{@var{ll}_@var{CC}}, where @samp{@var{ll}} is an @w{ISO 639} two-letter
+language code (lowercase) and @samp{@var{CC}} is an @w{ISO 3166} two-letter
+country code (uppercase).  The country code specification is not redundant:
+Some languages have dialects in different countries.  For example,
+@samp{de_AT} is used for Austria, and @samp{pt_BR} for Brazil.  The country
+code serves to distinguish the dialects. See @ref{Language Codes} and
+@ref{Country Codes} for the lists of codes.
+
+@item
+@samp{@var{ll}_@var{CC}@@@var{variant}}, where @samp{@var{ll}} is an
+@w{ISO 639} two-letter language code (lowercase), @samp{@var{CC}} is an
+@w{ISO 3166} two-letter country code (uppercase), and @samp{@var{variant}} is
+a variant designator. The variant designator (lowercase) can be a script
+designator, such as @samp{latin} or @samp{cyrillic}.
+@end itemize
+
+The naming convention @samp{@var{ll}_@var{CC}} is also the way locales are
+named on systems based on GNU libc.  But there are three important differences:
+
+@itemize @bullet
+@item
+In this PO file field, but not in locale names, @samp{@var{ll}_@var{CC}}
+combinations denoting a language's main dialect are abbreviated as
+@samp{@var{ll}}.  For example, @samp{de} is equivalent to @samp{de_DE}
+(German as spoken in Germany), and @samp{pt} to @samp{pt_PT} (Portuguese as
+spoken in Portugal) in this context.
+
+@item
+In this PO file field, suffixes like @samp{.@var{encoding}} are not used.
+
+@item
+In this PO file field, variant designators that are not relevant to message
+translation, such as @samp{@@euro}, are not used.
+@end itemize
+
+So, if your locale name is @samp{de_DE.UTF-8}, the language specification in
+PO files is just @samp{de}.
+
 @item Content-Type
 @cindex encoding of PO files
 @cindex charset of PO files
@@ -2976,7 +3103,7 @@ Italian, Portuguese, Spanish, Swedish, Walloon,
 @item @code{KOI8-R} for Russian,
 @item @code{KOI8-U} for Ukrainian,
 @item @code{KOI8-T} for Tajik,
-@item @code{CP1251} for Bulgarian, Byelorussian,
+@item @code{CP1251} for Bulgarian, Belarusian,
 @item @code{GB2312}, @code{GBK}, @code{GB18030}
 for simplified writing of Chinese,
 @item @code{BIG5}, @code{BIG5-HKSCS}
@@ -3021,7 +3148,8 @@ Set this to @code{8bit}.
 @item Plural-Forms
 This field is optional.  It is only needed if the PO file has plural forms.
 You can find them by searching for the @samp{msgid_plural} keyword.  The
-format of the plural forms field is described in @ref{Plural forms}.
+format of the plural forms field is described in @ref{Plural forms} and
+@ref{Translating plural forms}.
 @end table
 
 @node Updating, Editing, Creating, Top
@@ -3207,7 +3335,7 @@ Batch validate the format of the whole PO file (@code{po-validate}).
 @efindex po-undo@r{, PO Mode command}
 The command @kbd{_} (@code{po-undo}) interfaces to the Emacs
 @emph{undo} facility.  @xref{Undo, , Undoing Changes, emacs, The Emacs
-Editor}.  Each time @kbd{U} is typed, modifications which the translator
+Editor}.  Each time @kbd{_} is typed, modifications which the translator
 did to the PO file are undone a little more.  For the purpose of
 undoing, each PO mode command is atomic.  This is especially true for
 the @kbd{@key{RET}} command: the whole edition made by using a single
@@ -3601,13 +3729,13 @@ has to be later revisited.  So, some commands are more specifically
 related to fuzzy entry processing.
 
 @table @kbd
-@item z
-@efindex z@r{, PO Mode command}
+@item f
+@efindex f@r{, PO Mode command}
 @c better append "-entry" all the time. -ke-
 Find the next fuzzy entry (@code{po-next-fuzzy-entry}).
 
-@item Z
-@efindex Z@r{, PO Mode command}
+@item F
+@efindex F@r{, PO Mode command}
 Find the previous fuzzy entry (@code{po-previous-fuzzy-entry}).
 
 @item @key{TAB}
@@ -3616,11 +3744,11 @@ Remove the fuzzy attribute of the current entry (@code{po-unfuzzy}).
 
 @end table
 
-@efindex z@r{, PO Mode command}
+@efindex f@r{, PO Mode command}
 @efindex po-next-fuzzy-entry@r{, PO Mode command}
-@efindex Z@r{, PO Mode command}
+@efindex F@r{, PO Mode command}
 @efindex po-previous-fuzzy-entry@r{, PO Mode command}
-The commands @kbd{z} (@code{po-next-fuzzy-entry}) and @kbd{Z}
+The commands @kbd{f} (@code{po-next-fuzzy-entry}) and @kbd{F}
 (@code{po-previous-fuzzy-entry}) move forwards or backwards, chasing for
 a fuzzy entry.  If none is found, the search is extended and wraps
 around in the PO file buffer.
@@ -4493,7 +4621,7 @@ msgmerge --compendium compendium.po -o file.po /dev/null file.pot
 
 Concatenate the compendium file(s) and the existing PO, merge the
 result with the POT file and remove the obsolete entries (optional,
-here done using @samp{sed}):
+here done using @samp{msgattrib}):
 
 @example
 msgcat --use-first -o update.po compendium1.po compendium2.po file.po
@@ -5192,15 +5320,23 @@ which appears below.
 The first two words serve the identification of the file.  The magic
 number will always signal GNU MO files.  The number is stored in the
 byte order of the generating machine, so the magic number really is
-two numbers: @code{0x950412de} and @code{0xde120495}.  The second
-word describes the current revision of the file format.  For now the
-revision is 0.  This might change in future versions, and ensures
-that the readers of MO files can distinguish new formats from old
-ones, so that both can be handled correctly.  The version is kept
+two numbers: @code{0x950412de} and @code{0xde120495}.
+
+The second word describes the current revision of the file format,
+composed of a major and a minor revision number.  The revision numbers
+ensure that the readers of MO files can distinguish new formats from
+old ones and handle their contents, as far as possible.  For now the
+major revision is 0 or 1, and the minor revision is also 0 or 1.  More
+revisions might be added in the future.  A program seeing an unexpected
+major revision number should stop reading the MO file entirely; whereas
+an unexpected minor revision number means that the file can be read but
+will not reveal its full contents, when parsed by a program that
+supports only smaller minor revision numbers.
+
+The version is kept
 separate from the magic number, instead of using different magic
 numbers for different formats, mainly because @file{/etc/magic} is
-not updated often.  It might be better to have magic separated from
-internal format version identification.
+not updated often.
 
 Follow a number of pointers to later tables in the file, allowing
 for the extension of the prefix part of MO files without having to
@@ -5973,6 +6109,46 @@ printf (ngettext ("One file removed", "%d files removed", n), n);
 This works because the @samp{printf} function discards excess arguments that
 are not consumed by the format string.
 
+If this function is meant to yield a format string that takes two or more
+arguments, you can not use it like this:
+
+@smallexample
+printf (ngettext ("%d file removed from directory %s",
+                  "%d files removed from directory %s",
+                  n),
+        n, dir);
+@end smallexample
+
+@noindent
+because in many languages the translators want to replace the @samp{%d}
+with an explicit word in the singular case, just like ``one'' in English,
+and C format strings cannot consume the second argument but skip the first
+argument.  Instead, you have to reorder the arguments so that @samp{n}
+comes last:
+
+@smallexample
+printf (ngettext ("%$2d file removed from directory %$1s",
+                  "%$2d files removed from directory %$1s",
+                  n),
+        dir, n);
+@end smallexample
+
+@noindent
+See @ref{c-format} for details about this argument reordering syntax.
+
+When you know that the value of @code{n} is within a given range, you can
+specify it as a comment directed to the @code{xgettext} tool.  This
+information may help translators to use more adequate translations.  Like
+this:
+
+@smallexample
+if (days > 7 && days < 14)
+  /* xgettext: range: 1..6 */
+  printf (ngettext ("one week and one day", "one week and %d days",
+                    days - 7),
+          days - 7);
+@end smallexample
+
 It is also possible to use this function when the strings don't contain a
 cardinal number:
 
@@ -6059,9 +6235,9 @@ Languages with this property include:
 
 @table @asis
 @item Asian family
-Japanese, Korean, Vietnamese
-@item Turkic/Altaic family
-Turkish
+Japanese, @c   122.1 million speakers
+Vietnamese, @c  68.6 million speakers
+Korean @c       66.3 million speakers
 @end table
 
 @item Two forms, singular used for one only
@@ -6080,25 +6256,37 @@ Languages with this property include:
 
 @table @asis
 @item Germanic family
-Danish, Dutch, English, Faroese, German, Norwegian, Swedish
-@item Finno-Ugric family
-Estonian, Finnish
-@item Latin/Greek family
-Greek
-@item Semitic family
-Hebrew
+English, @c    328.0 million speakers
+German, @c      96.9 million speakers
+Dutch, @c       21.7 million speakers
+Swedish, @c      8.3 million speakers
+Danish, @c       5.6 million speakers
+Norwegian, @c    4.6 million speakers
+Faroese @c       0.05 million speakers
 @item Romanic family
-Italian, Portuguese, Spanish
+Spanish, @c    328.5 million speakers
+Portuguese, @c 178.0 million speakers - 163 million Brazilian Portuguese
+Italian, @c     61.7 million speakers
+Bulgarian @c     9.1 million speakers
+@item Latin/Greek family
+Greek @c        13.1 million speakers
+@item Finno-Ugric family
+Finnish, @c      5.0 million speakers
+Estonian @c      1.0 million speakers
+@item Semitic family
+Hebrew @c        5.3 million speakers
 @item Artificial
-Esperanto
+Esperanto @c       2 million speakers
 @end table
 
 @noindent
-Another language using the same header entry is:
+Other languages using the same header entry are:
 
 @table @asis
 @item Finno-Ugric family
-Hungarian
+Hungarian @c   12.5 million speakers
+@item Turkic/Altaic family
+Turkish @c     50.8 million speakers
 @end table
 
 Hungarian does not appear to have a plural if you look at sentences involving
@@ -6107,6 +6295,11 @@ cardinal numbers.  For example, ``1 apple'' is ``1 alma'', and ``123 apples'' is
 singular and plural exists: ``the apple'' is ``az alma'', and ``the apples'' is
 ``az alm@'{a}k''.  Since @code{ngettext} has to support both types of sentences,
 it is classified here, under ``two forms''.
+
+The same holds for Turkish: ``1 apple'' is ``1 elma'', and ``123 apples'' is
+``123 elma''.  But when the number is omitted, the distinction between singular
+and plural exists: ``the apple'' is ``elma'', and ``the apples'' is
+``elmalar''.
 
 @item Two forms, singular used for zero and one
 Exceptional case in the language family.  The header entry would be:
@@ -6120,7 +6313,8 @@ Languages with this property include:
 
 @table @asis
 @item Romanic family
-French, Brazilian Portuguese
+Brazilian Portuguese, @c 163 million speakers
+French @c                 67.8 million speakers
 @end table
 
 @item Three forms, special case for zero
@@ -6135,7 +6329,7 @@ Languages with this property include:
 
 @table @asis
 @item Baltic family
-Latvian
+Latvian @c     1.5 million speakers
 @end table
 
 @item Three forms, special cases for one and two
@@ -6150,7 +6344,7 @@ Languages with this property include:
 
 @table @asis
 @item Celtic
-Gaeilge (Irish)
+Gaeilge (Irish) @c 0.4 million speakers
 @end table
 
 @item Three forms, special case for numbers ending in 00 or [2-9][0-9]
@@ -6166,7 +6360,7 @@ Languages with this property include:
 
 @table @asis
 @item Romanic family
-Romanian
+Romanian @c    23.4 million speakers
 @end table
 
 @item Three forms, special case for numbers ending in 1[2-9]
@@ -6183,7 +6377,7 @@ Languages with this property include:
 
 @table @asis
 @item Baltic family
-Lithuanian
+Lithuanian @c  3.2 million speakers
 @end table
 
 @item Three forms, special cases for numbers ending in 1 and 2, 3, 4, except those ending in 1[1-4]
@@ -6200,7 +6394,11 @@ Languages with this property include:
 
 @table @asis
 @item Slavic family
-Croatian, Serbian, Russian, Ukrainian
+Russian, @c    143.6 million speakers
+Ukrainian, @c   37.0 million speakers
+Belarusian, @c   8.6 million speakers
+Serbian, @c      7.0 million speakers
+Croatian @c      5.5 million speakers
 @end table
 
 @item Three forms, special cases for 1 and 2, 3, 4
@@ -6216,7 +6414,8 @@ Languages with this property include:
 
 @table @asis
 @item Slavic family
-Slovak, Czech
+Czech, @c      9.5 million speakers
+Slovak @c      5.0 million speakers
 @end table
 
 @item Three forms, special case for one and some numbers ending in 2, 3, or 4
@@ -6233,7 +6432,7 @@ Languages with this property include:
 
 @table @asis
 @item Slavic family
-Polish
+Polish @c      40.0 million speakers
 @end table
 
 @item Four forms, special case for one and all numbers ending in 02, 03, or 04
@@ -6249,7 +6448,7 @@ Languages with this property include:
 
 @table @asis
 @item Slavic family
-Slovenian
+Slovenian @c   1.9 million speakers
 @end table
 @end table
 
@@ -6297,6 +6496,9 @@ Time elapsed: 1.000 seconds
 @end smallexample
 @noindent
 is acceptable in English, and similarly for other languages.
+
+The translators' perspective regarding plural forms is explained in
+@ref{Translating plural forms}.
 
 @node Optimized gettext,  , Plural forms, gettext
 @subsection Optimization of the *gettext functions
@@ -6680,6 +6882,7 @@ Solaris is not the only system having @code{gettext}.
 * Discussions::                 Discussions
 * Organization::                Organization
 * Information Flow::            Information Flow
+* Translating plural forms::    How to fill in @code{msgstr[0]}, @code{msgstr[1]}
 * Prioritizing messages::       How to find which messages to translate first
 @end menu
 
@@ -6841,12 +7044,12 @@ ready to work together at improving the results they obtain.
 
 Some people wonder if using GNU @code{gettext} necessarily brings their
 package under the protective wing of the GNU General Public License or
-the GNU Library General Public License, when they do not want to make
+the GNU Lesser General Public License, when they do not want to make
 their program free, or want other kinds of freedom.  The simplest
 answer is ``normally not''.
 
 The @code{gettext-runtime} part of GNU @code{gettext}, i.e.@: the
-contents of @code{libintl}, is covered by the GNU Library General Public
+contents of @code{libintl}, is covered by the GNU Lesser General Public
 License.  The @code{gettext-tools} part of GNU @code{gettext}, i.e.@: the
 rest of the GNU @code{gettext} package, is covered by the GNU General
 Public License.
@@ -7065,7 +7268,7 @@ run, each team should run its own list, from within their country.
 There also should be some central list to which all teams could
 subscribe as they see fit, as long as each team is represented in it.
 
-@node Information Flow, Prioritizing messages, Organization, Translators
+@node Information Flow, Translating plural forms, Organization, Translators
 @section Information Flow
 
 @strong{ NOTE: } This documentation section is outdated and needs to be
@@ -7091,7 +7294,7 @@ all of GNU, giving myself the duty of one small GNU package per week
 or so, taking many weeks or months for bigger packages.  But it does
 not work this way.  I first did all the things I'm responsible for.
 I've nothing against some missionary work on other maintainers, but
-I'm also loosing a lot of energy over it---same debates over again.
+I'm also losing a lot of energy over it---same debates over again.
 
 And when the first localized packages are released we'll get a lot of
 responses about ugly translations :-).  Surely, and we need to have
@@ -7106,7 +7309,104 @@ I sent a proposal for a fast and flexible format, but it is not
 receiving acceptance yet by the GNU deciders.  I'll tell you when I
 have more information about this.
 
-@node Prioritizing messages,  , Information Flow, Translators
+@node Translating plural forms, Prioritizing messages, Information Flow, Translators
+@section Translating plural forms
+
+@cindex plural forms, translating
+Suppose you are translating a PO file, and it contains an entry like this:
+
+@smallexample
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] ""
+msgstr[1] ""
+@end smallexample
+
+@noindent
+What does this mean? How do you fill it in?
+
+Such an entry denotes a message with plural forms, that is, a message where
+the text depends on a cardinal number.  The general form of the message,
+in English, is the @code{msgid_plural} line.  The @code{msgid} line is the
+English singular form, that is, the form for when the number is equal to 1.
+More details about plural forms are explained in @ref{Plural forms}.
+
+The first thing you need to look at is the @code{Plural-Forms} line in the
+header entry of the PO file.  It contains the number of plural forms and a
+formula.  If the PO file does not yet have such a line, you have to add it.
+It only depends on the language into which you are translating.  You can
+get this info by using the @code{msginit} command (see @ref{Creating}) --
+it contains a database of known plural formulas -- or by asking other
+members of your translation team.
+
+Suppose the line looks as follows:
+
+@smallexample
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+@end smallexample
+
+It's logically one line; recall that the PO file formatting is allowed to
+break long lines so that each physical line fits in 80 monospaced columns.
+
+The value of @code{nplurals} here tells you that there are three plural
+forms.  The first thing you need to do is to ensure that the entry contains
+an @code{msgstr} line for each of the forms:
+
+@smallexample
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+@end smallexample
+
+Then translate the @code{msgid_plural} line and fill it in into each
+@code{msgstr} line:
+
+@smallexample
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] "%d slika uklonjenih"
+msgstr[1] "%d slika uklonjenih"
+msgstr[2] "%d slika uklonjenih"
+@end smallexample
+
+Now you can refine the translation so that it matches the plural form.
+According to the formula above, @code{msgstr[0]} is used when the number
+ends in 1 but does not end in 11; @code{msgstr[1]} is used when the number
+ends in 2, 3, 4, but not in 12, 13, 14; and @code{msgstr[2]} is used in
+all other cases.  With this knowledge, you can refine the translations:
+
+@smallexample
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] "%d slika je uklonjena"
+msgstr[1] "%d datoteke uklonjenih"
+msgstr[2] "%d slika uklonjenih"
+@end smallexample
+
+You noticed that in the English singular form (@code{msgid}) the number
+placeholder could be omitted and replaced by the numeral word ``one''.
+Can you do this in your translation as well?
+
+@smallexample
+msgstr[0] "jednom datotekom je uklonjen"
+@end smallexample
+
+@noindent
+Well, it depends on whether @code{msgstr[0]} applies only to the number 1,
+or to other numbers as well.  If, according to the plural formula,
+@code{msgstr[0]} applies only to @code{n == 1}, then you can use the
+specialized translation without the number placeholder.  In our case,
+however, @code{msgstr[0]} also applies to the numbers 21, 31, 41, etc.,
+and therefore you cannot omit the placeholder.
+
+@node Prioritizing messages,  , Translating plural forms, Translators
 @section Prioritizing messages: How to determine which messages to translate first
 
 A translator sometimes has only a limited amount of time per week to
@@ -7645,11 +7945,11 @@ has platform dependent support for determining the locale's character
 encoding and therefore needs to identify the platform.
 
 You can obtain the newest version of @file{config.guess} and
-@file{config.sub} from the CVS of the @samp{config} project at
+@file{config.sub} from the @samp{config} project at
 @file{http://savannah.gnu.org/}. The commands to fetch them are
 @smallexample
-$ wget 'http://savannah.gnu.org/cgi-bin/viewcvs/*checkout*/config/config/config.guess'
-$ wget 'http://savannah.gnu.org/cgi-bin/viewcvs/*checkout*/config/config/config.sub'
+$ wget -O config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD'
+$ wget -O config.sub 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD'
 @end smallexample
 @noindent
 Less recent versions are also contained in the GNU @code{automake} and
@@ -7680,15 +7980,15 @@ automake 1.9.
 @cindex @file{aclocal.m4} file
 
 If you do not have an @file{aclocal.m4} file in your distribution,
-the simplest is to concatenate the files @file{codeset.m4},
+the simplest is to concatenate the files @file{codeset.m4}, @file{fcntl-o.m4},
 @file{gettext.m4}, @file{glibc2.m4}, @file{glibc21.m4}, @file{iconv.m4},
 @file{intdiv0.m4}, @file{intl.m4}, @file{intldir.m4}, @file{intlmacosx.m4},
 @file{intmax.m4}, @file{inttypes_h.m4}, @file{inttypes-pri.m4},
 @file{lcmessage.m4}, @file{lib-ld.m4}, @file{lib-link.m4},
 @file{lib-prefix.m4}, @file{lock.m4}, @file{longlong.m4}, @file{nls.m4},
 @file{po.m4}, @file{printf-posix.m4}, @file{progtest.m4}, @file{size_max.m4},
-@file{stdint_h.m4}, @file{uintmax_t.m4}, @file{visibility.m4},
-@file{wchar_t.m4}, @file{wint_t.m4}, @file{xsize.m4}
+@file{stdint_h.m4}, @file{threadlib.m4}, @file{uintmax_t.m4},
+@file{visibility.m4}, @file{wchar_t.m4}, @file{wint_t.m4}, @file{xsize.m4}
 from GNU @code{gettext}'s
 @file{m4/} directory into a single file.  If you have suppressed the
 @file{intl/} directory, only @file{gettext.m4}, @file{iconv.m4},
@@ -7717,6 +8017,18 @@ ACLOCAL_AMFLAGS = -I m4
 
 @noindent
 to your top level @file{Makefile.am}.
+
+If you are using GNU @code{automake} 1.10 or newer, it is even easier:
+Add the line
+
+@example
+ACLOCAL_AMFLAGS = --install -I m4
+@end example
+
+@noindent
+to your top level @file{Makefile.am}, and run @samp{aclocal --install -I m4}.
+This will copy the needed files to the @file{m4/} subdirectory automatically,
+before updating @file{aclocal.m4}.
 
 These macros check for the internationalization support functions
 and related informations.  Hopefully, once stabilized, these macros
@@ -7891,7 +8203,16 @@ textdomain (@var{PACKAGE});
 @end example
 
 To make LOCALEDIR known to the program, add the following lines to
-@file{Makefile.in}:
+@file{Makefile.in} if you are using Autoconf version 2.60 or newer:
+
+@example
+datadir = @@datadir@@
+datarootdir= @@datarootdir@@
+localedir = @@localedir@@
+DEFS = -DLOCALEDIR=\"$(localedir)\" @@DEFS@@
+@end example
+
+or these lines if your version of Autoconf is older than 2.60:
 
 @example
 datadir = @@datadir@@
@@ -7967,8 +8288,9 @@ for each specific module or compilation unit, or
 AM_CPPFLAGS = -DLOCALEDIR=\"$(localedir)\"
 @end example
 
-for all modules and compilation units together.  Furthermore, add this
-line to define @samp{localedir}:
+for all modules and compilation units together.  Furthermore, if you are
+using an Autoconf version older then 2.60, add this line to define
+@samp{localedir}:
 
 @example
 localedir = $(datadir)/locale
@@ -8660,9 +8982,13 @@ strings.
 * perl-format::                 Perl Format Strings
 * php-format::                  PHP Format Strings
 * gcc-internal-format::         GCC internal Format Strings
+* gfc-internal-format::         GFC internal Format Strings
 * qt-format::                   Qt Format Strings
+* qt-plural-format::            Qt Plural Format Strings
 * kde-format::                  KDE Format Strings
 * boost-format::                Boost Format Strings
+* lua-format::                  Lua Format Strings
+* javascript-format::           JavaScript Format Strings
 @end menu
 
 @node c-format, objc-format, Translators for other Languages, Translators for other Languages
@@ -8714,7 +9040,7 @@ glibc when NLS is disabled.)
 @subsection Objective C Format Strings
 
 Objective C format strings are like C format strings.  They support an
-additional format directive: "$@@", which when executed consumes an argument
+additional format directive: "%@@", which when executed consumes an argument
 of type @code{Object *}.
 
 @node sh-format, python-format, objc-format, Translators for other Languages
@@ -8739,13 +9065,21 @@ a variable reference is ignored.
 @node python-format, lisp-format, sh-format, Translators for other Languages
 @subsection Python Format Strings
 
-Python format strings are described in
+There are two kinds of format strings in Python: those acceptable to
+the Python built-in format operator @code{%}, labelled as
+@samp{python-format}, and those acceptable to the @code{format} method
+of the @samp{str} object.
+
+Python @code{%} format strings are described in
 @w{Python Library reference} /
 @w{2. Built-in Types, Exceptions and Functions} /
 @w{2.2. Built-in Types} /
 @w{2.2.6. Sequence Types} /
 @w{2.2.6.2. String Formatting Operations}.
 @uref{http://www.python.org/doc/2.2.1/lib/typesseq-strings.html}.
+
+Python brace format strings are described in @w{PEP 3101 -- Advanced
+String Formatting}, @uref{http://www.python.org/dev/peps/pep-3101/}.
 
 @node lisp-format, elisp-format, python-format, Translators for other Languages
 @subsection Lisp Format Strings
@@ -8813,7 +9147,9 @@ awk format strings are described in the gawk documentation, section
 @node object-pascal-format, ycp-format, awk-format, Translators for other Languages
 @subsection Object Pascal Format Strings
 
-Where is this documented?
+Object Pascal format strings are described in the documentation of the
+Free Pascal runtime library, section Format,
+@uref{http://www.freepascal.org/docs-html/rtl/sysutils/format.html}.
 
 @node ycp-format, tcl-format, object-pascal-format, Translators for other Languages
 @subsection YCP Format Strings
@@ -8853,7 +9189,7 @@ PHP format strings are described in the documentation of the PHP function
 @code{sprintf}, in @file{phpdoc/manual/function.sprintf.html} or
 @uref{http://www.php.net/manual/en/function.sprintf.php}.
 
-@node gcc-internal-format, qt-format, php-format, Translators for other Languages
+@node gcc-internal-format, gfc-internal-format, php-format, Translators for other Languages
 @subsection GCC internal Format Strings
 
 These format strings are used inside the GCC sources.  In such a format
@@ -8871,7 +9207,19 @@ denotes a programming language, @samp{O} denotes a binary operator,
 @samp{P} denotes a function parameter, @samp{Q} denotes an assignment
 operator, @samp{V} denotes a const/volatile qualifier.
 
-@node qt-format, kde-format, gcc-internal-format, Translators for other Languages
+@node gfc-internal-format, qt-format, gcc-internal-format, Translators for other Languages
+@subsection GFC internal Format Strings
+
+These format strings are used inside the GNU Fortran Compiler sources,
+that is, the Fortran frontend in the GCC sources.  In such a format
+string, a directive starts with @samp{%} and is finished by a
+specifier: @samp{%} denotes a literal percent sign, @samp{C} denotes the
+current source location, @samp{L} denotes a source location, @samp{c}
+denotes a character, @samp{s} denotes a string, @samp{i} and @samp{d}
+denote an integer, @samp{u} denotes an unsigned integer.  @samp{i},
+@samp{d}, and @samp{u} may be preceded by a size specifier @samp{l}.
+
+@node qt-format, qt-plural-format, gfc-internal-format, Translators for other Languages
 @subsection Qt Format Strings
 
 Qt format strings are described in the documentation of the QString class
@@ -8879,7 +9227,14 @@ Qt format strings are described in the documentation of the QString class
 In summary, a directive consists of a @samp{%} followed by a digit. The same
 directive cannot occur more than once in a format string.
 
-@node kde-format, boost-format, qt-format, Translators for other Languages
+@node qt-plural-format, kde-format, qt-format, Translators for other Languages
+@subsection Qt Format Strings
+
+Qt format strings are described in the documentation of the QObject::tr method
+@uref{file:/usr/lib/qt-4.3.0/doc/html/qobject.html}.
+In summary, the only allowed directive is @samp{%n}.
+
+@node kde-format, boost-format, qt-plural-format, Translators for other Languages
 @subsection KDE Format Strings
 
 KDE 4 format strings are defined as follows:
@@ -8887,7 +9242,7 @@ A directive consists of a @samp{%} followed by a non-zero decimal number.
 If a @samp{%n} occurs in a format strings, all of @samp{%1}, ..., @samp{%(n-1)}
 must occur as well, except possibly one of them.
 
-@node boost-format,  , kde-format, Translators for other Languages
+@node boost-format, lua-format, kde-format, Translators for other Languages
 @subsection Boost Format Strings
 
 Boost format strings are described in the documentation of the
@@ -8897,6 +9252,27 @@ In summary, a directive has either the same syntax as in a C format string,
 such as @samp{%1$+5d}, or may be surrounded by vertical bars, such as
 @samp{%|1$+5d|} or @samp{%|1$+5|}, or consists of just an argument number
 between percent signs, such as @samp{%1%}.
+
+@node lua-format, javascript-format, boost-format, Translators for other Languages
+@subsection Lua Format Strings
+
+Lua format strings are described in the Lua reference manual, section @w{String Manipulation},
+@uref{http://www.lua.org/manual/5.1/manual.html#pdf-string.format}.
+
+@node javascript-format,  , lua-format, Translators for other Languages
+@subsection JavaScript Format Strings
+
+Although JavaScript specification itself does not define any format
+strings, many JavaScript implementations provide printf-like
+functions.  @code{xgettext} understands a set of common format strings
+used in popular JavaScript implementations including Gjs, Seed, and
+Node.JS.  In such a format string, a directive starts with @samp{%}
+and is finished by a specifier: @samp{%} denotes a literal percent
+sign, @samp{c} denotes a character, @samp{s} denotes a string,
+@samp{b}, @samp{d}, @samp{o}, @samp{x}, @samp{X} denote an integer,
+@samp{f} denotes floating-point number, @samp{j} denotes a JSON
+object.
+
 
 @node Maintainers for other Languages, List of Programming Languages, Translators for other Languages, Programming Languages
 @section The Maintainer's View
@@ -9001,6 +9377,8 @@ that language, and to combine the resulting files using @code{msgcat}.
 * PHP::                         PHP Hypertext Preprocessor
 * Pike::                        Pike
 * GCC-source::                  GNU Compiler Collection sources
+* Lua::                         Lua
+* JavaScript::                  JavaScript
 @end menu
 
 @node C, sh, List of Programming Languages, List of Programming Languages
@@ -9268,10 +9646,18 @@ See @ref{eval_ngettext Invocation}.
 
 @include rt-gettext.texi
 
+Note: @code{xgettext} supports only the one-argument form of the
+@code{gettext} invocation, where no options are present and the
+@var{textdomain} is implicit, from the environment.
+
 @node ngettext Invocation, envsubst Invocation, gettext Invocation, sh
 @subsubsection Invoking the @code{ngettext} program
 
 @include rt-ngettext.texi
+
+Note: @code{xgettext} supports only the three-arguments form of the
+@code{ngettext} invocation, where no options are present and the
+@var{textdomain} is implicit, from the environment.
 
 @node envsubst Invocation, eval_gettext Invocation, ngettext Invocation, sh
 @subsubsection Invoking the @code{envsubst} program
@@ -9400,6 +9786,36 @@ fully portable
 @end table
 
 An example is available in the @file{examples} directory: @code{hello-python}.
+
+A note about format strings: Python supports format strings with unnamed
+arguments, such as @code{'...%d...'}, and format strings with named arguments,
+such as @code{'...%(ident)d...'}.  The latter are preferable for
+internationalized programs, for two reasons:
+
+@itemize @bullet
+@item
+When a format string takes more than one argument, the translator can provide
+a translation that uses the arguments in a different order, if the format
+string uses named arguments.  For example, the translator can reformulate
+@smallexample
+"'%(volume)s' has only %(freespace)d bytes free."
+@end smallexample
+@noindent
+to
+@smallexample
+"Only %(freespace)d bytes free on '%(volume)s'."
+@end smallexample
+@noindent
+Additionally, the identifiers also provide some context to the translator.
+
+@item
+In the context of plural forms, the format string used for the singular form
+does not use the numeric argument in many languages.  Even in English, one
+prefers to write @code{"one hour"} instead of @code{"1 hour"}.  Omitting
+individual arguments from format strings like this is only possible with
+the named argument syntax.  (With unnamed arguments, Python -- unlike C --
+verifies that the format string uses all supplied arguments.)
+@end itemize
 
 @node Common Lisp, clisp C, Python, List of Programming Languages
 @subsection GNU clisp - Common Lisp
@@ -10454,7 +10870,7 @@ argument is given.
 perl
 
 @item File extension
-@code{pl}, @code{PL}, @code{pm}, @code{cgi}
+@code{pl}, @code{PL}, @code{pm}, @code{perl}, @code{cgi}
 
 @item String syntax
 @itemize @bullet
@@ -10657,12 +11073,65 @@ the semantic context.  If a slash is really a division sign but
 mis-interpreted as a pattern match, the rest of the input file is most
 probably parsed incorrectly.
 
+There are certain cases, where the ambiguity cannot be resolved at all:
+
+@example
+$x = wantarray ? 1 : 0;
+@end example
+
+The Perl built-in function @code{wantarray} does not accept any arguments.
+The Perl parser therefore knows that the question mark does not start
+a regular expression but is the ternary conditional operator.
+
+@example 
+sub wantarrays @{@}
+$x = wantarrays ? 1 : 0;
+@end example
+
+Now the situation is different.  The function @code{wantarrays} takes
+a variable number of arguments (like any non-prototyped Perl function).
+The question mark is now the delimiter of a pattern match, and hence
+the piece of code does not compile.
+
+@example
+sub wantarrays() @{@}
+$x = wantarrays ? 1 : 0;
+@end example
+
+Now the function is prototyped, Perl knows that it does not accept any
+arguments, and the question mark is therefore interpreted as the
+ternaray operator again.  But that unfortunately outsmarts @code{xgettext}.
+
+The Perl parser in @code{xgettext} cannot know whether a function has
+a prototype and what that prototype would look like.  It therefore makes
+an educated guess.  If a function is known to be a Perl built-in and
+this function does not accept any arguments, a following question mark
+or slash is treated as an operator, otherwise as the delimiter of a
+following regular expression.  The Perl built-ins that do not accept
+arguments are @code{wantarray}, @code{fork}, @code{time}, @code{times},
+@code{getlogin}, @code{getppid}, @code{getpwent}, @code{getgrent},
+@code{gethostent}, @code{getnetent}, @code{getprotoent}, @code{getservent},
+@code{setpwent}, @code{setgrent}, @code{endpwent}, @code{endgrent},
+@code{endhostent}, @code{endnetent}, @code{endprotoent}, and
+@code{endservent}.
+
 If you find that @code{xgettext} fails to extract strings from
 portions of your sources, you should therefore look out for slashes
 and/or question marks preceding these sections.  You may have come
 across a bug in @code{xgettext}'s Perl parser (and of course you
 should report that bug).  In the meantime you should consider to
 reformulate your code in a manner less challenging to @code{xgettext}.
+
+In particular, if the parser is too dumb to see that a function
+does not accept arguments, use parentheses:
+
+@example
+$x = somefunc() ? 1 : 0;
+$y = (somefunc) ? 1 : 0;
+@end example
+
+In fact the Perl parser itself has similar problems and warns you
+about such constructs.
 
 @node Default Keywords, Special Keywords, General Problems, Perl
 @subsubsection Which keywords will xgettext look for?
@@ -11321,7 +11790,7 @@ On platforms without gettext, the functions are not available.
 ---
 @end table
 
-@node GCC-source,  , Pike, List of Programming Languages
+@node GCC-source, Lua, Pike, List of Programming Languages
 @subsection GNU Compiler Collection sources
 @cindex GCC-source
 
@@ -11368,6 +11837,122 @@ Uses autoconf macros
 
 @item po-mode marking
 yes
+@end table
+
+@node Lua, JavaScript, GCC-source, List of Programming Languages
+@subsection Lua
+
+@table @asis
+@item RPMs
+lua
+
+@item File extension
+@code{lua}
+
+@item String syntax
+@itemize @bullet
+
+@item @code{"abc"}
+
+@item @code{'abc'}
+
+@item @code{[[abc]]}
+
+@item @code{[=[abc]=]}
+
+@item @code{[==[abc]==]}
+
+@item ...
+
+@end itemize
+
+@item gettext shorthand
+@code{_("abc")}
+
+@item gettext/ngettext functions
+@code{gettext.gettext}, @code{gettext.dgettext}, @code{gettext.dcgettext},
+@code{gettext.ngettext}, @code{gettext.dngettext}, @code{gettext.dcngettext}
+
+@item textdomain
+@code{textdomain} function
+
+@item bindtextdomain
+@code{bindtextdomain} function
+
+@item setlocale
+automatic
+
+@item Prerequisite
+@code{require 'gettext'} or running lua interpreter with @code{-l gettext} option
+
+@item Use or emulate GNU gettext
+use
+
+@item Extractor
+@code{xgettext}
+
+@item Formatting with positions
+---
+
+@item Portability
+On platforms without gettext, the functions are not available.
+
+@item po-mode marking
+---
+@end table
+
+@node JavaScript
+@subsection JavaScript
+
+@table @asis
+@item RPMs
+js
+
+@item File extension
+@code{js}
+
+@item String syntax
+@itemize @bullet
+
+@item @code{"abc"}
+
+@item @code{'abc'}
+
+@end itemize
+
+@item gettext shorthand
+@code{_("abc")}
+
+@item gettext/ngettext functions
+@code{gettext}, @code{dgettext}, @code{dcgettext}, @code{ngettext},
+@code{dngettext}
+
+@item textdomain
+@code{textdomain} function
+
+@item bindtextdomain
+@code{bindtextdomain} function
+
+@item setlocale
+automatic
+
+@item Prerequisite
+---
+
+@item Use or emulate GNU gettext
+use, or emulate
+
+@item Extractor
+@code{xgettext}
+
+@item Formatting with positions
+---
+
+@item Portability
+On platforms without gettext, the functions are not available.
+
+@item po-mode marking
+---
 @end table
 
 @c This is the template for new languages.
@@ -11449,7 +12034,7 @@ fpk
 @code{xgettext}, @code{rstconv}
 @end table
 
-@node Glade,  , RST, List of Data Formats
+@node Glade,   , RST, List of Data Formats
 @subsection Glade - GNOME user interface description
 
 @table @asis
@@ -11457,7 +12042,7 @@ fpk
 glade, libglade, glade2, libglade2, intltool
 
 @item File extension
-@code{glade}, @code{glade2}
+@code{glade}, @code{glade2}, @code{ui}
 
 @item Extractor
 @code{xgettext}, @code{libglade-xgettext}, @code{xml-i18n-extract}, @code{intltool-extract}
@@ -11679,7 +12264,7 @@ particular file or directory.  Here is a summary:
 @itemize @bullet
 @item
 The @code{libintl} and @code{libasprintf} libraries are covered by the
-GNU Library General Public License (LGPL).  
+GNU Lesser General Public License (LGPL).  
 A copy of the license is included in @ref{GNU LGPL}.
 
 @item
@@ -11749,11 +12334,6 @@ A copy of the license is included in @ref{GNU GPL}.
 @unnumbered General Index
 
 @printindex cp
-
-@iftex
-@c Table of Contents
-@contents
-@end iftex
 
 @bye
 

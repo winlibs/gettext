@@ -9,6 +9,6 @@ struct fd_ostream_representation
   struct ostream_representation base;
   int fd;
   char *filename;
-  char *buffer;			 
-  size_t avail;			 
+  char *buffer;                  
+  size_t avail;                  
 };

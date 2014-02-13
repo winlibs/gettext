@@ -1,5 +1,5 @@
 /* xgettext C/C++/ObjectiveC backend.
-   Copyright (C) 2001-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006, 2009 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -28,38 +28,42 @@ extern "C" {
 
 
 #define EXTENSIONS_C \
-  { "c",      "C"     },						\
-  { "h",      "C"     },						\
-  { "C",      "C++"   },						\
-  { "c++",    "C++"   },						\
-  { "cc",     "C++"   },						\
-  { "cxx",    "C++"   },						\
-  { "cpp",    "C++"   },						\
-  { "hh",     "C++"   },						\
-  { "hxx",    "C++"   },						\
-  { "hpp",    "C++"   },						\
-  { "m",      "ObjectiveC" },						\
+  { "c",      "C"     },                                                \
+  { "h",      "C"     },                                                \
+  { "C",      "C++"   },                                                \
+  { "c++",    "C++"   },                                                \
+  { "cc",     "C++"   },                                                \
+  { "cxx",    "C++"   },                                                \
+  { "cpp",    "C++"   },                                                \
+  { "hh",     "C++"   },                                                \
+  { "hxx",    "C++"   },                                                \
+  { "hpp",    "C++"   },                                                \
+  { "m",      "ObjectiveC" },                                           \
 
 #define SCANNERS_C \
-  { "C",		extract_c,					\
-			&flag_table_c, &formatstring_c, NULL },		\
-  { "C++",		extract_c,					\
-			&flag_table_c, &formatstring_c, NULL },		\
-  { "ObjectiveC",	extract_objc,					\
-		     &flag_table_objc, &formatstring_c, &formatstring_objc }, \
-  { "GCC-source",	extract_c,					\
-		&flag_table_gcc_internal, &formatstring_gcc_internal, NULL }, \
+  { "C",                extract_c,                                      \
+                        &flag_table_c,                                  \
+                        &formatstring_c, NULL },                        \
+  { "C++",              extract_c,                                      \
+                        &flag_table_c,                                  \
+                        &formatstring_c, NULL },                        \
+  { "ObjectiveC",       extract_objc,                                   \
+                        &flag_table_objc,                               \
+                        &formatstring_c, &formatstring_objc },          \
+  { "GCC-source",       extract_c,                                      \
+                        &flag_table_gcc_internal,                       \
+                        &formatstring_gcc_internal, &formatstring_gfc_internal }, \
 
 /* Scan a C/C++ file and add its translatable strings to mdlp.  */
 extern void extract_c (FILE *fp, const char *real_filename,
-		       const char *logical_filename,
-		       flag_context_list_table_ty *flag_table,
-		       msgdomain_list_ty *mdlp);
+                       const char *logical_filename,
+                       flag_context_list_table_ty *flag_table,
+                       msgdomain_list_ty *mdlp);
 /* Scan an ObjectiveC file and add its translatable strings to mdlp.  */
 extern void extract_objc (FILE *fp, const char *real_filename,
-			  const char *logical_filename,
-			  flag_context_list_table_ty *flag_table,
-			  msgdomain_list_ty *mdlp);
+                          const char *logical_filename,
+                          flag_context_list_table_ty *flag_table,
+                          msgdomain_list_ty *mdlp);
 
 
 /* Handling of options specific to this language.  */

@@ -1,5 +1,5 @@
 /* Look at first character in UTF-16 string.
-   Copyright (C) 1999-2002, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2006-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify it
@@ -10,12 +10,17 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
+   General Public License for more details.
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
+
+#if defined IN_LIBUNISTRING
+/* Tell unistr.h to declare u16_mbtouc as 'extern', not 'static inline'.  */
+# include "unistring-notinline.h"
+#endif
 
 /* Specification.  */
 #include "unistr.h"
@@ -35,18 +40,18 @@ u16_mbtouc (ucs4_t *puc, const uint16_t *s, size_t n)
   if (c < 0xdc00)
     {
       if (n >= 2)
-	{
-	  if (s[1] >= 0xdc00 && s[1] < 0xe000)
-	    {
-	      *puc = 0x10000 + ((c - 0xd800) << 10) + (s[1] - 0xdc00);
-	      return 2;
-	    }
-	  /* invalid multibyte character */
-	}
+        {
+          if (s[1] >= 0xdc00 && s[1] < 0xe000)
+            {
+              *puc = 0x10000 + ((c - 0xd800) << 10) + (s[1] - 0xdc00);
+              return 2;
+            }
+          /* invalid multibyte character */
+        }
       else
-	{
-	  /* incomplete multibyte character */
-	}
+        {
+          /* incomplete multibyte character */
+        }
     }
   /* invalid multibyte character */
   *puc = 0xfffd;

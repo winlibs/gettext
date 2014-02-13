@@ -1,7 +1,7 @@
 /* Analyze differences between two vectors.
 
-   Copyright (C) 1988-1989, 1992-1995, 2001-2004, 2006, 2007 Free
-   Software Foundation, Inc.
+   Copyright (C) 1988-1989, 1992-1995, 2001-2004, 2006-2013 Free Software
+   Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -49,14 +49,35 @@
      EXTRA_CONTEXT_FIELDS    Declarations of fields for 'struct context'.
      NOTE_DELETE(ctxt, xoff) Record the removal of the object xvec[xoff].
      NOTE_INSERT(ctxt, yoff) Record the insertion of the object yvec[yoff].
+     EARLY_ABORT(ctxt)       (Optional) A boolean expression that triggers an
+                             early abort of the computation.
      USE_HEURISTIC           (Optional) Define if you want to support the
-                             heuristic for large vectors.  */
+                             heuristic for large vectors.
+   It is also possible to use this file with abstract arrays.  In this case,
+   xvec and yvec are not represented in memory.  They only exist conceptually.
+   In this case, the list of defines above is amended as follows:
+     ELEMENT                 Undefined.
+     EQUAL                   Undefined.
+     XVECREF_YVECREF_EQUAL(ctxt, xoff, yoff)
+                             A three-argument macro: References xvec[xoff] and
+                             yvec[yoff] and tests these elements for equality.
+   Before including this file, you also need to include:
+     #include <limits.h>
+     #include <stdbool.h>
+     #include "minmax.h"
+ */
 
 /* Maximum value of type OFFSET.  */
 #define OFFSET_MAX \
   ((((OFFSET)1 << (sizeof (OFFSET) * CHAR_BIT - 2)) - 1) * 2 + 1)
 
-/* Use this to suppress gcc's `...may be used before initialized' warnings. */
+/* Default to no early abort.  */
+#ifndef EARLY_ABORT
+# define EARLY_ABORT(ctxt) false
+#endif
+
+/* Use this to suppress gcc's "...may be used before initialized" warnings.
+   Beware: The Code argument must not contain commas.  */
 #ifndef IF_LINT
 # ifdef lint
 #  define IF_LINT(Code) Code
@@ -65,14 +86,25 @@
 # endif
 #endif
 
+/* As above, but when Code must contain one comma. */
+#ifndef IF_LINT2
+# ifdef lint
+#  define IF_LINT2(Code1, Code2) Code1, Code2
+# else
+#  define IF_LINT2(Code1, Code2) /* empty */
+# endif
+#endif
+
 /*
  * Context of comparison operation.
  */
 struct context
 {
+  #ifdef ELEMENT
   /* Vectors being compared.  */
-  const ELEMENT *xvec;
-  const ELEMENT *yvec;
+  ELEMENT const *xvec;
+  ELEMENT const *yvec;
+  #endif
 
   /* Extra fields.  */
   EXTRA_CONTEXT_FIELDS
@@ -97,7 +129,7 @@ struct context
   /* Edit scripts longer than this are too expensive to compute.  */
   OFFSET too_expensive;
 
-  /* Snakes bigger than this are considered `big'.  */
+  /* Snakes bigger than this are considered "big".  */
   #define SNAKE_LIMIT 20
 };
 
@@ -146,248 +178,259 @@ static void
 diag (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim, bool find_minimal,
       struct partition *part, struct context *ctxt)
 {
-  OFFSET *const fd = ctxt->fdiag;	/* Give the compiler a chance. */
-  OFFSET *const bd = ctxt->bdiag;	/* Additional help for the compiler. */
-  const ELEMENT *const xv = ctxt->xvec;	/* Still more help for the compiler. */
-  const ELEMENT *const yv = ctxt->yvec;	/* And more and more . . . */
-  const OFFSET dmin = xoff - ylim;	/* Minimum valid diagonal. */
-  const OFFSET dmax = xlim - yoff;	/* Maximum valid diagonal. */
-  const OFFSET fmid = xoff - yoff;	/* Center diagonal of top-down search. */
-  const OFFSET bmid = xlim - ylim;	/* Center diagonal of bottom-up search. */
+  OFFSET *const fd = ctxt->fdiag;       /* Give the compiler a chance. */
+  OFFSET *const bd = ctxt->bdiag;       /* Additional help for the compiler. */
+#ifdef ELEMENT
+  ELEMENT const *const xv = ctxt->xvec; /* Still more help for the compiler. */
+  ELEMENT const *const yv = ctxt->yvec; /* And more and more . . . */
+  #define XREF_YREF_EQUAL(x,y)  EQUAL (xv[x], yv[y])
+#else
+  #define XREF_YREF_EQUAL(x,y)  XVECREF_YVECREF_EQUAL (ctxt, x, y)
+#endif
+  const OFFSET dmin = xoff - ylim;      /* Minimum valid diagonal. */
+  const OFFSET dmax = xlim - yoff;      /* Maximum valid diagonal. */
+  const OFFSET fmid = xoff - yoff;      /* Center diagonal of top-down search. */
+  const OFFSET bmid = xlim - ylim;      /* Center diagonal of bottom-up search. */
   OFFSET fmin = fmid;
-  OFFSET fmax = fmid;		/* Limits of top-down search. */
+  OFFSET fmax = fmid;           /* Limits of top-down search. */
   OFFSET bmin = bmid;
-  OFFSET bmax = bmid;		/* Limits of bottom-up search. */
-  OFFSET c;			/* Cost. */
-  bool odd = (fmid - bmid) & 1;	/* True if southeast corner is on an odd
-				   diagonal with respect to the northwest. */
+  OFFSET bmax = bmid;           /* Limits of bottom-up search. */
+  OFFSET c;                     /* Cost. */
+  bool odd = (fmid - bmid) & 1; /* True if southeast corner is on an odd
+                                   diagonal with respect to the northwest. */
 
   fd[fmid] = xoff;
   bd[bmid] = xlim;
 
   for (c = 1;; ++c)
     {
-      OFFSET d;			/* Active diagonal. */
+      OFFSET d;                 /* Active diagonal. */
       bool big_snake = false;
 
       /* Extend the top-down search by an edit step in each diagonal. */
       if (fmin > dmin)
-	fd[--fmin - 1] = -1;
+        fd[--fmin - 1] = -1;
       else
-	++fmin;
+        ++fmin;
       if (fmax < dmax)
-	fd[++fmax + 1] = -1;
+        fd[++fmax + 1] = -1;
       else
-	--fmax;
+        --fmax;
       for (d = fmax; d >= fmin; d -= 2)
-	{
-	  OFFSET x;
-	  OFFSET y;
-	  OFFSET tlo = fd[d - 1];
-	  OFFSET thi = fd[d + 1];
-	  OFFSET x0 = tlo < thi ? thi : tlo + 1;
+        {
+          OFFSET x;
+          OFFSET y;
+          OFFSET tlo = fd[d - 1];
+          OFFSET thi = fd[d + 1];
+          OFFSET x0 = tlo < thi ? thi : tlo + 1;
 
-	  for (x = x0, y = x0 - d;
-	       x < xlim && y < ylim && EQUAL (xv[x], yv[y]);
-	       x++, y++)
-	    continue;
-	  if (x - x0 > SNAKE_LIMIT)
-	    big_snake = true;
-	  fd[d] = x;
-	  if (odd && bmin <= d && d <= bmax && bd[d] <= x)
-	    {
-	      part->xmid = x;
-	      part->ymid = y;
-	      part->lo_minimal = part->hi_minimal = true;
-	      return;
-	    }
-	}
+          for (x = x0, y = x0 - d;
+               x < xlim && y < ylim && XREF_YREF_EQUAL (x, y);
+               x++, y++)
+            continue;
+          if (x - x0 > SNAKE_LIMIT)
+            big_snake = true;
+          fd[d] = x;
+          if (odd && bmin <= d && d <= bmax && bd[d] <= x)
+            {
+              part->xmid = x;
+              part->ymid = y;
+              part->lo_minimal = part->hi_minimal = true;
+              return;
+            }
+        }
 
       /* Similarly extend the bottom-up search.  */
       if (bmin > dmin)
-	bd[--bmin - 1] = OFFSET_MAX;
+        bd[--bmin - 1] = OFFSET_MAX;
       else
-	++bmin;
+        ++bmin;
       if (bmax < dmax)
-	bd[++bmax + 1] = OFFSET_MAX;
+        bd[++bmax + 1] = OFFSET_MAX;
       else
-	--bmax;
+        --bmax;
       for (d = bmax; d >= bmin; d -= 2)
-	{
-	  OFFSET x;
-	  OFFSET y;
-	  OFFSET tlo = bd[d - 1];
-	  OFFSET thi = bd[d + 1];
-	  OFFSET x0 = tlo < thi ? tlo : thi - 1;
+        {
+          OFFSET x;
+          OFFSET y;
+          OFFSET tlo = bd[d - 1];
+          OFFSET thi = bd[d + 1];
+          OFFSET x0 = tlo < thi ? tlo : thi - 1;
 
-	  for (x = x0, y = x0 - d;
-	       xoff < x && yoff < y && EQUAL (xv[x - 1], yv[y - 1]);
-	       x--, y--)
-	    continue;
-	  if (x0 - x > SNAKE_LIMIT)
-	    big_snake = true;
-	  bd[d] = x;
-	  if (!odd && fmin <= d && d <= fmax && x <= fd[d])
-	    {
-	      part->xmid = x;
-	      part->ymid = y;
-	      part->lo_minimal = part->hi_minimal = true;
-	      return;
-	    }
-	}
+          for (x = x0, y = x0 - d;
+               xoff < x && yoff < y && XREF_YREF_EQUAL (x - 1, y - 1);
+               x--, y--)
+            continue;
+          if (x0 - x > SNAKE_LIMIT)
+            big_snake = true;
+          bd[d] = x;
+          if (!odd && fmin <= d && d <= fmax && x <= fd[d])
+            {
+              part->xmid = x;
+              part->ymid = y;
+              part->lo_minimal = part->hi_minimal = true;
+              return;
+            }
+        }
 
       if (find_minimal)
-	continue;
+        continue;
 
 #ifdef USE_HEURISTIC
       /* Heuristic: check occasionally for a diagonal that has made lots
-	 of progress compared with the edit distance.  If we have any
-	 such, find the one that has made the most progress and return it
-	 as if it had succeeded.
+         of progress compared with the edit distance.  If we have any
+         such, find the one that has made the most progress and return it
+         as if it had succeeded.
 
-	 With this heuristic, for vectors with a constant small density
-	 of changes, the algorithm is linear in the vector size.  */
+         With this heuristic, for vectors with a constant small density
+         of changes, the algorithm is linear in the vector size.  */
 
       if (200 < c && big_snake && ctxt->heuristic)
-	{
-	  OFFSET best = 0;
+        {
+          {
+            OFFSET best = 0;
 
-	  for (d = fmax; d >= fmin; d -= 2)
-	    {
-	      OFFSET dd = d - fmid;
-	      OFFSET x = fd[d];
-	      OFFSET y = x - d;
-	      OFFSET v = (x - xoff) * 2 - dd;
+            for (d = fmax; d >= fmin; d -= 2)
+              {
+                OFFSET dd = d - fmid;
+                OFFSET x = fd[d];
+                OFFSET y = x - d;
+                OFFSET v = (x - xoff) * 2 - dd;
 
-	      if (v > 12 * (c + (dd < 0 ? -dd : dd)))
-		{
-		  if (v > best
-		      && xoff + SNAKE_LIMIT <= x && x < xlim
-		      && yoff + SNAKE_LIMIT <= y && y < ylim)
-		    {
-		      /* We have a good enough best diagonal; now insist
-			 that it end with a significant snake.  */
-		      int k;
+                if (v > 12 * (c + (dd < 0 ? -dd : dd)))
+                  {
+                    if (v > best
+                        && xoff + SNAKE_LIMIT <= x && x < xlim
+                        && yoff + SNAKE_LIMIT <= y && y < ylim)
+                      {
+                        /* We have a good enough best diagonal; now insist
+                           that it end with a significant snake.  */
+                        int k;
 
-		      for (k = 1; EQUAL (xv[x - k], yv[y - k]); k++)
-			if (k == SNAKE_LIMIT)
-			  {
-			    best = v;
-			    part->xmid = x;
-			    part->ymid = y;
-			    break;
-			  }
-		    }
-		}
-	    }
-	  if (best > 0)
-	    {
-	      part->lo_minimal = true;
-	      part->hi_minimal = false;
-	      return;
-	    }
+                        for (k = 1; XREF_YREF_EQUAL (x - k, y - k); k++)
+                          if (k == SNAKE_LIMIT)
+                            {
+                              best = v;
+                              part->xmid = x;
+                              part->ymid = y;
+                              break;
+                            }
+                      }
+                  }
+              }
+            if (best > 0)
+              {
+                part->lo_minimal = true;
+                part->hi_minimal = false;
+                return;
+              }
+          }
 
-	  best = 0;
-	  for (d = bmax; d >= bmin; d -= 2)
-	    {
-	      OFFSET dd = d - bmid;
-	      OFFSET x = bd[d];
-	      OFFSET y = x - d;
-	      OFFSET v = (xlim - x) * 2 + dd;
+          {
+            OFFSET best = 0;
 
-	      if (v > 12 * (c + (dd < 0 ? -dd : dd)))
-		{
-		  if (v > best
-		      && xoff < x && x <= xlim - SNAKE_LIMIT
-		      && yoff < y && y <= ylim - SNAKE_LIMIT)
-		    {
-		      /* We have a good enough best diagonal; now insist
-			 that it end with a significant snake.  */
-		      int k;
+            for (d = bmax; d >= bmin; d -= 2)
+              {
+                OFFSET dd = d - bmid;
+                OFFSET x = bd[d];
+                OFFSET y = x - d;
+                OFFSET v = (xlim - x) * 2 + dd;
 
-		      for (k = 0; EQUAL (xv[x + k], yv[y + k]); k++)
-			if (k == SNAKE_LIMIT - 1)
-			  {
-			    best = v;
-			    part->xmid = x;
-			    part->ymid = y;
-			    break;
-			  }
-		    }
-		}
-	    }
-	  if (best > 0)
-	    {
-	      part->lo_minimal = false;
-	      part->hi_minimal = true;
-	      return;
-	    }
-	}
+                if (v > 12 * (c + (dd < 0 ? -dd : dd)))
+                  {
+                    if (v > best
+                        && xoff < x && x <= xlim - SNAKE_LIMIT
+                        && yoff < y && y <= ylim - SNAKE_LIMIT)
+                      {
+                        /* We have a good enough best diagonal; now insist
+                           that it end with a significant snake.  */
+                        int k;
+
+                        for (k = 0; XREF_YREF_EQUAL (x + k, y + k); k++)
+                          if (k == SNAKE_LIMIT - 1)
+                            {
+                              best = v;
+                              part->xmid = x;
+                              part->ymid = y;
+                              break;
+                            }
+                      }
+                  }
+              }
+            if (best > 0)
+              {
+                part->lo_minimal = false;
+                part->hi_minimal = true;
+                return;
+              }
+          }
+        }
 #endif /* USE_HEURISTIC */
 
       /* Heuristic: if we've gone well beyond the call of duty, give up
-	 and report halfway between our best results so far.  */
+         and report halfway between our best results so far.  */
       if (c >= ctxt->too_expensive)
-	{
-	  OFFSET fxybest;
-	  OFFSET fxbest IF_LINT (= 0);
-	  OFFSET bxybest;
-	  OFFSET bxbest IF_LINT (= 0);
+        {
+          OFFSET fxybest;
+          OFFSET fxbest IF_LINT (= 0);
+          OFFSET bxybest;
+          OFFSET bxbest IF_LINT (= 0);
 
-	  /* Find forward diagonal that maximizes X + Y.  */
-	  fxybest = -1;
-	  for (d = fmax; d >= fmin; d -= 2)
-	    {
-	      OFFSET x = MIN (fd[d], xlim);
-	      OFFSET y = x - d;
-	      if (ylim < y)
-		{
-		  x = ylim + d;
-		  y = ylim;
-		}
-	      if (fxybest < x + y)
-		{
-		  fxybest = x + y;
-		  fxbest = x;
-		}
-	    }
+          /* Find forward diagonal that maximizes X + Y.  */
+          fxybest = -1;
+          for (d = fmax; d >= fmin; d -= 2)
+            {
+              OFFSET x = MIN (fd[d], xlim);
+              OFFSET y = x - d;
+              if (ylim < y)
+                {
+                  x = ylim + d;
+                  y = ylim;
+                }
+              if (fxybest < x + y)
+                {
+                  fxybest = x + y;
+                  fxbest = x;
+                }
+            }
 
-	  /* Find backward diagonal that minimizes X + Y.  */
-	  bxybest = OFFSET_MAX;
-	  for (d = bmax; d >= bmin; d -= 2)
-	    {
-	      OFFSET x = MAX (xoff, bd[d]);
-	      OFFSET y = x - d;
-	      if (y < yoff)
-		{
-		  x = yoff + d;
-		  y = yoff;
-		}
-	      if (x + y < bxybest)
-		{
-		  bxybest = x + y;
-		  bxbest = x;
-		}
-	    }
+          /* Find backward diagonal that minimizes X + Y.  */
+          bxybest = OFFSET_MAX;
+          for (d = bmax; d >= bmin; d -= 2)
+            {
+              OFFSET x = MAX (xoff, bd[d]);
+              OFFSET y = x - d;
+              if (y < yoff)
+                {
+                  x = yoff + d;
+                  y = yoff;
+                }
+              if (x + y < bxybest)
+                {
+                  bxybest = x + y;
+                  bxbest = x;
+                }
+            }
 
-	  /* Use the better of the two diagonals.  */
-	  if ((xlim + ylim) - bxybest < fxybest - (xoff + yoff))
-	    {
-	      part->xmid = fxbest;
-	      part->ymid = fxybest - fxbest;
-	      part->lo_minimal = true;
-	      part->hi_minimal = false;
-	    }
-	  else
-	    {
-	      part->xmid = bxbest;
-	      part->ymid = bxybest - bxbest;
-	      part->lo_minimal = false;
-	      part->hi_minimal = true;
-	    }
-	  return;
-	}
+          /* Use the better of the two diagonals.  */
+          if ((xlim + ylim) - bxybest < fxybest - (xoff + yoff))
+            {
+              part->xmid = fxbest;
+              part->ymid = fxybest - fxbest;
+              part->lo_minimal = true;
+              part->hi_minimal = false;
+            }
+          else
+            {
+              part->xmid = bxbest;
+              part->ymid = bxybest - bxbest;
+              part->lo_minimal = false;
+              part->hi_minimal = true;
+            }
+          return;
+        }
     }
+  #undef XREF_YREF_EQUAL
 }
 
 
@@ -402,24 +445,32 @@ diag (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim, bool find_minimal,
    If FIND_MINIMAL, find a minimal difference no matter how
    expensive it is.
 
-   The results are recorded by invoking NOTE_DELETE and NOTE_INSERT.  */
+   The results are recorded by invoking NOTE_DELETE and NOTE_INSERT.
 
-static void
+   Return false if terminated normally, or true if terminated through early
+   abort.  */
+
+static bool
 compareseq (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim,
-	    bool find_minimal, struct context *ctxt)
+            bool find_minimal, struct context *ctxt)
 {
+#ifdef ELEMENT
   ELEMENT const *xv = ctxt->xvec; /* Help the compiler.  */
   ELEMENT const *yv = ctxt->yvec;
+  #define XREF_YREF_EQUAL(x,y)  EQUAL (xv[x], yv[y])
+#else
+  #define XREF_YREF_EQUAL(x,y)  XVECREF_YVECREF_EQUAL (ctxt, x, y)
+#endif
 
   /* Slide down the bottom initial diagonal.  */
-  while (xoff < xlim && yoff < ylim && EQUAL (xv[xoff], yv[yoff]))
+  while (xoff < xlim && yoff < ylim && XREF_YREF_EQUAL (xoff, yoff))
     {
       xoff++;
       yoff++;
     }
 
   /* Slide up the top initial diagonal. */
-  while (xoff < xlim && yoff < ylim && EQUAL (xv[xlim - 1], yv[ylim - 1]))
+  while (xoff < xlim && yoff < ylim && XREF_YREF_EQUAL (xlim - 1, ylim - 1))
     {
       xlim--;
       ylim--;
@@ -429,26 +480,35 @@ compareseq (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim,
   if (xoff == xlim)
     while (yoff < ylim)
       {
-	NOTE_INSERT (ctxt, yoff);
-	yoff++;
+        NOTE_INSERT (ctxt, yoff);
+        if (EARLY_ABORT (ctxt))
+          return true;
+        yoff++;
       }
   else if (yoff == ylim)
     while (xoff < xlim)
       {
-	NOTE_DELETE (ctxt, xoff);
-	xoff++;
+        NOTE_DELETE (ctxt, xoff);
+        if (EARLY_ABORT (ctxt))
+          return true;
+        xoff++;
       }
   else
     {
-      struct partition part;
+      struct partition part IF_LINT2 (= { .xmid = 0, .ymid = 0 });
 
       /* Find a point of correspondence in the middle of the vectors.  */
       diag (xoff, xlim, yoff, ylim, find_minimal, &part, ctxt);
 
       /* Use the partitions to split this problem into subproblems.  */
-      compareseq (xoff, part.xmid, yoff, part.ymid, part.lo_minimal, ctxt);
-      compareseq (part.xmid, xlim, part.ymid, ylim, part.hi_minimal, ctxt);
+      if (compareseq (xoff, part.xmid, yoff, part.ymid, part.lo_minimal, ctxt))
+        return true;
+      if (compareseq (part.xmid, xlim, part.ymid, ylim, part.hi_minimal, ctxt))
+        return true;
     }
+
+  return false;
+  #undef XREF_YREF_EQUAL
 }
 
 #undef ELEMENT
@@ -457,5 +517,7 @@ compareseq (OFFSET xoff, OFFSET xlim, OFFSET yoff, OFFSET ylim,
 #undef EXTRA_CONTEXT_FIELDS
 #undef NOTE_DELETE
 #undef NOTE_INSERT
+#undef EARLY_ABORT
 #undef USE_HEURISTIC
+#undef XVECREF_YVECREF_EQUAL
 #undef OFFSET_MAX

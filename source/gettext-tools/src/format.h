@@ -1,5 +1,5 @@
 /* Format strings.
-   Copyright (C) 2001-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2009 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -20,9 +20,10 @@
 
 #include <stdbool.h>
 
-#include "pos.h"	/* Get lex_pos_ty.  */
-#include "message.h"	/* Get NFORMATS.  */
-#include "error.h"	/* Get fallback definition of __attribute__.  */
+#include "pos.h"        /* Get lex_pos_ty.  */
+#include "message.h"    /* Get NFORMATS.  */
+#include "plural-distrib.h" /* Get struct plural_distribution.  */
+#include "error.h"      /* Get fallback definition of __attribute__.  */
 
 
 #ifdef __cplusplus
@@ -90,7 +91,7 @@ struct formatstring_parser
      msgstr_descr may omit some of the arguments of msgid_descr).
      If not, signal an error using error_logger (only if error_logger != NULL)
      and return true.  Otherwise return false.  */
-  bool (*check) (void *msgid_descr, void *msgstr_descr, bool equality, formatstring_error_logger_t error_logger, const char *pretty_msgstr);
+  bool (*check) (void *msgid_descr, void *msgstr_descr, bool equality, formatstring_error_logger_t error_logger, const char *pretty_msgid, const char *pretty_msgstr);
 };
 
 /* Format string parsers, each defined in its own file.  */
@@ -98,6 +99,7 @@ extern DLL_VARIABLE struct formatstring_parser formatstring_c;
 extern DLL_VARIABLE struct formatstring_parser formatstring_objc;
 extern DLL_VARIABLE struct formatstring_parser formatstring_sh;
 extern DLL_VARIABLE struct formatstring_parser formatstring_python;
+extern DLL_VARIABLE struct formatstring_parser formatstring_python_brace;
 extern DLL_VARIABLE struct formatstring_parser formatstring_lisp;
 extern DLL_VARIABLE struct formatstring_parser formatstring_elisp;
 extern DLL_VARIABLE struct formatstring_parser formatstring_librep;
@@ -113,9 +115,13 @@ extern DLL_VARIABLE struct formatstring_parser formatstring_perl;
 extern DLL_VARIABLE struct formatstring_parser formatstring_perl_brace;
 extern DLL_VARIABLE struct formatstring_parser formatstring_php;
 extern DLL_VARIABLE struct formatstring_parser formatstring_gcc_internal;
+extern DLL_VARIABLE struct formatstring_parser formatstring_gfc_internal;
 extern DLL_VARIABLE struct formatstring_parser formatstring_qt;
+extern DLL_VARIABLE struct formatstring_parser formatstring_qt_plural;
 extern DLL_VARIABLE struct formatstring_parser formatstring_kde;
 extern DLL_VARIABLE struct formatstring_parser formatstring_boost;
+extern DLL_VARIABLE struct formatstring_parser formatstring_lua;
+extern DLL_VARIABLE struct formatstring_parser formatstring_javascript;
 
 /* Table of all format string parsers.  */
 extern DLL_VARIABLE struct formatstring_parser *formatstring_parsers[NFORMATS];
@@ -132,7 +138,7 @@ struct interval
 };
 extern void
        get_sysdep_c_format_directives (const char *string, bool translated,
-				 struct interval **intervalsp, size_t *lengthp);
+                                 struct interval **intervalsp, size_t *lengthp);
 
 /* Returns the number of unnamed arguments consumed by a Python format
    string.  */
@@ -140,32 +146,25 @@ extern unsigned int get_python_format_unnamed_arg_count (const char *string);
 
 /* Check whether both formats strings contain compatible format
    specifications for format type i (0 <= i < NFORMATS).
-   PLURAL_DISTRIBUTION is either NULL or an array of nplurals elements,
-   PLURAL_DISTRIBUTION[j] being true if the value j appears to be assumed
-   infinitely often by the plural formula.
    Return the number of errors that were seen.  */
 extern int
        check_msgid_msgstr_format_i (const char *msgid, const char *msgid_plural,
-				    const char *msgstr, size_t msgstr_len,
-				    size_t i,
-				    const unsigned char *plural_distribution,
-				    unsigned long plural_distribution_length,
-				    formatstring_error_logger_t error_logger);
+                                    const char *msgstr, size_t msgstr_len,
+                                    size_t i,
+                                    struct argument_range range,
+                                    const struct plural_distribution *distribution,
+                                    formatstring_error_logger_t error_logger);
 
 /* Check whether both formats strings contain compatible format
    specifications.
-   PLURAL_DISTRIBUTION is either NULL or an array of nplurals elements,
-   PLURAL_DISTRIBUTION[j] being true if the value j appears to be assumed
-   infinitely often by the plural formula.
-   PLURAL_DISTRIBUTION_LENGTH is the length of the PLURAL_DISTRIBUTION array.
    Return the number of errors that were seen.  */
 extern int
        check_msgid_msgstr_format (const char *msgid, const char *msgid_plural,
-				  const char *msgstr, size_t msgstr_len,
-				  const enum is_format is_format[NFORMATS],
-				  const unsigned char *plural_distribution,
-				  unsigned long plural_distribution_length,
-				  formatstring_error_logger_t error_logger);
+                                  const char *msgstr, size_t msgstr_len,
+                                  const enum is_format is_format[NFORMATS],
+                                  struct argument_range range,
+                                  const struct plural_distribution *distribution,
+                                  formatstring_error_logger_t error_logger);
 
 
 #ifdef __cplusplus

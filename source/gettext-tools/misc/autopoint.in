@@ -1,6 +1,6 @@
 #! /bin/sh
 #
-# Copyright (C) 2002-2007 Free Software Foundation, Inc.
+# Copyright (C) 2002-2013 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -69,18 +69,7 @@ func_find_curr_installdir ()
   case "$curr_executable" in
     */* | *\\*) ;;
     *) # Need to look in the PATH.
-      if test "${PATH_SEPARATOR+set}" != set; then
-        func_tmpdir
-        { echo "#! /bin/sh"; echo "exit 0"; } > "$tmp"/conf.sh
-        chmod +x "$tmp"/conf.sh
-        if (PATH="/nonexistent;$tmp"; conf.sh) >/dev/null 2>&1; then
-          PATH_SEPARATOR=';'
-        else
-          PATH_SEPARATOR=:
-        fi
-        rm -rf "$tmp"
-      fi
-      save_IFS="$IFS"; IFS="$PATH_SEPARATOR"
+      save_IFS="$IFS"; IFS="${PATH_SEPARATOR='@PATH_SEPARATOR@'}"
       for dir in $PATH; do
         IFS="$save_IFS"
         test -z "$dir" && dir=.
@@ -147,6 +136,38 @@ if test "@RELOCATABLE@" = yes; then
   gettext_dir=`echo "$gettext_dir/" | sed -e "s%^${orig_installprefix}/%${curr_installprefix}/%" | sed -e 's,/$,,'`
 fi
 
+# func_trace macro
+# traces an Autoconf macro call and outputs the arguments to stdout.
+func_trace ()
+{
+  case "$1" in
+    AC_*)
+      # For Autoconf standard macros, autom4te --trace can be used.
+      autom4te --no-cache --language=Autoconf-without-aclocal-m4 --trace="$1":\$% "$configure_in"
+      ;;
+    *)
+      # Otherwise, manually extract macro calls in configure.ac with
+      # sed.  This is less reliable than the above way and does not
+      # support multiple calls.
+      sed_extract_arguments='
+s,#.*$,,; s,^dnl .*$,,; s, dnl .*$,,;
+/'"$1"'(/ {
+  ta
+  :a
+    s/)/)/
+    tb
+    s/\\$//
+    N
+    ba
+  :b
+  s,^.*'"$1"'([[ ]*\([^]"$`\\)]*\).*$,\1,p
+}
+d'
+      sed -e "$sed_extract_arguments" "$configure_in"
+      ;;
+  esac
+}
+
 # func_usage
 # outputs to stdout the --help usage message.
 func_usage ()
@@ -173,7 +194,8 @@ Report bugs to <bug-gnu-gettext@gnu.org>."
 func_version ()
 {
   echo "$progname (GNU $package) $version"
-  echo "Copyright (C) 2002-2007 Free Software Foundation, Inc.
+  echo "Uses a versions archive in @ARCHIVE_FORMAT@ format."
+  echo "Copyright (C) 2002-2013 Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law."
@@ -266,7 +288,7 @@ fi
 
 # Check whether the -V option and the version number in configure.in match.
 # At least one of the two must be given. If both are given, they must agree.
-xver=`cat "$configure_in" | grep '^AM_GNU_GETTEXT_VERSION(' | sed -e 's/^AM_GNU_GETTEXT_VERSION(\([^()]*\))/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
+xver=`func_trace AM_GNU_GETTEXT_VERSION`
 if test -z "$xver" && test -f intl/VERSION; then
   xver=`cat intl/VERSION | LC_ALL=C sed -n -e 's/^.*gettext-\([-+_.0-9A-Za-z]*\).*$/\1/p'`
 fi
@@ -293,64 +315,33 @@ case "$ver" in
   0.14 | 0.14.1 | 0.14.2 | 0.14.3 | 0.14.4 | 0.14.5 | 0.14.6 | \
   0.15 | \
   0.16 | 0.16.1 | \
-  0.17 )
+  0.17 | \
+  0.18 | 0.18.1 | 0.18.2 | 0.18.3 )
     ;;
   *)
-    func_fatal_error "The AM_GNU_GETTEXT_VERSION declaration in your $configure_in\
-               file requires the infrastructure from gettext-$ver but this version\
+    func_fatal_error "The AM_GNU_GETTEXT_VERSION declaration in your $configure_in
+               file requires the infrastructure from gettext-$ver but this version
                is older. Please upgrade to gettext-$ver or newer."
     ;;
 esac
 
-# We distribute the many different versions of the files in a CVS repository.
-# This guarantees a good compression rate:
-#
-#   Including version    size in KB of
-#                       "du autopoint-files/archive"
-#      0.10.35                  240
-#      0.10.36                  428
-#      0.10.37                  436
-#      0.10.38                  488
-#      0.10.39                  500
-#      0.10.40                  528
-#      0.11                     720
-#      0.11.1                   740
-#      0.11.2                   748
-#      0.11.3                   804
-#      0.11.4                   864
-#      0.11.5                   880
-#      0.12                    1032
-#      0.12.1                  1032
-#      0.13                    1220
-#      0.13.1                  1236
-#      0.14                    1296
-#      0.14.1                  1300
-#      0.14.2                  1420
-#      0.14.3                  1428
-#      0.14.4                  1464
-#      0.14.5                  1508
-#      0.14.6                  1580
-#      0.15                    1760
-#      0.16                    1808
-#      0.16.1                  1812
-#      0.17                    2128
-#
-# The requirement that the user must have the CVS program available is not
-# a severe restrictions, because most of the people who use autopoint are
-# users of CVS.
-#
-# Check availability of the CVS program.
-(cvs -v) >/dev/null 2>/dev/null || func_fatal_error "cvs program not found"
-
 # Check in which directory config.rpath, mkinstalldirs etc. belong.
-auxdir=`cat "$configure_in" | grep '^AC_CONFIG_AUX_DIR' | sed -n -e 's/AC_CONFIG_AUX_DIR(\([^()]*\))/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
+auxdir=`func_trace AC_CONFIG_AUX_DIR`
 if test -n "$auxdir"; then
   auxdir="$auxdir/"
 fi
 
 # Check in which directory the *.m4 macros belong.
-m4dir=m4
-if test -f Makefile.am; then
+macrodirs=`func_trace AC_CONFIG_MACRO_DIR_TRACE`
+if test -z "$macrodirs"; then
+  macrodirs=`func_trace AC_CONFIG_MACRO_DIR`
+fi
+for arg in $macrodirs; do
+  m4dir="$arg"
+  break
+done
+
+if test -z "$m4dir" && test -f Makefile.am; then
   # A package using automake.
   # Extract the macro directory name from Makefile.am.
   aclocal_amflags=`grep '^ACLOCAL_AMFLAGS[ 	]*=' Makefile.am | sed -e 's/^ACLOCAL_AMFLAGS[ 	]*=\(.*\)$/\1/'`
@@ -370,28 +361,33 @@ if test -f Makefile.am; then
 fi
 
 # Check whether to omit the intl/ directory.
-omitintl=`cat "$configure_in" | grep '^AM_GNU_GETTEXT' | sed -n -e 's/^AM_GNU_GETTEXT(\([^(),]*\).*$/\1/p' | sed -e 's/^\[\(.*\)\]$/\1/' | sed -e 1q`
-omitintl=`if test 'external' = "$omitintl"; then echo yes; fi`
-
-# Set up a temporary CVS repository and a temporary checkout directory.
-# We need the temporary CVS repository because any checkout needs write
-# access to the CVSROOT/history file, so it cannot be under $gettext_dir.
-# We need the temporary checkout directory because when --force was not
-# given, we need to compare the existing files with the checked out ones.
-# Set variables
-# - cvs_dir         directory containing the temporary repository
-# - work_dir        directory containing the temporary checkout
-cvs_dir=tmpcvs$$
-work_dir=tmpwrk$$
-# Use an umask of 077, to avoid attacks that work by overwriting files in the
-# "$CVSROOT"/CVSROOT directory.
-(umask 077 && mkdir "$cvs_dir") || {
-  if test -d "$cvs_dir"; then
-    func_fatal_error "directory $cvs_dir already exists"
-  else
-    func_fatal_error "cannot create directory $cvs_dir"
+omitintl=no
+xargs=`func_trace AM_GNU_GETTEXT`
+for arg in $xargs; do
+  if test 'external' = "$arg"; then
+    omitintl=yes
+    break
   fi
-}
+done
+
+# Check in which directory or directories the po/* infrastructure belongs.
+configfiles=`func_trace AC_CONFIG_FILES`
+# PO directories have a Makefile.in generated from Makefile.in.in.
+# Treat a directory as a PO directory if and only if it has a
+# POTFILES.in file. This allows packages to have multiple PO
+# directories under different names or in different locations.
+sed_remove_Makefile_in='s,/Makefile\.in$,,'
+podirs=`for f in $configfiles; do case "$f" in */Makefile.in) echo $f;; esac; done | sed -e "$sed_remove_Makefile_in"`
+if test -z "$podirs"; then
+  # If we cannot get the list of PO directories from configure.ac, assume the
+  # common default.
+  podirs="po"
+fi
+
+# Set up a temporary checkout directory.
+# Set variables
+# - work_dir        directory containing the temporary checkout
+work_dir=tmpwrk$$
 mkdir "$work_dir" || {
   if test -d "$work_dir"; then
     func_fatal_error "directory $work_dir already exists"
@@ -399,37 +395,158 @@ mkdir "$work_dir" || {
     func_fatal_error "cannot create directory $work_dir"
   fi
 }
-CVSROOT="$srcdir/$cvs_dir"
-export CVSROOT
-unset CVS_CLIENT_LOG
-unset CVS_CLIENT_PORT
-unset CVS_IGNORE_REMOTE_ROOT
-unset CVS_PASSFILE
-unset CVS_PASSWORD
-unset CVS_RCMD_PORT
-unset CVS_RSH
-unset CVS_SERVER
-unset CVS_SERVER_SLEEP
-unset CVSIGNORE
-unset CVSREAD
-unset CVSUMASK
-unset CVSWRAPPERS
 
-# Need to pass -d "$CVSROOT", because there may be a CVS directory in the
-# current directory.
-cvs -d "$CVSROOT" init
-gzip -d -c < "$gettext_dir/archive.tar.gz" | (cd "$cvs_dir" && tar xf -)
+# We support three archive formats.
+#
+# Format | Size (KiB) for gettext-0.17 | Extra tools needed |
+# -------+-----------------------------+--------------------+
+#  dir   |            3000             |         --         |
+#  cvs   |             356             |         cvs        |
+#  git   |             484             |         git        |
+# -------+-----------------------------+--------------------+
 
-cd "$work_dir"
-cvsver=gettext-`echo "$ver" | sed -e 's/\./_/g'`
-(cvs checkout -r"$cvsver" archive > /dev/null) 2>&1 | grep -v '^cvs checkout: Updating'
-find archive -name CVS -type d -print | xargs rm -rf
-if test `find archive -type f -print | wc -l` = 0; then
-  cd ..
-  rm -rf "$cvs_dir" "$work_dir"
-  func_fatal_error "infrastructure files for version $ver not found; this is autopoint from GNU $package $version"
-fi
-cd ..
+case "@ARCHIVE_FORMAT@" in
+  dir*)
+    # The archive of different versions is very large (unless xz compression is
+    # used), but using it does not require special tools.
+    case "@ARCHIVE_FORMAT@" in
+      dirgz) gzip -d -c < "$gettext_dir/archive.dir.tar.gz" ;;
+      dirbz2) bzip2 -d -c < "$gettext_dir/archive.dir.tar.bz2" ;;
+      dirxz) xz -d -c < "$gettext_dir/archive.dir.tar.xz" ;;
+    esac \
+      | (cd "$work_dir" && tar xf - "gettext-$ver")
+    if test `find "$work_dir" -type f -print | wc -l` = 0; then
+      rm -rf "$work_dir"
+      func_fatal_error "infrastructure files for version $ver not found; this is autopoint from GNU $package $version"
+    fi
+    mv "$work_dir/gettext-$ver" "$work_dir/archive"
+    ;;
+
+  cvs)
+    # We distributed the many different versions of the files in a CVS
+    # repository. This guaranteed a good compression rate:
+    #
+    #   Including version    size in KB of
+    #                       "du autopoint-files/archive"
+    #      0.10.35                  240
+    #      0.10.36                  428
+    #      0.10.37                  436
+    #      0.10.38                  488
+    #      0.10.39                  500
+    #      0.10.40                  528
+    #      0.11                     720
+    #      0.11.1                   740
+    #      0.11.2                   748
+    #      0.11.3                   804
+    #      0.11.4                   864
+    #      0.11.5                   880
+    #      0.12                    1032
+    #      0.12.1                  1032
+    #      0.13                    1220
+    #      0.13.1                  1236
+    #      0.14                    1296
+    #      0.14.1                  1300
+    #      0.14.2                  1420
+    #      0.14.3                  1428
+    #      0.14.4                  1464
+    #      0.14.5                  1508
+    #      0.14.6                  1580
+    #      0.15                    1760
+    #      0.16                    1808
+    #      0.16.1                  1812
+    #      0.17                    2128
+    #      0.18                    2656
+    #
+    # The requirement that the user must have the CVS program available is not
+    # a severe restrictions, because most of the people who use autopoint are
+    # users of CVS.
+    #
+    # But the CVS format is now deprecated, because "cvs init" does not work in
+    # all circumstances
+    # (see <http://lists.gnu.org/archive/html/bug-cvs/2010-05/msg00003.html>)
+    # and we are not allowed to distribute the cvs infrastructure files
+    # ourselves
+    # (see <http://lists.gnu.org/archive/html/bug-cvs/2010-06/msg00011.html>).
+    #
+    # Check availability of the CVS program.
+    (cvs -v) >/dev/null 2>/dev/null || func_fatal_error "cvs program not found"
+
+    # Set up a temporary CVS repository.
+    # We need the temporary CVS repository because any checkout needs write
+    # access to the CVSROOT/history file, so it cannot be under $gettext_dir.
+    # We need the temporary checkout directory because when --force was not
+    # given, we need to compare the existing files with the checked out ones.
+    # Set variables
+    # - cvs_dir         directory containing the temporary repository
+    cvs_dir=tmpcvs$$
+    # Use an umask of 077, to avoid attacks that work by overwriting files in
+    # the "$CVSROOT"/CVSROOT directory.
+    (umask 077 && mkdir "$cvs_dir") || {
+      if test -d "$cvs_dir"; then
+        func_fatal_error "directory $cvs_dir already exists"
+      else
+        func_fatal_error "cannot create directory $cvs_dir"
+      fi
+    }
+    CVSROOT="$srcdir/$cvs_dir"
+    unset CVS_CLIENT_LOG
+    unset CVS_CLIENT_PORT
+    unset CVS_IGNORE_REMOTE_ROOT
+    unset CVS_LOCAL_BRANCH_NUM
+    unset CVS_NOBASES
+    unset CVS_PASSFILE
+    unset CVS_PASSWORD
+    unset CVS_PROXY_PORT
+    unset CVS_RCMD_PORT
+    unset CVS_RSH
+    unset CVS_SERVER
+    unset CVS_SERVER_SLEEP
+    CVS_SIGN_COMMITS=
+    export CVS_SIGN_COMMITS
+    unset CVS_SSH
+    unset CVS_VERIFY_CHECKOUTS
+    unset CVS_VERIFY_TEMPLATE
+    unset CVSIGNORE
+    unset CVSREAD
+    unset CVSREADONLYFS
+    unset CVSUMASK
+    unset CVSWRAPPERS
+
+    # Need to pass -d "$CVSROOT", because there may be a CVS directory in the
+    # current directory.
+    cvs -d "$CVSROOT" init
+    gzip -d -c < "$gettext_dir/archive.cvs.tar.gz" | (cd "$cvs_dir" && tar xf -)
+
+    cd "$work_dir"
+    cvsver=gettext-`echo "$ver" | sed -e 's/\./_/g'`
+    (cvs -d "$CVSROOT" checkout -r"$cvsver" archive > /dev/null) 2>&1 | grep -v '^cvs checkout: Updating'
+    find archive -name CVS -type d -print | xargs rm -rf
+    cd ..
+    rm -rf "$cvs_dir"
+    # Check that really all CVS directories are gone, otherwise we would overwrite
+    # the contents of the user's CVS directories.
+    if test `find $work_dir/archive -name CVS -type d -print | wc -l` != 0; then
+      rm -rf "$work_dir"
+      func_fatal_error "failed to remove all CVS subdirectories"
+    fi
+    if test `find $work_dir/archive -type f -print | wc -l` = 0; then
+      rm -rf "$work_dir"
+      func_fatal_error "infrastructure files for version $ver not found; this is autopoint from GNU $package $version"
+    fi
+    ;;
+
+  git)
+    # Check availability of the git program.
+    (git --version) >/dev/null 2>/dev/null || func_fatal_error "git program not found"
+    mkdir "$work_dir/archive"
+    gzip -d -c < "$gettext_dir/archive.git.tar.gz" | (cd "$work_dir/archive" && tar xf -)
+    (cd "$work_dir/archive" && git checkout -q "gettext-$ver") || {
+      rm -rf "$work_dir"
+      func_fatal_error "infrastructure files for version $ver not found; this is autopoint from GNU $package $version"
+    }
+    (cd "$work_dir/archive" && rm -rf .git .gitignore)
+    ;;
+esac
 
 # func_destfile file
 # determines the destination file, relative to the package's top level
@@ -439,6 +556,7 @@ cd ..
 #                   empty if the file shall be omitted
 # - sharedowner     yes if the file is not only owned by GNU gettext but may
 #                   be installed by automake or other tools, otherwise empty
+# - allpodirs       yes if the file is to be installed in every dir in $podirs
 func_destfile ()
 {
   # There are five categories of files:
@@ -446,8 +564,9 @@ func_destfile ()
   # config.rpath mkinstalldirs -> $auxdir
   # m4/* -> $m4dir/
   # intl/* -> intl/
-  # po/* -> po/
+  # po/* -> 
   sharedowner=
+  allpodirs=
   case `echo "$1" | sed -e 's,[^/]*$,,'` in
     "" )
       case "$1" in
@@ -458,8 +577,43 @@ func_destfile ()
       ;;
     m4/ ) destfile=`echo "$1" | sed -e "s,^m4/,$m4dir/,"` ;;
     intl/ ) if test -n "$omitintl"; then destfile=""; else destfile="$1"; fi ;;
+    po/ ) destfile=`echo "$1" | sed -e "s,^po/,,"` allpodirs=yes ;;
     * ) destfile="$1" ;;
   esac
+}
+
+# func_compare existingfile gettextfile
+# compares the existing file and the file from gettext, and decides whether the
+# existing file should be overwritten with the file from gettext. Returns 0 if
+# it should be overwritten, or 1 if it should be skipped.
+sed_extract_serial='s/^#.* serial \([^ ]*\).*/\1/p
+1q'
+func_compare ()
+{
+  if cmp -s "$1" "$2"; then
+    false
+  else
+    case "$2" in
+      *.m4)
+        # For interoperability with gnulib. gnulib often has newer versions of
+        # the *.m4 files than the latest gettext release. Don't overwrite a
+        # newer version from gnulib with an older version from the gettext
+        # release. The version can be retrieved from the first line, which
+        # looks like this:   # file.m4 serial NN ...
+        existing_serial=`sed -n -e "$sed_extract_serial" < "$1"`
+        gettext_serial=`sed -n -e "$sed_extract_serial" < "$2"`
+        if test -n "$existing_serial" && test -n "$gettext_serial" \
+           && test "$existing_serial" -ge "$gettext_serial" 2> /dev/null; then
+          false
+        else
+          true
+        fi
+        ;;
+      *)
+        true
+        ;;
+    esac
+  fi
 }
 
 # If some files have been locally modified and we have not been requested
@@ -473,23 +627,32 @@ if test -z "$force"; then
   for file in `find "$work_dir/archive" -type f -print | sed -e "s,^$work_dir/archive/,," | LC_ALL=C sort`; do
     func_destfile "$file"
     if test -n "$destfile"; then
-      if test -f "$destfile"; then
-        if cmp -s "$work_dir/archive/$file" "$destfile"; then
-          :
-        else
-          if test -n "$sharedowner"; then
-            echo "autopoint: warning: File $destfile has been locally modified." 1>&2
-          else
-            echo "autopoint: File $destfile has been locally modified." 1>&2
-            mismatch=yes
-            diff -c "$work_dir/archive/$file" "$destfile" | sed -e "1s,$work_dir/archive/,," >> "$mismatchfile"
+      func_compare_to_destfile ()
+      {
+        finaldestfile="$1"
+        if test -f "$finaldestfile"; then
+          if func_compare "$finaldestfile" "$work_dir/archive/$file"; then
+            if test -n "$sharedowner"; then
+              echo "autopoint: warning: File $finaldestfile has been locally modified." 1>&2
+            else
+              echo "autopoint: File $finaldestfile has been locally modified." 1>&2
+              mismatch=yes
+              diff -c "$work_dir/archive/$file" "$finaldestfile" | sed -e "1s,$work_dir/archive/,," >> "$mismatchfile"
+            fi
           fi
         fi
+      }
+      if test -n "$allpodirs"; then
+        for dir in $podirs; do
+          func_compare_to_destfile "$dir/$destfile"
+        done
+      else
+        func_compare_to_destfile "$destfile"
       fi
     fi
   done
   if test -n "$mismatch"; then
-    rm -rf "$cvs_dir" "$work_dir"
+    rm -rf "$work_dir"
     func_fatal_error "Some files have been locally modified. Not overwriting them because --force has not been specified. For your convenience, you find the local modifications in the file '$mismatchfile'."
   fi
   rm -rf "$tmp"
@@ -541,29 +704,38 @@ func_backup ()
 # Now copy the files.
 for file in `find "$work_dir/archive" -type f -print | sed -e "s,^$work_dir/archive/,," | LC_ALL=C sort`; do
   func_destfile "$file"
-  mustcopy=
   if test -n "$destfile"; then
-    if test -f "$destfile"; then
-      if cmp -s "$work_dir/archive/$file" "$destfile"; then
-        :
-      else
-        if test -n "$force"; then
-          # Overwrite locally modified file.
-          mustcopy=yes
+    func_copy_to_destfile ()
+    {
+      finaldestfile="$1"
+      mustcopy=
+      if test -f "$finaldestfile"; then
+        if func_compare "$finaldestfile" "$work_dir/archive/$file"; then
+          if test -n "$force"; then
+            # Overwrite locally modified file.
+            mustcopy=yes
+          fi
+          # If --force is not specified, don't overwrite locally modified files
+          # for which GNU gettext is a shared owner.
         fi
-        # If --force is not specified, don't overwrite locally modified files
-        # for which GNU gettext is a shared owner.
+      else
+        mustcopy=yes
       fi
+      if test -n "$mustcopy"; then
+        func_backup "$finaldestfile"
+        func_copy "$work_dir/archive/$file" "$finaldestfile"
+      fi
+    }
+    if test -n "$allpodirs"; then
+      for dir in $podirs; do
+        func_copy_to_destfile "$dir/$destfile"
+      done
     else
-      mustcopy=yes
+      func_copy_to_destfile "$destfile"
     fi
-  fi
-  if test -n "$mustcopy"; then
-    func_backup "$destfile"
-    func_copy "$work_dir/archive/$file" "$destfile"
   fi
 done
 
 # That's it.
-rm -rf "$cvs_dir" "$work_dir"
+rm -rf "$work_dir"
 exit 0

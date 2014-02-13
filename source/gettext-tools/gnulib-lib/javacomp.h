@@ -1,5 +1,5 @@
 /* Compile a Java program.
-   Copyright (C) 2001-2002, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2006, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -36,7 +36,7 @@
              1.4                 48.0
              1.5                 49.0
              1.6                 50.0
-   target_version can also be given as NULL. In this case, the required 
+   target_version can also be given as NULL. In this case, the required
    target_version is determined from the found JVM (see javaversion.h).
    Specifying target_version is useful when building a library (.jar) that is
    useful outside the given package. Passing target_version = NULL is useful
@@ -62,14 +62,14 @@
    If verbose, the command to be executed will be printed.
    Return false if OK, true on error.  */
 extern bool compile_java_class (const char * const *java_sources,
-				unsigned int java_sources_count,
-				const char * const *classpaths,
-				unsigned int classpaths_count,
-				const char *source_version,
-				const char *target_version,
-				const char *directory,
-				bool optimize, bool debug,
-				bool use_minimal_classpath,
-				bool verbose);
+                                unsigned int java_sources_count,
+                                const char * const *classpaths,
+                                unsigned int classpaths_count,
+                                const char *source_version,
+                                const char *target_version,
+                                const char *directory,
+                                bool optimize, bool debug,
+                                bool use_minimal_classpath,
+                                bool verbose);
 
 #endif /* _JAVACOMP_H */

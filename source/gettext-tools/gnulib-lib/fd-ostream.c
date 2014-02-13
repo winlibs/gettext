@@ -60,74 +60,74 @@ fd_ostream__write_mem (fd_ostream_t stream, const void *data, size_t len)
   if (len > 0)
     {
       if (stream->buffer != NULL)
-	{
-	  /* Buffered.  */
-	  assert (stream->avail > 0);
-	  #if 0 /* unoptimized */
-	  do
-	    {
-	      size_t n = (len <= stream->avail ? len : stream->avail);
-	      if (n > 0)
-		{
-		  memcpy (stream->buffer + BUFSIZE - stream->avail, data, n);
-		  data = (char *) data + n;
-		  stream->avail -= n;
-		  len -= n;
-		}
-	      if (stream->avail == 0)
-		{
-		  if (full_write (stream->fd, stream->buffer, BUFSIZE) < BUFSIZE)
-		    error (EXIT_FAILURE, errno, _("error writing to %s"),
-			   stream->filename);
-		  stream->avail = BUFSIZE;
-		}
-	    }
-	  while (len > 0);
-	  #else /* optimized */
-	  if (len < stream->avail)
-	    {
-	      /* Move the data into the buffer.  */
-	      memcpy (stream->buffer + BUFSIZE - stream->avail, data, len);
-	      stream->avail -= len;
-	    }
-	  else
-	    {
-	      /* Split the data into:
-		   - a first chunk, which is added to the buffer and output,
-		   - a series of chunks of size BUFSIZE, which can be output
-		     directly, without going through the buffer, and
-		   - a last chunk, which is copied to the buffer.  */
-	      size_t n = stream->avail;
-	      memcpy (stream->buffer + BUFSIZE - stream->avail, data, n);
-	      data = (char *) data + n;
-	      len -= n;
-	      if (full_write (stream->fd, stream->buffer, BUFSIZE) < BUFSIZE)
-		error (EXIT_FAILURE, errno, _("error writing to %s"),
-		       stream->filename);
+        {
+          /* Buffered.  */
+          assert (stream->avail > 0);
+          #if 0 /* unoptimized */
+          do
+            {
+              size_t n = (len <= stream->avail ? len : stream->avail);
+              if (n > 0)
+                {
+                  memcpy (stream->buffer + BUFSIZE - stream->avail, data, n);
+                  data = (char *) data + n;
+                  stream->avail -= n;
+                  len -= n;
+                }
+              if (stream->avail == 0)
+                {
+                  if (full_write (stream->fd, stream->buffer, BUFSIZE) < BUFSIZE)
+                    error (EXIT_FAILURE, errno, _("error writing to %s"),
+                           stream->filename);
+                  stream->avail = BUFSIZE;
+                }
+            }
+          while (len > 0);
+          #else /* optimized */
+          if (len < stream->avail)
+            {
+              /* Move the data into the buffer.  */
+              memcpy (stream->buffer + BUFSIZE - stream->avail, data, len);
+              stream->avail -= len;
+            }
+          else
+            {
+              /* Split the data into:
+                   - a first chunk, which is added to the buffer and output,
+                   - a series of chunks of size BUFSIZE, which can be output
+                     directly, without going through the buffer, and
+                   - a last chunk, which is copied to the buffer.  */
+              size_t n = stream->avail;
+              memcpy (stream->buffer + BUFSIZE - stream->avail, data, n);
+              data = (char *) data + n;
+              len -= n;
+              if (full_write (stream->fd, stream->buffer, BUFSIZE) < BUFSIZE)
+                error (EXIT_FAILURE, errno, _("error writing to %s"),
+                       stream->filename);
 
-	      while (len >= BUFSIZE)
-		{
-		  if (full_write (stream->fd, data, BUFSIZE) < BUFSIZE)
-		    error (EXIT_FAILURE, errno, _("error writing to %s"),
-			   stream->filename);
-		  data = (char *) data + BUFSIZE;
-		  len -= BUFSIZE;
-		}
+              while (len >= BUFSIZE)
+                {
+                  if (full_write (stream->fd, data, BUFSIZE) < BUFSIZE)
+                    error (EXIT_FAILURE, errno, _("error writing to %s"),
+                           stream->filename);
+                  data = (char *) data + BUFSIZE;
+                  len -= BUFSIZE;
+                }
 
-	      if (len > 0)
-		memcpy (stream->buffer, data, len);
-	      stream->avail = BUFSIZE - len;
-	    }
-	  #endif
-	  assert (stream->avail > 0);
-	}
+              if (len > 0)
+                memcpy (stream->buffer, data, len);
+              stream->avail = BUFSIZE - len;
+            }
+          #endif
+          assert (stream->avail > 0);
+        }
       else
-	{
-	  /* Unbuffered.  */
-	  if (full_write (stream->fd, data, len) < len)
-	    error (EXIT_FAILURE, errno, _("error writing to %s"),
-		   stream->filename);
-	}
+        {
+          /* Unbuffered.  */
+          if (full_write (stream->fd, data, len) < len)
+            error (EXIT_FAILURE, errno, _("error writing to %s"),
+                   stream->filename);
+        }
     }
 }
 
@@ -138,7 +138,7 @@ fd_ostream__flush (fd_ostream_t stream)
     {
       size_t filled = BUFSIZE - stream->avail;
       if (full_write (stream->fd, stream->buffer, filled) < filled)
-	error (EXIT_FAILURE, errno, _("error writing to %s"), stream->filename);
+        error (EXIT_FAILURE, errno, _("error writing to %s"), stream->filename);
       stream->avail = BUFSIZE;
     }
 }
@@ -159,7 +159,7 @@ fd_ostream_create (int fd, const char *filename, bool buffered)
   fd_ostream_t stream =
     (struct fd_ostream_representation *)
     xmalloc (sizeof (struct fd_ostream_representation)
-	     + (buffered ? BUFSIZE : 0));
+             + (buffered ? BUFSIZE : 0));
 
   stream->base.vtable = &fd_ostream_vtable;
   stream->fd = fd;
@@ -167,7 +167,7 @@ fd_ostream_create (int fd, const char *filename, bool buffered)
   if (buffered)
     {
       stream->buffer =
-	(char *) (void *) stream + sizeof (struct fd_ostream_representation);
+        (char *) (void *) stream + sizeof (struct fd_ostream_representation);
       stream->avail = BUFSIZE;
     }
   else

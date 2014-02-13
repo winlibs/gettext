@@ -4,12 +4,12 @@
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
- * Lesser General Public License for more details.
+ * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public
  * License along with this library; if not, write to the
@@ -40,11 +40,11 @@ typedef uint32_t guint32;
 typedef size_t gsize;
 typedef ssize_t gssize;
 
-#define GPOINTER_TO_INT(p)	((gint)   (p))
-#define GPOINTER_TO_UINT(p)	((guint)  (p))
+#define GPOINTER_TO_INT(p)	((gint)  (intptr_t)  (p))
+#define GPOINTER_TO_UINT(p)	((guint) (uintptr_t) (p))
 
-#define GINT_TO_POINTER(i)	((gpointer)  (i))
-#define GUINT_TO_POINTER(u)	((gpointer)  (u))
+#define GINT_TO_POINTER(i)	((gpointer) (intptr_t)  (i))
+#define GUINT_TO_POINTER(u)	((gpointer) (uintptr_t) (u))
 
 #define g_memmove memmove
 

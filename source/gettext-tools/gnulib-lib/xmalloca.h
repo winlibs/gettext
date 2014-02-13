@@ -1,5 +1,5 @@
 /* Safe automatic memory allocation with out of memory checking.
-   Copyright (C) 2003, 2005, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 #define _XMALLOCA_H
 
 #include "malloca.h"
+#include "xalloc.h"
 
 
 #ifdef __cplusplus
@@ -31,7 +32,7 @@ extern "C" {
    the function returns.  Upon failure, it exits with an error message.  */
 #if HAVE_ALLOCA
 # define xmalloca(N) \
-  ((N) < 4032 - sa_increment					    \
+  ((N) < 4032 - sa_increment                                        \
    ? (void *) ((char *) alloca ((N) + sa_increment) + sa_increment) \
    : xmmalloca (N))
 extern void * xmmalloca (size_t n);
@@ -40,9 +41,19 @@ extern void * xmmalloca (size_t n);
   xmalloc (N)
 #endif
 
-/* Maybe we should also define a variant
-    xnmalloca (size_t n, size_t s) - behaves like xmalloca (n * s)
-   If this would be useful in your application. please speak up.  */
+/* xnmalloca(N,S) is an overflow-safe variant of xmalloca (N * S).
+   It allocates an array of N objects, each with S bytes of memory,
+   on the stack.  S must be positive and N must be nonnegative.
+   The array must be freed using freea() before the function returns.
+   Upon failure, it exits with an error message.  */
+#if HAVE_ALLOCA
+/* Rely on xmalloca (SIZE_MAX) calling xalloc_die ().  */
+# define xnmalloca(n, s) \
+    xmalloca (xalloc_oversized ((n), (s)) ? (size_t) (-1) : (n) * (s))
+#else
+# define xnmalloca(n, s) \
+    xnmalloc ((n), (s))
+#endif
 
 
 #ifdef __cplusplus

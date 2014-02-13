@@ -1,5 +1,5 @@
 /* Java CLASSPATH handling.
-   Copyright (C) 2001-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 
 /* Separator in PATH like lists of pathnames.  */
 #if ((defined _WIN32 || defined __WIN32__) && !defined __CYGWIN__) || defined __EMX__ || defined __DJGPP__
-  /* Win32, OS/2, DOS */
+  /* Native Windows, OS/2, DOS */
 # define PATH_SEPARATOR ';'
 #else
   /* Unix */
@@ -46,7 +46,7 @@
    CLASSPATH is ignored.  */
 char *
 new_classpath (const char * const *classpaths, unsigned int classpaths_count,
-	       bool use_minimal_classpath)
+               bool use_minimal_classpath)
 {
   const char *old_classpath;
   unsigned int length;
@@ -81,7 +81,7 @@ new_classpath (const char * const *classpaths, unsigned int classpaths_count,
   else
     {
       if (classpaths_count > 0)
-	p--;
+        p--;
     }
   *p = '\0';
 
@@ -91,7 +91,7 @@ new_classpath (const char * const *classpaths, unsigned int classpaths_count,
 /* Set CLASSPATH and returns a safe copy of its old value.  */
 char *
 set_classpath (const char * const *classpaths, unsigned int classpaths_count,
-	       bool use_minimal_classpath, bool verbose)
+               bool use_minimal_classpath, bool verbose)
 {
   const char *old_CLASSPATH = getenv (CLASSPATHVAR);
   char *result = (old_CLASSPATH != NULL ? xstrdup (old_CLASSPATH) : NULL);

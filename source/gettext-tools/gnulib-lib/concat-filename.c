@@ -1,5 +1,5 @@
-/* Construct a full pathname from a directory and a filename.
-   Copyright (C) 2001-2004, 2006-2007 Free Software Foundation, Inc.
+/* Construct a full filename from a directory and a relative filename.
+   Copyright (C) 2001-2004, 2006-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the
@@ -19,19 +19,22 @@
 #include <config.h>
 
 /* Specification.  */
-#include "filename.h"
+#include "concat-filename.h"
 
+#include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
-#include "xalloc.h"
+#include "filename.h"
 
 /* Concatenate a directory filename, a relative filename and an optional
    suffix.  The directory may end with the directory separator.  The second
    argument may not start with the directory separator (it is relative).
-   Return a freshly allocated filename.  */
+   Return a freshly allocated filename.  Return NULL and set errno
+   upon memory allocation failure.  */
 char *
 concatenated_filename (const char *directory, const char *filename,
-		       const char *suffix)
+                       const char *suffix)
 {
   char *result;
   char *p;
@@ -39,27 +42,29 @@ concatenated_filename (const char *directory, const char *filename,
   if (strcmp (directory, ".") == 0)
     {
       /* No need to prepend the directory.  */
-      result = XNMALLOC (strlen (filename)
-			 + (suffix != NULL ? strlen (suffix) : 0)
-			 + 1,
-			 char);
+      result = (char *) malloc (strlen (filename)
+                                + (suffix != NULL ? strlen (suffix) : 0)
+                                + 1);
+      if (result == NULL)
+        return NULL; /* errno is set here */
       p = result;
     }
   else
     {
       size_t directory_len = strlen (directory);
       int need_slash =
-	(directory_len > FILE_SYSTEM_PREFIX_LEN (directory)
-	 && !ISSLASH (directory[directory_len - 1]));
-      result = XNMALLOC (directory_len + need_slash
-			 + strlen (filename)
-			 + (suffix != NULL ? strlen (suffix) : 0)
-			 + 1,
-			 char);
+        (directory_len > FILE_SYSTEM_PREFIX_LEN (directory)
+         && !ISSLASH (directory[directory_len - 1]));
+      result = (char *) malloc (directory_len + need_slash
+                                + strlen (filename)
+                                + (suffix != NULL ? strlen (suffix) : 0)
+                                + 1);
+      if (result == NULL)
+        return NULL; /* errno is set here */
       memcpy (result, directory, directory_len);
       p = result + directory_len;
       if (need_slash)
-	*p++ = '/';
+        *p++ = '/';
     }
   p = stpcpy (p, filename);
   if (suffix != NULL)

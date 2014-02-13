@@ -1,3 +1,831 @@
+2013-07-07  Daiki Ueno  <ueno@gnu.org>
+
+	* lang-javascript: Fix gjs module checks.
+
+2013-06-27  Daiki Ueno  <ueno@gnu.org>
+
+	* xgettext-python-1: Test non-literal string concatenation with
+	'+' to the test script.
+
+2013-06-25  Daiki Ueno  <ueno@gnu.org>
+
+	Fix handling of \u escape sequences in Tcl.
+	* Makefile.am (TESTS): Add xgettext-tcl-4.
+	* xgettext-tcl-4: New test for escape sequences.
+
+2013-06-17  Daiki Ueno  <ueno@gnu.org>
+
+	* format-python-brace-1: No need to pass
+	--flag=gettext:1:pass-python-brace-format to xgettext.
+
+2013-06-17  Daiki Ueno  <ueno@gnu.org>
+
+	* Makefile.am: Rename xgettext-gtkbuilder-* to
+	xgettext-glade-* as the current GtkBuilder support is implemented
+	as a variant of Glade.
+	(TESTS): Remove xgettext-gtkbuilder-[12] and add
+	xgettext-glade-[67].
+	(EXTRA_DIST): Remove xgettext-gtkbuilder-empty.ui.
+	* xgettext-glade-6: Rename from xgettext-gtkbuilder-1.
+	* xgettext-glade-7: Rename from xgettext-gtkbuilder-2.
+
+2013-06-13  Miguel Angel Arruga Vivas  <rosen644835@gmail.com>
+
+	Tests for GtkBuilder support.
+	* Makefile.am (TESTS): New tests xgettext-gtkbuilder{1,2}.
+	(EXTRA_DIST): Added file 'xgettext-gtkbuilder-empty.ui'.
+	* xgettext-gtkbuilder-empty.ui: New file for testing.
+	* xgettext-gtkbuilder-1: New test.
+	* xgettext-gtkbuilder-2: Likewise.
+
+2013-06-06  Daiki Ueno  <ueno@gnu.org>
+
+	* lang-javascript: Check if gjs gettext and format modules are
+	available.
+
+2013-06-04  Daiki Ueno  <ueno@gnu.org>
+
+	Support for Vala.
+	* xgettext-vala-1: New file.
+	* lang-vala: New file.
+	* Makefile.am (TESTS): Add them.
+
+2013-05-29  Stefano Lattarini  <stefano.lattarini@gmail.com>  (tiny change)
+
+	* Makefile.am (TESTS_ENVIRONMENT): Remove $(SHELL).
+	(LOG_COMPILER): Define to $(SHELL).
+
+2013-05-29  Daiki Ueno  <ueno@gnu.org>
+
+	Avoid temp file name collisions in test scripts.
+	* format-c-3: Use distinct temporary file names.
+	* format-c-4: Likewise.
+	* lang-c: Likewise.
+	* lang-c++: Likewise.
+	* gettext-1: Likewise.
+	* gettext-2: Likewise.
+	* gettext-3: Likewise.
+	* gettext-4: Likewise.
+	* gettext-5: Likewise.
+	* gettext-6: Likewise.
+	* gettext-7: Likewise.
+	* lang-bash: Likewise.
+	* lang-c: Likewise.
+	* lang-c++: Likewise.
+	* lang-clisp: Likewise.
+	* lang-csharp: Likewise.
+	* lang-elisp: Likewise.
+	* lang-gawk: Likewise.
+	* lang-guile: Likewise.
+	* lang-java: Likewise.
+	* lang-javascript: Likewise.
+	* lang-librep: Likewise.
+	* lang-lua: Likewise.
+	* lang-objc: Likewise.
+	* lang-pascal: Likewise.
+	* lang-perl-1: Likewise.
+	* lang-perl-2: Likewise.
+	* lang-php: Likewise.
+	* lang-po: Likewise.
+	* lang-python-1: Likewise.
+	* lang-python-2: Likewise.
+	* lang-rst: Likewise.
+	* lang-sh: Likewise.
+	* lang-smalltalk: Likewise.
+	* lang-tcl: Likewise.
+	* lang-ycp: Likewise.
+	* msgfmt-1: Likewise.
+	* msgfmt-17: Likewise.
+	* msgfmt-2: Likewise.
+	* msgfmt-properties-1: Likewise.
+	* msgunfmt-csharp-1: Likewise.
+	* msgunfmt-java-1: Likewise.
+	* msgunfmt-tcl-1: Likewise.
+	* plural-1: Likewise.
+	* plural-2: Likewise.
+	* xgettext-glade-1: Likewise.
+	* xgettext-glade-2: Likewise.
+	* xgettext-glade-3: Likewise.
+	* xgettext-glade-4: Likewise.
+	* xgettext-glade-5: Likewise.
+	* xgettext-python-4: Likewise.
+	* xgettext-stringtable-1: Likewise.
+	* format-c-3-prg.c: Use distinct message catalog directory.
+	* format-c-4-prg.c: Likewise.
+	* gettext-3-prg.c: Likewise.
+	* gettext-4-prg.c: Likewise.
+	* gettext-5-prg.c: Likewise.
+	* gettext-6-prg.c: Likewise.
+	* gettext-7-prg.c: Likewise.
+	* plural-1-prg.c: Likewise.
+
+2013-05-12  Daiki Ueno  <ueno@gnu.org>
+
+	* xgettext-javascript-4: Add a test for normal escape sequences.
+
+2013-05-12  Andreas Stricker <astricker@futurelab.ch>
+
+	Improve JavaScript scanner tests.
+	* xgettext-javascript-2: Add tests for backslash escapes and
+	_(...) call in regular expressions.
+	* xgettext-javascript-3: Use distinct temporary file names.
+	* xgettext-javascript-4: Likewise.
+	* xgettext-javascript-5: Add tests for unbalanced double-quotes in
+	regular expressions and strings.
+	* Makefile.am (TESTS): Add xgettext-javascript-5.
+
+2013-05-02  Daiki Ueno  <ueno@gnu.org>
+
+	* format-python-brace-2: Fix test for added argument.
+
+2013-04-26  Daiki Ueno  <ueno@gnu.org>
+
+	Support for Python brace format.
+	* format-python-brace-1: New file.
+	* format-python-brace-2: New file.
+	* Makefile.am (TESTS): Add them.
+
+2013-04-22  Daiki Ueno  <ueno@gnu.org>
+
+	Support explicit string concatenation in Python.
+	* xgettext-python-1: Add test for explicit string concatenation.
+
+2013-04-17  Andreas Stricker  <astricker@futurelab.ch>
+
+	Support for JavaScript.
+	* format-javascript-1: New file.
+	* format-javascript-2: New file.
+	* xgettext-javascript-1: New file.
+	* xgettext-javascript-2: New file.
+	* xgettext-javascript-3: New file.
+	* xgettext-javascript-4: New file.
+	* lang-javascript: New file.
+	* Makefile.am (TESTS): Add them.
+
+2013-04-16  Ľubomír Remák  <lubomirr@lubomirr.eu>
+
+	Support for escape sequences added in Lua 5.2.
+	* xgettext-lua-1: New test cases for \x and \z escape sequences.
+
+2013-04-11  Ľubomír Remák  <lubomirr@lubomirr.eu>
+
+	Support for Lua.
+	* format-lua-1: New file.
+	* format-lua-2: New file.
+	* xgettext-lua-1: New file.
+	* xgettext-lua-2: New file.
+	* lang-lua: New file.
+	* Makefile.am (TESTS): Add them.
+
+2013-03-03  Miguel Angel Arruga Vivas  <rosen644835@gmail.com>
+
+	Add a test case for atkproperty tag in Glade2 files.
+	* xgettext-glade-4: New test case for atkproperty.
+
+2013-03-14  Miguel Angel Arruga Vivas  <rosen644835@gmail.com>
+
+	Test msgctxt extraction on glade files.
+	* Makefile.am (TESTS): Add xgettext-glade-5.
+	* xgettext-glade-5: New test for msgctxt Glade2 extraction.
+
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2012-06-03  Jim Meyering  <jim@meyering.net>
+
+	* msgcomm-17: Spelling fixes.
+
+2012-02-19  Bruno Haible  <bruno@clisp.org>
+
+	Avoid spurious test output with guile 2.0.x.
+	* lang-guile: Filter out ";;;" lines from standard error.
+
+2012-02-18  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test failure with fpc version 2.6.0.
+	* lang-rst: Allow a test result with line wrapping.
+
+2012-02-18  Bruno Haible  <bruno@clisp.org>
+
+	Make the lang-pascal test work on x86_64 platforms.
+	* lang-pascal: Try also the ppcx64 program.
+
+2012-01-26  Bruno Haible  <bruno@clisp.org>
+
+	Modernize quoting.
+	* tstgettext.c (usage): Quote 'like this', not `like this', as per the
+	recent change to the GNU coding standards.
+	* tstngettext.c (usage): Likewise.
+
+2012-01-15  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test failure on Solaris 11.
+	* msgfilter-sr-latin-1: Skip the test if the PO file is incorrect.
+
+2011-06-02  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-python-1: Update expected result after linebreaking in
+	libunistring changed on 2011-01-09.
+
+2010-11-20  Bruno Haible  <bruno@clisp.org>
+
+	Port to uClibc.
+	* gettext-6-prg.c: Treat uClibc like a non-glibc platform.
+	* gettext-7-prg.c: Likewise.
+	* format-c-5-prg.c: Likewise.
+
+2010-08-31  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test leftovers on MacOS X 10.5.
+	* lang-objc: Add hello.dSYM to tmpfiles.
+
+2010-06-06  Bruno Haible  <bruno@clisp.org>
+
+	Test the libgettextpo library and its functions.
+	* gettextpo-1: New file.
+	* gettextpo-1-prg.c: New file.
+	* gettextpo-1.de.po: New file.
+	* Makefile.am (TESTS): Add gettextpo-1.
+	(EXTRA_DIST): Add gettextpo-1.de.po.
+	(noinst_PROGRAMS): Add gettextpo-1-prg.
+	(gettextpo_1_prg_SOURCES, gettextpo_1_prg_CPPFLAGS,
+	gettextpo_1_prg_LDADD): New variables.
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-05-26  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test suite failures on NetBSD 5.0.
+	* msgfilter-1: Skip the test if the 'fold' program trims trailing
+	spaces.
+	* msgfilter-3: Likewise.
+
+2010-05-23  Bruno Haible  <bruno@clisp.org>
+
+	msggrep: Fix interpretation of '$' in regular expressions.
+	* msggrep-9: New file.
+	* msggrep-10: New file.
+	* Makefile.am (TESTS): Add them.
+	Reported by Sean Flanigan <sflaniga@redhat.com>.
+
+2010-05-22  Bruno Haible  <bruno@clisp.org>
+
+	xgettext-glade-4: Skip, not fail, when expat was not available.
+	* xgettext-glade-4: Use the same test for xgettext Glade support as in
+	xgettext-glade-[123].
+	Patch by Matt Burgess <matthew@linuxfromscratch.org>.
+
+2010-05-15  Bruno Haible  <bruno@clisp.org>
+
+	Avoid link error on MacOS X 10.4, due to replaced 'unsetenv' function.
+	* Makefile.am (gettext_6_prg_LDADD, gettext_7_prg_LDADD): Add
+	libgettextlib.la. Add $(LDADD).
+	(gettext_6_prg_LDADD_1, gettext_7_prg_LDADD_1): Remove $(LDADD) here.
+	Reported by <ryandesign> at <https://savannah.gnu.org/bugs/?29888>.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test suite failures on Cygwin 1.7.
+	* lang-c++: Link without the -Wl,--disable-auto-import option.
+	* lang-clisp: Convert CR/LF to LF before applying DIFF.
+	* lang-tcl: Likewise.
+
+2010-04-25  Bruno Haible  <bruno@clisp.org>
+
+	Update support of object-pascal-format strings.
+	* format-pascal-1: Add test for "%:d".
+	* format-pascal-2: Add test for "%:s". Test type compatibility between
+	%d, %u, %x.
+
+2010-03-31  Guido Flohr  <guido@imperia.net>
+
+	Improve how xgettext handles Perl syntax ambiguities.
+	* xgettext-perl-8: New file.
+	* Makefile.am (TESTS): Add it.
+	Reported by Guillem Jover <guillem@debian.org> via Santiago Vila.
+
+2009-12-26  Bruno Haible  <bruno@clisp.org>
+
+	Enable the gettext-6 and gettext-7 tests also on MacOS X.
+	* Makefile.am (gettext_6_prg_CFLAGS, gettext_7_prg_CFLAGS): Depend on
+	HAVE_NEWLOCALE instead of GLIBC2.
+	(gettext_6_prg_LDADD, gettext_7_prg_LDADD): Likewise. Remove
+	libgettextlib.la.
+	* gettext-6-prg.c: Enable the test also on MacOS X platforms that have
+	uselocale.
+	(LOCALE_DE_ISO8859, LOCALE_FR_ISO8859): New macros.
+	(thread1_execution, thread2_execution): Use them.
+	(check_locale_exists): New function.
+	(main): Check for the locales if an argument is passed.
+	* gettext-7-prg.c: Enable the test also on MacOS X platforms that have
+	uselocale.
+	(LOCALE_DE_ISO8859, LOCALE_DE_UTF8): New macros.
+	(thread1_execution, thread2_execution): Use them.
+	(check_locale_exists): New function.
+	(main): Check for the locales if an argument is passed.
+	* gettext-6: Make the test work also on MacOS X systems. Test the
+	presence of the locales through the program, not through testlocale.
+	* gettext-7: Likewise.
+
+2009-12-26  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-7: Make the test fail when it produced unexpected results.
+
+2009-12-21  Bruno Haible  <bruno@clisp.org>
+
+	* format-c-3-prg.c: Don't use setlocale override.
+	* format-c-4-prg.c: Likewise.
+	* plural-1-prg.c: Likewise.
+
+2009-12-13  Bruno Haible  <bruno@clisp.org>
+
+	Avoid a test failure on MacOS X 10.5.
+	* lang-java: Make the test work when both locales fr_FR.ISO8859-1 and
+	fr_FR.UTF-8 exist.
+
+2009-12-12  Bruno Haible  <bruno@clisp.org>
+
+	* *.c: Untabify.
+
+2009-08-30  Bruno Haible  <bruno@clisp.org>
+
+	Fix a test failure on Solaris.
+	* msgexec-2 (TR): New variable.
+
+2009-08-15  Bruno Haible  <bruno@clisp.org>
+
+	* msgunfmt-tcl-1: Explain that this test fails on mingw.
+
+2009-08-14  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (update-expected): New target.
+
+2009-08-14  Bruno Haible  <bruno@clisp.org>
+
+	Avoid a warning message on Cygwin.
+	* msggrep-7: Filter out msggrep's warning about locale charset.
+
+2009-08-13  Bruno Haible  <bruno@clisp.org>
+
+	* msgexec-1: Filter out msgexec's warning about locale charset.
+	* msgexec-2: Likewise.
+	* msgexec-4: Likewise. Explain why this test fails on mingw.
+
+2009-08-10  Bruno Haible  <bruno@clisp.org>
+
+	Avoid a test failure on Cygwin.
+	* msginit-1: Replace also CP1252 label with ASCII.
+
+2009-07-27  Часлав Илић (Chusslove Illich)  <caslav.ilic@gmx.net>
+            Bruno Haible  <bruno@clisp.org>
+
+	* recode-sr-latin-1: Add test cases with accents.
+
+2009-06-06  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-perl-1: Add test of // operator.
+
+2009-05-29  Bruno Haible  <bruno@clisp.org>
+
+	* msgfmt-10: Update after msgfmt's error message changed.
+
+2009-05-29  Bruno Haible  <bruno@clisp.org>
+
+	Avoid lang-c++ test failure.
+	* lang-c++: Pass --tag option to libtool.
+
+2009-05-21  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (AUTOMAKE_OPTIONS): Add 1.11 and color-tests.
+
+2009-05-16  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-glade-4: New file.
+	* Makefile.am (TESTS): Add it.
+
+2009-03-29  Bruno Haible  <bruno@clisp.org>
+
+	* format-gfc-internal-1: New file.
+	* format-gfc-internal-2: New file.
+	* Makefile.am (TESTS): Add them.
+
+2009-01-28  Bruno Haible  <bruno@clisp.org>
+
+	* format-qt-plural-1: New file.
+	* format-qt-plural-2: New file.
+	* Makefile.am (TESTS): Add them.
+
+2009-01-27  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-c-13: Test also the 3 variants of the tr function and the
+	qt-plural-format flag.
+
+2009-01-25  Bruno Haible  <bruno@clisp.org>
+
+	Avoid a test suite failure on platforms that have a gl_IE locale.
+	* msginit-1: Normalize the charset of the generated PO file.
+
+2008-10-04  Bruno Haible  <bruno@clisp.org>
+
+	* msgfmt-17: New file.
+	* Makefile.am (TESTS): Add it.
+	Reported by Anatoly Techtonik <techtonik@gmail.com>
+	via <https://savannah.gnu.org/bugs/?24433>.
+
+2008-10-04  Bruno Haible  <bruno@clisp.org>
+
+	* msgcat-18: New file.
+	* msgcomm-27: New file.
+	* msgmerge-24: New file.
+	* xgettext-c-18: New file.
+	* Makefile.am (TESTS): Add them.
+
+2008-09-29  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test suite failures on mingw.
+	* msgexec-1: Don't produce CR/LFs in the per-message command script.
+	* msgexec-3: Likewise.
+	* msgexec-4: Likewise.
+
+2008-09-28  Bruno Haible  <bruno@clisp.org>
+
+	Avoid test suite failures on mingw.
+	* msgcmp-2: Normalize program name with .exe suffix also when it
+	occurs at the beginning of a line of error output.
+	* msgcmp-3: Likewise.
+	* msgfmt-7: Likewise.
+	* msgfmt-8: Likewise.
+	* msgfmt-9: Likewise.
+	* msgfmt-10: Likewise.
+	* msgmerge-2: Likewise.
+	* msgmerge-9: Likewise.
+	* msgexec-2: Convert CR/LF to LF before applying DIFF.
+
+2008-08-23  Bruno Haible  <bruno@clisp.org>
+
+	* msgmerge-update-4: New file, based on msgmerge-update-3.
+	* Makefile.am (TESTS): Add it.
+	Reported by Vincent Danjean <vdanjean.abo@free.fr>
+	via <http://savannah.gnu.org/bugs/?24123>.
+
+2008-08-16  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-python-1: Test that strings inside [ ] are not extracted for
+	an outer gettext call.
+
+2008-08-15  Bruno Haible  <bruno@clisp.org>
+
+	* format-python-2: Check that %.0s normally behaves like %s.
+
+2008-06-01  Bruno Haible  <bruno@clisp.org>
+
+	* lang-bash: Add note about failure on MacOS X.
+
+2008-06-01  Bruno Haible  <bruno@clisp.org>
+
+	* lang-smalltalk: Avoid test failure with gst-3.0.3 on MacOS X.
+
+2008-05-26  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-8: New file.
+	* Makefile.am (noinst_PROGRAMS): Add gettext-8-prg, remove gettext-8.
+	(gettext_8_prg_*): Renamed from gettext_8_*.
+
+2008-05-12  Bruno Haible  <bruno@clisp.org>
+
+	* msgcat-17: Change test so that it works with newer line-breaking
+	algorithm.
+
+2008-04-06  Bruno Haible  <bruno@clisp.org>
+
+	Avoid testsuite failures on MacOS X 10.5.
+	* format-c-3: Use "LC_ALL=C tr" instead of "tr". Avoids error with
+	non-ASCII bytes in UTF-8 locales.
+	* format-c-4: Likewise.
+	* format-c-5: Likewise.
+	* format-perl-mixed-1: Likewise.
+	* gettext-1: Likewise.
+	* lang-bash: Likewise.
+	* lang-c: Likewise.
+	* lang-c++: Likewise.
+	* lang-clisp: Likewise.
+	* lang-csharp: Likewise.
+	* lang-elisp: Likewise.
+	* lang-gawk: Likewise.
+	* lang-guile: Likewise.
+	* lang-java: Likewise.
+	* lang-librep: Likewise.
+	* lang-objc: Likewise.
+	* lang-pascal: Likewise.
+	* lang-perl-1: Likewise.
+	* lang-perl-2: Likewise.
+	* lang-php: Likewise.
+	* lang-po: Likewise.
+	* lang-python-1: Likewise.
+	* lang-python-2: Likewise.
+	* lang-rst: Likewise.
+	* lang-sh: Likewise.
+	* lang-smalltalk: Likewise.
+	* lang-tcl: Likewise.
+	* lang-ycp: Likewise.
+	* msgattrib-1: Likewise.
+	* msgattrib-10: Likewise.
+	* msgattrib-11: Likewise.
+	* msgattrib-12: Likewise.
+	* msgattrib-13: Likewise.
+	* msgattrib-14: Likewise.
+	* msgattrib-15: Likewise.
+	* msgattrib-16: Likewise.
+	* msgattrib-17: Likewise.
+	* msgattrib-2: Likewise.
+	* msgattrib-3: Likewise.
+	* msgattrib-4: Likewise.
+	* msgattrib-5: Likewise.
+	* msgattrib-6: Likewise.
+	* msgattrib-7: Likewise.
+	* msgattrib-8: Likewise.
+	* msgattrib-9: Likewise.
+	* msgattrib-properties-1: Likewise.
+	* msgcat-1: Likewise.
+	* msgcat-10: Likewise.
+	* msgcat-11: Likewise.
+	* msgcat-13: Likewise.
+	* msgcat-15: Likewise.
+	* msgcat-16: Likewise.
+	* msgcat-17: Likewise.
+	* msgcat-2: Likewise.
+	* msgcat-3: Likewise.
+	* msgcat-4: Likewise.
+	* msgcat-5: Likewise.
+	* msgcat-6: Likewise.
+	* msgcat-7: Likewise.
+	* msgcat-8: Likewise.
+	* msgcat-9: Likewise.
+	* msgcat-properties-1: Likewise.
+	* msgcat-stringtable-1: Likewise.
+	* msgcmp-2: Likewise.
+	* msgcmp-3: Likewise.
+	* msgcomm-1: Likewise.
+	* msgcomm-10: Likewise.
+	* msgcomm-11: Likewise.
+	* msgcomm-12: Likewise.
+	* msgcomm-13: Likewise.
+	* msgcomm-14: Likewise.
+	* msgcomm-16: Likewise.
+	* msgcomm-17: Likewise.
+	* msgcomm-18: Likewise.
+	* msgcomm-19: Likewise.
+	* msgcomm-2: Likewise.
+	* msgcomm-20: Likewise.
+	* msgcomm-21: Likewise.
+	* msgcomm-22: Likewise.
+	* msgcomm-23: Likewise.
+	* msgcomm-24: Likewise.
+	* msgcomm-25: Likewise.
+	* msgcomm-26: Likewise.
+	* msgcomm-3: Likewise.
+	* msgcomm-4: Likewise.
+	* msgcomm-5: Likewise.
+	* msgcomm-6: Likewise.
+	* msgcomm-7: Likewise.
+	* msgcomm-8: Likewise.
+	* msgcomm-9: Likewise.
+	* msgconv-5: Likewise.
+	* msgconv-6: Likewise.
+	* msgen-1: Likewise.
+	* msgen-2: Likewise.
+	* msgen-3: Likewise.
+	* msgfilter-sr-latin-1: Likewise.
+	* msgfmt-1: Likewise.
+	* msgfmt-10: Likewise.
+	* msgfmt-12: Likewise.
+	* msgfmt-14: Likewise.
+	* msgfmt-16: Likewise.
+	* msgfmt-5: Likewise.
+	* msgfmt-7: Likewise.
+	* msgfmt-8: Likewise.
+	* msgfmt-9: Likewise.
+	* msgfmt-properties-1: Likewise.
+	* msggrep-1: Likewise.
+	* msggrep-2: Likewise.
+	* msggrep-3: Likewise.
+	* msggrep-4: Likewise.
+	* msggrep-5: Likewise.
+	* msggrep-6: Likewise.
+	* msggrep-7: Likewise.
+	* msggrep-8: Likewise.
+	* msginit-1: Likewise.
+	* msginit-2: Likewise.
+	* msgmerge-1: Likewise.
+	* msgmerge-10: Likewise.
+	* msgmerge-11: Likewise.
+	* msgmerge-12: Likewise.
+	* msgmerge-13: Likewise.
+	* msgmerge-14: Likewise.
+	* msgmerge-15: Likewise.
+	* msgmerge-16: Likewise.
+	* msgmerge-17: Likewise.
+	* msgmerge-18: Likewise.
+	* msgmerge-19: Likewise.
+	* msgmerge-2: Likewise.
+	* msgmerge-20: Likewise.
+	* msgmerge-21: Likewise.
+	* msgmerge-22: Likewise.
+	* msgmerge-23: Likewise.
+	* msgmerge-3: Likewise.
+	* msgmerge-4: Likewise.
+	* msgmerge-5: Likewise.
+	* msgmerge-6: Likewise.
+	* msgmerge-7: Likewise.
+	* msgmerge-8: Likewise.
+	* msgmerge-9: Likewise.
+	* msgmerge-compendium-1: Likewise.
+	* msgmerge-compendium-2: Likewise.
+	* msgmerge-compendium-3: Likewise.
+	* msgmerge-compendium-4: Likewise.
+	* msgmerge-compendium-5: Likewise.
+	* msgmerge-compendium-6: Likewise.
+	* msgmerge-properties-1: Likewise.
+	* msgmerge-properties-2: Likewise.
+	* msgmerge-update-2: Likewise.
+	* msgunfmt-1: Likewise.
+	* msgunfmt-2: Likewise.
+	* msgunfmt-properties-1: Likewise.
+	* msguniq-1: Likewise.
+	* msguniq-2: Likewise.
+	* msguniq-3: Likewise.
+	* msguniq-5: Likewise.
+	* msguniq-6: Likewise.
+	* plural-1: Likewise.
+	* xgettext-2: Likewise.
+	* xgettext-3: Likewise.
+	* xgettext-4: Likewise.
+	* xgettext-5: Likewise.
+	* xgettext-6: Likewise.
+	* xgettext-7: Likewise.
+	* xgettext-8: Likewise.
+	* xgettext-9: Likewise.
+	* xgettext-awk-1: Likewise.
+	* xgettext-awk-2: Likewise.
+	* xgettext-c-1: Likewise.
+	* xgettext-c-10: Likewise.
+	* xgettext-c-11: Likewise.
+	* xgettext-c-12: Likewise.
+	* xgettext-c-13: Likewise.
+	* xgettext-c-14: Likewise.
+	* xgettext-c-15: Likewise.
+	* xgettext-c-16: Likewise.
+	* xgettext-c-17: Likewise.
+	* xgettext-c-2: Likewise.
+	* xgettext-c-3: Likewise.
+	* xgettext-c-4: Likewise.
+	* xgettext-c-5: Likewise.
+	* xgettext-c-6: Likewise.
+	* xgettext-c-7: Likewise.
+	* xgettext-c-8: Likewise.
+	* xgettext-c-9: Likewise.
+	* xgettext-csharp-1: Likewise.
+	* xgettext-csharp-2: Likewise.
+	* xgettext-csharp-3: Likewise.
+	* xgettext-csharp-4: Likewise.
+	* xgettext-csharp-5: Likewise.
+	* xgettext-csharp-6: Likewise.
+	* xgettext-csharp-7: Likewise.
+	* xgettext-elisp-1: Likewise.
+	* xgettext-elisp-2: Likewise.
+	* xgettext-java-1: Likewise.
+	* xgettext-java-2: Likewise.
+	* xgettext-java-3: Likewise.
+	* xgettext-java-4: Likewise.
+	* xgettext-java-5: Likewise.
+	* xgettext-java-6: Likewise.
+	* xgettext-java-7: Likewise.
+	* xgettext-librep-1: Likewise.
+	* xgettext-librep-2: Likewise.
+	* xgettext-lisp-1: Likewise.
+	* xgettext-lisp-2: Likewise.
+	* xgettext-objc-1: Likewise.
+	* xgettext-objc-2: Likewise.
+	* xgettext-perl-1: Likewise.
+	* xgettext-perl-2: Likewise.
+	* xgettext-perl-3: Likewise.
+	* xgettext-perl-4: Likewise.
+	* xgettext-perl-5: Likewise.
+	* xgettext-perl-6: Likewise.
+	* xgettext-perl-7: Likewise.
+	* xgettext-php-1: Likewise.
+	* xgettext-php-2: Likewise.
+	* xgettext-php-3: Likewise.
+	* xgettext-php-4: Likewise.
+	* xgettext-po-1: Likewise.
+	* xgettext-properties-1: Likewise.
+	* xgettext-python-1: Likewise.
+	* xgettext-python-2: Likewise.
+	* xgettext-python-3: Likewise.
+	* xgettext-python-4: Likewise.
+	* xgettext-scheme-1: Likewise.
+	* xgettext-scheme-3: Likewise.
+	* xgettext-sh-1: Likewise.
+	* xgettext-sh-2: Likewise.
+	* xgettext-sh-3: Likewise.
+	* xgettext-sh-4: Likewise.
+	* xgettext-sh-5: Likewise.
+	* xgettext-sh-6: Likewise.
+	* xgettext-smalltalk-1: Likewise.
+	* xgettext-smalltalk-2: Likewise.
+	* xgettext-stringtable-1: Likewise.
+	* xgettext-tcl-1: Likewise.
+	* xgettext-tcl-2: Likewise.
+	* xgettext-tcl-3: Likewise.
+	* xgettext-ycp-1: Likewise.
+	* xgettext-ycp-2: Likewise.
+	* xgettext-ycp-3: Likewise.
+	* xgettext-ycp-4: Likewise.
+
+2008-02-20  Bruno Haible  <bruno@clisp.org>
+
+	* format-gcc-internal-1: Test also %K.
+
+2008-02-04  Bruno Haible  <bruno@clisp.org>
+
+	* msgmerge-23: New file.
+	* Makefile.am (TESTS): Add it.
+	Reported by Yukiko Bando <ybando@k6.dion.ne.jp> via
+	Chusslove Illich (Часлав Илић) <caslav.ilic@gmx.net>.
+
+2008-01-12  Bruno Haible  <bruno@clisp.org>
+
+	* xgettext-glade-2: Use 'grep' with a pipe as input, not a regular
+	file.
+	* xgettext-glade-3: Likewise.
+	* xgettext-java-2: Likewise.
+	* xgettext-python-1: Likewise.
+	* xgettext-python-3: Likewise.
+	* xgettext-stringtable-1: Likewise.
+	* xgettext-tcl-1: Likewise.
+	Fixes test failures on OpenBSD 4.0.
+
+2007-12-24  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-3-prg.c: Don't include setenv.h.
+	* gettext-5-prg.c: Likewise.
+	* gettext-6-prg.c: Likewise.
+	* gettext-7-prg.c: Likewise.
+
+2007-12-24  Bruno Haible  <bruno@clisp.org>
+
+	* msginit-1: Add 'Language' field in header to input. Check that it is
+	filled.
+	* msginit-2: Likewise.
+	* msgmerge-5: Add 'Language' field in header to expected result.
+	* msgmerge-6: Likewise.
+	* msgmerge-10: Likewise.
+	* msgmerge-11: Likewise.
+	* msgmerge-12: Likewise.
+	* msgmerge-13: Likewise.
+	* msgmerge-14: Likewise.
+	* msgmerge-16: Likewise.
+	* msgmerge-21: Likewise.
+	* msgmerge-22: Likewise.
+	* mm-viet.out: Likewise.
+	* msgmerge-update-1: Add 'Language' field in header to input.
+	* msgmerge-update-2: Likewise.
+	* msgmerge-update-3: Likewise.
+	* xgettext-3: Add 'Language' field in header to expected result.
+	* xgettext-4: Likewise.
+	* xgettext-5: Likewise.
+	* xgettext-8: Likewise.
+	* xgettext-csharp-2: Likewise.
+	* xgettext-csharp-3: Likewise.
+	* xgettext-glade-1: Likewise.
+	* xgettext-glade-2: Likewise.
+	* xgettext-glade-3: Likewise.
+	* xgettext-java-2: Likewise.
+	* xgettext-perl-2: Likewise.
+	* xgettext-perl-3: Likewise.
+	* xgettext-python-1: Likewise.
+	* xgettext-python-3: Likewise.
+	* xgettext-stringtable-1: Likewise.
+	* xgettext-tcl-1: Likewise.
+
+2007-12-22  Bruno Haible  <bruno@clisp.org>
+
+	* msgcat-17: New file.
+	* Makefile.am (TESTS): Add it.
+
+2007-11-15  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-8-prg.c: New file.
+	* Makefile.am (TESTS, noinst_PROGRAMS): Add gettext-8.
+	(gettext_8_*): New variables.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.
@@ -332,8 +1160,8 @@
 
 2007-04-30  Bruno Haible  <bruno@clisp.org>
 
-        * lang-php: Remove 'echo' of printf result.
-        Patch by Jens Petersen <petersen@redhat.com>.
+	* lang-php: Remove 'echo' of printf result.
+	Patch by Jens Petersen <petersen@redhat.com>.
 
 2007-03-27  Bruno Haible  <bruno@clisp.org>
 
@@ -349,8 +1177,8 @@
 
 2007-03-17  Bruno Haible  <bruno@clisp.org>
 
-	* xgettext-php-1: Test that strings [ ] are not extracted for an outer
-	gettext call.
+	* xgettext-php-1: Test that strings inside [ ] are not extracted for an
+	outer gettext call.
 
 2007-02-19  Bruno Haible  <bruno@clisp.org>
 
@@ -549,7 +1377,7 @@
 
 2006-06-04  Bruno Haible  <bruno@clisp.org>
 
-        * recode-sr-latin-2: Skip the test on MacOS X and BeOS.
+	* recode-sr-latin-2: Skip the test on MacOS X and BeOS.
 
 2006-06-04  Bruno Haible  <bruno@clisp.org>
 
@@ -921,7 +1749,7 @@
 
 2005-07-16  Bruno Haible  <bruno@clisp.org>
 
-        * msgcat-stringtable-1: Filter out warning message from output.
+	* msgcat-stringtable-1: Filter out warning message from output.
 
 2005-05-27  Bruno Haible  <bruno@clisp.org>
 

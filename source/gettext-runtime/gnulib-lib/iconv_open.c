@@ -1,9 +1,9 @@
 /* Character set conversion.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -12,8 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -36,6 +35,7 @@
 #define ICONV_FLAVOR_HPUX "iconv_open-hpux.h"
 #define ICONV_FLAVOR_IRIX "iconv_open-irix.h"
 #define ICONV_FLAVOR_OSF "iconv_open-osf.h"
+#define ICONV_FLAVOR_SOLARIS "iconv_open-solaris.h"
 
 #ifdef ICONV_FLAVOR
 # include ICONV_FLAVOR
@@ -56,7 +56,7 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
      iconv() to these encoding inserts a BOM, which is wrong.
      We do not need to handle conversion between arbitrary encodings and
      UTF-{16,32}{BE,LE}, because the 'striconveh' module implements two-step
-     conversion throough UTF-8.
+     conversion through UTF-8.
      The _ICONV_* constants are chosen to be disjoint from any iconv_t
      returned by the system's iconv_open() functions.  Recall that iconv_t
      is a scalar type.  */
@@ -66,33 +66,33 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
       && fromcode[3] == '-')
     {
       if (c_toupper (tocode[0]) == 'U'
-	  && c_toupper (tocode[1]) == 'T'
-	  && c_toupper (tocode[2]) == 'F'
-	  && tocode[3] == '-')
-	{
-	  if (strcmp (fromcode + 4, "8") == 0)
-	    {
-	      if (c_strcasecmp (tocode + 4, "16BE") == 0)
-		return _ICONV_UTF8_UTF16BE;
-	      if (c_strcasecmp (tocode + 4, "16LE") == 0)
-		return _ICONV_UTF8_UTF16LE;
-	      if (c_strcasecmp (tocode + 4, "32BE") == 0)
-		return _ICONV_UTF8_UTF32BE;
-	      if (c_strcasecmp (tocode + 4, "32LE") == 0)
-		return _ICONV_UTF8_UTF32LE;
-	    }
-	  else if (strcmp (tocode + 4, "8") == 0)
-	    {
-	      if (c_strcasecmp (fromcode + 4, "16BE") == 0)
-		return _ICONV_UTF16BE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "16LE") == 0)
-		return _ICONV_UTF16LE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "32BE") == 0)
-		return _ICONV_UTF32BE_UTF8;
-	      if (c_strcasecmp (fromcode + 4, "32LE") == 0)
-		return _ICONV_UTF32LE_UTF8;
-	    }
-	}
+          && c_toupper (tocode[1]) == 'T'
+          && c_toupper (tocode[2]) == 'F'
+          && tocode[3] == '-')
+        {
+          if (strcmp (fromcode + 4, "8") == 0)
+            {
+              if (c_strcasecmp (tocode + 4, "16BE") == 0)
+                return _ICONV_UTF8_UTF16BE;
+              if (c_strcasecmp (tocode + 4, "16LE") == 0)
+                return _ICONV_UTF8_UTF16LE;
+              if (c_strcasecmp (tocode + 4, "32BE") == 0)
+                return _ICONV_UTF8_UTF32BE;
+              if (c_strcasecmp (tocode + 4, "32LE") == 0)
+                return _ICONV_UTF8_UTF32LE;
+            }
+          else if (strcmp (tocode + 4, "8") == 0)
+            {
+              if (c_strcasecmp (fromcode + 4, "16BE") == 0)
+                return _ICONV_UTF16BE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "16LE") == 0)
+                return _ICONV_UTF16LE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "32BE") == 0)
+                return _ICONV_UTF32BE_UTF8;
+              if (c_strcasecmp (fromcode + 4, "32LE") == 0)
+                return _ICONV_UTF32LE_UTF8;
+            }
+        }
     }
 #endif
 
@@ -115,20 +115,20 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
 
   /* Convert the encodings to upper case, because
        1. in the arguments of iconv_open() on AIX, HP-UX, and OSF/1 the case
-	  matters,
+          matters,
        2. it makes searching in the table faster.  */
   {
     const char *p = fromcode;
     char *q = fromcode_upper;
     while ((*q = c_toupper (*p)) != '\0')
       {
-	p++;
-	q++;
-	if (q == &fromcode_upper[SIZEOF (fromcode_upper)])
-	  {
-	    errno = EINVAL;
-	    return (iconv_t)(-1);
-	  }
+        p++;
+        q++;
+        if (q == &fromcode_upper[SIZEOF (fromcode_upper)])
+          {
+            errno = EINVAL;
+            return (iconv_t)(-1);
+          }
       }
     fromcode_upper_end = q;
   }
@@ -138,13 +138,13 @@ rpl_iconv_open (const char *tocode, const char *fromcode)
     char *q = tocode_upper;
     while ((*q = c_toupper (*p)) != '\0')
       {
-	p++;
-	q++;
-	if (q == &tocode_upper[SIZEOF (tocode_upper)])
-	  {
-	    errno = EINVAL;
-	    return (iconv_t)(-1);
-	  }
+        p++;
+        q++;
+        if (q == &tocode_upper[SIZEOF (tocode_upper)])
+          {
+            errno = EINVAL;
+            return (iconv_t)(-1);
+          }
       }
     tocode_upper_end = q;
   }

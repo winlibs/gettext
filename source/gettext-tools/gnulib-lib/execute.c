@@ -1,5 +1,5 @@
 /* Creation of autonomous subprocesses.
-   Copyright (C) 2001-2004, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -35,37 +35,17 @@
 
 #define _(str) gettext (str)
 
-#if defined _MSC_VER || defined __MINGW32__
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
 
-/* Native Woe32 API.  */
+/* Native Windows API.  */
 # include <process.h>
 # include "w32spawn.h"
 
 #else
 
 /* Unix API.  */
-# if HAVE_POSIX_SPAWN
-#  include <spawn.h>
-# else
-#  if HAVE_VFORK_H
-#   include <vfork.h>
-#  endif
-# endif
+# include <spawn.h>
 
-#endif
-
-#if ! HAVE_ENVIRON_DECL
-extern char **environ;
-#endif
-
-#ifndef STDIN_FILENO
-# define STDIN_FILENO 0
-#endif
-#ifndef STDOUT_FILENO
-# define STDOUT_FILENO 1
-#endif
-#ifndef STDERR_FILENO
-# define STDERR_FILENO 2
 #endif
 
 /* The results of open() in this file are not used with fchdir,
@@ -74,13 +54,13 @@ extern char **environ;
 #undef close
 
 
-#ifdef EINTR
+#if defined EINTR && ((defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__)
 
 /* EINTR handling for close(), open().
    These functions can return -1/EINTR even though we don't have any
    signal handlers set up, namely when we get interrupted via SIGSTOP.  */
 
-static inline int
+static int
 nonintr_close (int fd)
 {
   int retval;
@@ -93,7 +73,7 @@ nonintr_close (int fd)
 }
 #define close nonintr_close
 
-static inline int
+static int
 nonintr_open (const char *pathname, int oflag, mode_t mode)
 {
   int retval;
@@ -118,14 +98,15 @@ nonintr_open (const char *pathname, int oflag, mode_t mode)
    creator receives a catchable fatal signal.  */
 int
 execute (const char *progname,
-	 const char *prog_path, char **prog_argv,
-	 bool ignore_sigpipe,
-	 bool null_stdin, bool null_stdout, bool null_stderr,
-	 bool slave_process, bool exit_on_error)
+         const char *prog_path, char **prog_argv,
+         bool ignore_sigpipe,
+         bool null_stdin, bool null_stdout, bool null_stderr,
+         bool slave_process, bool exit_on_error,
+         int *termsigp)
 {
-#if defined _MSC_VER || defined __MINGW32__
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
 
-  /* Native Woe32 API.  */
+  /* Native Windows API.  */
   int orig_stdin;
   int orig_stdout;
   int orig_stderr;
@@ -133,15 +114,16 @@ execute (const char *progname,
   int nullinfd;
   int nulloutfd;
 
+  /* FIXME: Need to free memory allocated by prepare_spawn.  */
   prog_argv = prepare_spawn (prog_argv);
 
   /* Save standard file handles of parent process.  */
   if (null_stdin)
-    orig_stdin = dup_noinherit (STDIN_FILENO);
+    orig_stdin = dup_safer_noinherit (STDIN_FILENO);
   if (null_stdout)
-    orig_stdout = dup_noinherit (STDOUT_FILENO);
+    orig_stdout = dup_safer_noinherit (STDOUT_FILENO);
   if (null_stderr)
-    orig_stderr = dup_noinherit (STDERR_FILENO);
+    orig_stderr = dup_safer_noinherit (STDERR_FILENO);
   exitcode = -1;
 
   /* Create standard file handles of child process.  */
@@ -149,21 +131,41 @@ execute (const char *progname,
   nulloutfd = -1;
   if ((!null_stdin
        || ((nullinfd = open ("NUL", O_RDONLY, 0)) >= 0
-	   && (nullinfd == STDIN_FILENO
-	       || (dup2 (nullinfd, STDIN_FILENO) >= 0
-		   && close (nullinfd) >= 0))))
+           && (nullinfd == STDIN_FILENO
+               || (dup2 (nullinfd, STDIN_FILENO) >= 0
+                   && close (nullinfd) >= 0))))
       && (!(null_stdout || null_stderr)
-	  || ((nulloutfd = open ("NUL", O_RDWR, 0)) >= 0
-	      && (!null_stdout
-		  || nulloutfd == STDOUT_FILENO
-		  || dup2 (nulloutfd, STDOUT_FILENO) >= 0)
-	      && (!null_stderr
-		  || nulloutfd == STDERR_FILENO
-		  || dup2 (nulloutfd, STDERR_FILENO) >= 0)
-	      && ((null_stdout && nulloutfd == STDOUT_FILENO)
-		  || (null_stderr && nulloutfd == STDERR_FILENO)
-		  || close (nulloutfd) >= 0))))
-    exitcode = spawnvp (P_WAIT, prog_path, prog_argv);
+          || ((nulloutfd = open ("NUL", O_RDWR, 0)) >= 0
+              && (!null_stdout
+                  || nulloutfd == STDOUT_FILENO
+                  || dup2 (nulloutfd, STDOUT_FILENO) >= 0)
+              && (!null_stderr
+                  || nulloutfd == STDERR_FILENO
+                  || dup2 (nulloutfd, STDERR_FILENO) >= 0)
+              && ((null_stdout && nulloutfd == STDOUT_FILENO)
+                  || (null_stderr && nulloutfd == STDERR_FILENO)
+                  || close (nulloutfd) >= 0))))
+    /* Use spawnvpe and pass the environment explicitly.  This is needed if
+       the program has modified the environment using putenv() or [un]setenv().
+       On Windows, programs have two environments, one in the "environment
+       block" of the process and managed through SetEnvironmentVariable(), and
+       one inside the process, in the location retrieved by the 'environ'
+       macro.  When using spawnvp() without 'e', the child process inherits a
+       copy of the environment block - ignoring the effects of putenv() and
+       [un]setenv().  */
+    {
+      exitcode = spawnvpe (P_WAIT, prog_path, (const char **) prog_argv,
+                           (const char **) environ);
+      if (exitcode < 0 && errno == ENOEXEC)
+        {
+          /* prog is not a native executable.  Try to execute it as a
+             shell script.  Note that prepare_spawn() has already prepended
+             a hidden element "sh.exe" to prog_argv.  */
+          --prog_argv;
+          exitcode = spawnvpe (P_WAIT, prog_argv[0], (const char **) prog_argv,
+                               (const char **) environ);
+        }
+    }
   if (nulloutfd >= 0)
     close (nulloutfd);
   if (nullinfd >= 0)
@@ -171,17 +173,20 @@ execute (const char *progname,
 
   /* Restore standard file handles of parent process.  */
   if (null_stderr)
-    dup2 (orig_stderr, STDERR_FILENO), close (orig_stderr);
+    undup_safer_noinherit (orig_stderr, STDERR_FILENO);
   if (null_stdout)
-    dup2 (orig_stdout, STDOUT_FILENO), close (orig_stdout);
+    undup_safer_noinherit (orig_stdout, STDOUT_FILENO);
   if (null_stdin)
-    dup2 (orig_stdin, STDIN_FILENO), close (orig_stdin);
+    undup_safer_noinherit (orig_stdin, STDIN_FILENO);
+
+  if (termsigp != NULL)
+    *termsigp = 0;
 
   if (exitcode == -1)
     {
       if (exit_on_error || !null_stderr)
-	error (exit_on_error ? EXIT_FAILURE : 0, errno,
-	       _("%s subprocess failed"), progname);
+        error (exit_on_error ? EXIT_FAILURE : 0, errno,
+               _("%s subprocess failed"), progname);
       return 127;
     }
 
@@ -195,7 +200,6 @@ execute (const char *progname,
      subprocess to exit with return code 127.  It is implementation
      dependent which error is reported which way.  We treat both cases as
      equivalent.  */
-#if HAVE_POSIX_SPAWN
   sigset_t blocked_signals;
   posix_spawn_file_actions_t actions;
   bool actions_allocated;
@@ -203,11 +207,7 @@ execute (const char *progname,
   bool attrs_allocated;
   int err;
   pid_t child;
-#else
-  int child;
-#endif
 
-#if HAVE_POSIX_SPAWN
   if (slave_process)
     {
       sigprocmask (SIG_SETMASK, NULL, &blocked_signals);
@@ -217,92 +217,54 @@ execute (const char *progname,
   attrs_allocated = false;
   if ((err = posix_spawn_file_actions_init (&actions)) != 0
       || (actions_allocated = true,
-	  (null_stdin
-	    && (err = posix_spawn_file_actions_addopen (&actions,
-							STDIN_FILENO,
-							"/dev/null", O_RDONLY,
-							0))
-	       != 0)
-	  || (null_stdout
-	      && (err = posix_spawn_file_actions_addopen (&actions,
-							  STDOUT_FILENO,
-							  "/dev/null", O_RDWR,
-							  0))
-		 != 0)
-	  || (null_stderr
-	      && (err = posix_spawn_file_actions_addopen (&actions,
-							  STDERR_FILENO,
-							  "/dev/null", O_RDWR,
-							  0))
-		 != 0)
-	  || (slave_process
-	      && ((err = posix_spawnattr_init (&attrs)) != 0
-		  || (attrs_allocated = true,
-		      (err = posix_spawnattr_setsigmask (&attrs,
-							 &blocked_signals))
-		      != 0
-		      || (err = posix_spawnattr_setflags (&attrs,
-							POSIX_SPAWN_SETSIGMASK))
-			 != 0)))
-	  || (err = posix_spawnp (&child, prog_path, &actions,
-				  attrs_allocated ? &attrs : NULL, prog_argv,
-				  environ))
-	     != 0))
+          (null_stdin
+            && (err = posix_spawn_file_actions_addopen (&actions,
+                                                        STDIN_FILENO,
+                                                        "/dev/null", O_RDONLY,
+                                                        0))
+               != 0)
+          || (null_stdout
+              && (err = posix_spawn_file_actions_addopen (&actions,
+                                                          STDOUT_FILENO,
+                                                          "/dev/null", O_RDWR,
+                                                          0))
+                 != 0)
+          || (null_stderr
+              && (err = posix_spawn_file_actions_addopen (&actions,
+                                                          STDERR_FILENO,
+                                                          "/dev/null", O_RDWR,
+                                                          0))
+                 != 0)
+          || (slave_process
+              && ((err = posix_spawnattr_init (&attrs)) != 0
+                  || (attrs_allocated = true,
+                      (err = posix_spawnattr_setsigmask (&attrs,
+                                                         &blocked_signals))
+                      != 0
+                      || (err = posix_spawnattr_setflags (&attrs,
+                                                        POSIX_SPAWN_SETSIGMASK))
+                         != 0)))
+          || (err = posix_spawnp (&child, prog_path, &actions,
+                                  attrs_allocated ? &attrs : NULL, prog_argv,
+                                  environ))
+             != 0))
     {
       if (actions_allocated)
-	posix_spawn_file_actions_destroy (&actions);
+        posix_spawn_file_actions_destroy (&actions);
       if (attrs_allocated)
-	posix_spawnattr_destroy (&attrs);
+        posix_spawnattr_destroy (&attrs);
       if (slave_process)
-	unblock_fatal_signals ();
+        unblock_fatal_signals ();
+      if (termsigp != NULL)
+        *termsigp = 0;
       if (exit_on_error || !null_stderr)
-	error (exit_on_error ? EXIT_FAILURE : 0, err,
-	       _("%s subprocess failed"), progname);
+        error (exit_on_error ? EXIT_FAILURE : 0, err,
+               _("%s subprocess failed"), progname);
       return 127;
     }
   posix_spawn_file_actions_destroy (&actions);
   if (attrs_allocated)
     posix_spawnattr_destroy (&attrs);
-#else
-  if (slave_process)
-    block_fatal_signals ();
-  /* Use vfork() instead of fork() for efficiency.  */
-  if ((child = vfork ()) == 0)
-    {
-      /* Child process code.  */
-      int nullinfd;
-      int nulloutfd;
-
-      if ((!null_stdin
-	   || ((nullinfd = open ("/dev/null", O_RDONLY, 0)) >= 0
-	       && (nullinfd == STDIN_FILENO
-		   || (dup2 (nullinfd, STDIN_FILENO) >= 0
-		       && close (nullinfd) >= 0))))
-	  && (!(null_stdout || null_stderr)
-	      || ((nulloutfd = open ("/dev/null", O_RDWR, 0)) >= 0
-		  && (!null_stdout
-		      || nulloutfd == STDOUT_FILENO
-		      || dup2 (nulloutfd, STDOUT_FILENO) >= 0)
-		  && (!null_stderr
-		      || nulloutfd == STDERR_FILENO
-		      || dup2 (nulloutfd, STDERR_FILENO) >= 0)
-		  && ((null_stdout && nulloutfd == STDOUT_FILENO)
-		      || (null_stderr && nulloutfd == STDERR_FILENO)
-		      || close (nulloutfd) >= 0)))
-	  && (!slave_process || (unblock_fatal_signals (), true)))
-	execvp (prog_path, prog_argv);
-      _exit (127);
-    }
-  if (child == -1)
-    {
-      if (slave_process)
-	unblock_fatal_signals ();
-      if (exit_on_error || !null_stderr)
-	error (exit_on_error ? EXIT_FAILURE : 0, errno,
-	       _("%s subprocess failed"), progname);
-      return 127;
-    }
-#endif
   if (slave_process)
     {
       register_slave_subprocess (child);
@@ -310,7 +272,7 @@ execute (const char *progname,
     }
 
   return wait_subprocess (child, progname, ignore_sigpipe, null_stderr,
-			  slave_process, exit_on_error);
+                          slave_process, exit_on_error, termsigp);
 
 #endif
 }

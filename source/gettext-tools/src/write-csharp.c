@@ -1,5 +1,5 @@
 /* Writing C# satellite assemblies.
-   Copyright (C) 2003-2007 Free Software Foundation, Inc.
+   Copyright (C) 2003-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -82,7 +82,7 @@
 #include "po-charset.h"
 #include "xalloc.h"
 #include "xmalloca.h"
-#include "filename.h"
+#include "concat-filename.h"
 #include "fwriteerror.h"
 #include "clean-temp.h"
 #include "unistr.h"
@@ -116,8 +116,8 @@ construct_class_name (const char *resource_name)
     {
       char c = *p;
       if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == '_')
-	    || (p > resource_name && c >= '0' && c <= '9')))
-	valid = false;
+            || (p > resource_name && c >= '0' && c <= '9')))
+        valid = false;
     }
   if (valid)
     return xstrdup (resource_name);
@@ -132,35 +132,35 @@ construct_class_name (const char *resource_name)
       b = class_name;
       memcpy (b, "__UESCAPED__", 12); b += 12;
       while (str < str_limit)
-	{
-	  unsigned int uc;
-	  str += u8_mbtouc (&uc, (const unsigned char *) str, str_limit - str);
-	  if (uc >= 0x10000)
-	    {
-	      *b++ = '_';
-	      *b++ = 'U';
-	      *b++ = hexdigit[(uc >> 28) & 0x0f];
-	      *b++ = hexdigit[(uc >> 24) & 0x0f];
-	      *b++ = hexdigit[(uc >> 20) & 0x0f];
-	      *b++ = hexdigit[(uc >> 16) & 0x0f];
-	      *b++ = hexdigit[(uc >> 12) & 0x0f];
-	      *b++ = hexdigit[(uc >> 8) & 0x0f];
-	      *b++ = hexdigit[(uc >> 4) & 0x0f];
-	      *b++ = hexdigit[uc & 0x0f];
-	    }
-	  else if (!((uc >= 'A' && uc <= 'Z') || (uc >= 'a' && uc <= 'z')
-		     || (uc >= '0' && uc <= '9')))
-	    {
-	      *b++ = '_';
-	      *b++ = 'u';
-	      *b++ = hexdigit[(uc >> 12) & 0x0f];
-	      *b++ = hexdigit[(uc >> 8) & 0x0f];
-	      *b++ = hexdigit[(uc >> 4) & 0x0f];
-	      *b++ = hexdigit[uc & 0x0f];
-	    }
-	  else
-	    *b++ = uc;
-	}
+        {
+          ucs4_t uc;
+          str += u8_mbtouc (&uc, (const unsigned char *) str, str_limit - str);
+          if (uc >= 0x10000)
+            {
+              *b++ = '_';
+              *b++ = 'U';
+              *b++ = hexdigit[(uc >> 28) & 0x0f];
+              *b++ = hexdigit[(uc >> 24) & 0x0f];
+              *b++ = hexdigit[(uc >> 20) & 0x0f];
+              *b++ = hexdigit[(uc >> 16) & 0x0f];
+              *b++ = hexdigit[(uc >> 12) & 0x0f];
+              *b++ = hexdigit[(uc >> 8) & 0x0f];
+              *b++ = hexdigit[(uc >> 4) & 0x0f];
+              *b++ = hexdigit[uc & 0x0f];
+            }
+          else if (!((uc >= 'A' && uc <= 'Z') || (uc >= 'a' && uc <= 'z')
+                     || (uc >= '0' && uc <= '9')))
+            {
+              *b++ = '_';
+              *b++ = 'u';
+              *b++ = hexdigit[(uc >> 12) & 0x0f];
+              *b++ = hexdigit[(uc >> 8) & 0x0f];
+              *b++ = hexdigit[(uc >> 4) & 0x0f];
+              *b++ = hexdigit[uc & 0x0f];
+            }
+          else
+            *b++ = uc;
+        }
       *b++ = '\0';
       return (char *) xrealloc (class_name, b - class_name);
     }
@@ -177,40 +177,40 @@ write_csharp_string (FILE *stream, const char *str)
   fprintf (stream, "\"");
   while (str < str_limit)
     {
-      unsigned int uc;
+      ucs4_t uc;
       str += u8_mbtouc (&uc, (const unsigned char *) str, str_limit - str);
       if (uc == 0x0000)
-	fprintf (stream, "\\0");
+        fprintf (stream, "\\0");
       else if (uc == 0x0007)
-	fprintf (stream, "\\a");
+        fprintf (stream, "\\a");
       else if (uc == 0x0008)
-	fprintf (stream, "\\b");
+        fprintf (stream, "\\b");
       else if (uc == 0x0009)
-	fprintf (stream, "\\t");
+        fprintf (stream, "\\t");
       else if (uc == 0x000a)
-	fprintf (stream, "\\n");
+        fprintf (stream, "\\n");
       else if (uc == 0x000b)
-	fprintf (stream, "\\v");
+        fprintf (stream, "\\v");
       else if (uc == 0x000c)
-	fprintf (stream, "\\f");
+        fprintf (stream, "\\f");
       else if (uc == 0x000d)
-	fprintf (stream, "\\r");
+        fprintf (stream, "\\r");
       else if (uc == 0x0022)
-	fprintf (stream, "\\\"");
+        fprintf (stream, "\\\"");
       else if (uc == 0x005c)
-	fprintf (stream, "\\\\");
+        fprintf (stream, "\\\\");
       else if (uc >= 0x0020 && uc < 0x007f)
-	fprintf (stream, "%c", uc);
+        fprintf (stream, "%c", (int) uc);
       else if (uc < 0x10000)
-	fprintf (stream, "\\u%c%c%c%c",
-		 hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
-		 hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
+        fprintf (stream, "\\u%c%c%c%c",
+                 hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
+                 hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
       else
-	fprintf (stream, "\\U%c%c%c%c%c%c%c%c",
-		 hexdigit[(uc >> 28) & 0x0f], hexdigit[(uc >> 24) & 0x0f],
-		 hexdigit[(uc >> 20) & 0x0f], hexdigit[(uc >> 16) & 0x0f],
-		 hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
-		 hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
+        fprintf (stream, "\\U%c%c%c%c%c%c%c%c",
+                 hexdigit[(uc >> 28) & 0x0f], hexdigit[(uc >> 24) & 0x0f],
+                 hexdigit[(uc >> 20) & 0x0f], hexdigit[(uc >> 16) & 0x0f],
+                 hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
+                 hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
     }
   fprintf (stream, "\"");
 }
@@ -258,19 +258,19 @@ write_csharp_msgstr (FILE *stream, message_ty *mp)
 
       fprintf (stream, "new System.String[] { ");
       for (p = mp->msgstr, first = true;
-	   p < mp->msgstr + mp->msgstr_len;
-	   p += strlen (p) + 1, first = false)
-	{
-	  if (!first)
-	    fprintf (stream, ", ");
-	  write_csharp_string (stream, p);
-	}
+           p < mp->msgstr + mp->msgstr_len;
+           p += strlen (p) + 1, first = false)
+        {
+          if (!first)
+            fprintf (stream, ", ");
+          write_csharp_string (stream, p);
+        }
       fprintf (stream, " }");
     }
   else
     {
       if (mp->msgstr_len != strlen (mp->msgstr) + 1)
-	abort ();
+        abort ();
 
       write_csharp_string (stream, mp->msgstr);
     }
@@ -305,7 +305,7 @@ is_expression_boolean (struct expression *exp)
       return (exp->val.num == 0 || exp->val.num == 1);
     case qmop:
       return is_expression_boolean (exp->val.args[1])
-	     && is_expression_boolean (exp->val.args[2]);
+             && is_expression_boolean (exp->val.args[2]);
     default:
       abort ();
     }
@@ -323,170 +323,170 @@ write_csharp_expression (FILE *stream, const struct expression *exp, bool as_boo
     {
       /* Emit a C# expression of type 'bool'.  */
       switch (exp->operation)
-	{
-	case num:
-	  fprintf (stream, "%s", exp->val.num ? "true" : "false");
-	  return;
-	case lnot:
-	  fprintf (stream, "(!");
-	  write_csharp_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, ")");
-	  return;
-	case less_than:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " < ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case greater_than:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " > ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case less_or_equal:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " <= ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case greater_or_equal:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " >= ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case equal:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " == ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case not_equal:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " != ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case land:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " && ");
-	  write_csharp_expression (stream, exp->val.args[1], true);
-	  fprintf (stream, ")");
-	  return;
-	case lor:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " || ");
-	  write_csharp_expression (stream, exp->val.args[1], true);
-	  fprintf (stream, ")");
-	  return;
-	case qmop:
-	  if (is_expression_boolean (exp->val.args[1])
-	      && is_expression_boolean (exp->val.args[2]))
-	    {
-	      fprintf (stream, "(");
-	      write_csharp_expression (stream, exp->val.args[0], true);
-	      fprintf (stream, " ? ");
-	      write_csharp_expression (stream, exp->val.args[1], true);
-	      fprintf (stream, " : ");
-	      write_csharp_expression (stream, exp->val.args[2], true);
-	      fprintf (stream, ")");
-	      return;
-	    }
-	  /*FALLTHROUGH*/
-	case var:
-	case mult:
-	case divide:
-	case module:
-	case plus:
-	case minus:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp, false);
-	  fprintf (stream, " != 0)");
-	  return;
-	default:
-	  abort ();
-	}
+        {
+        case num:
+          fprintf (stream, "%s", exp->val.num ? "true" : "false");
+          return;
+        case lnot:
+          fprintf (stream, "(!");
+          write_csharp_expression (stream, exp->val.args[0], true);
+          fprintf (stream, ")");
+          return;
+        case less_than:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " < ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case greater_than:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " > ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case less_or_equal:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " <= ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case greater_or_equal:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " >= ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case equal:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " == ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case not_equal:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " != ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case land:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " && ");
+          write_csharp_expression (stream, exp->val.args[1], true);
+          fprintf (stream, ")");
+          return;
+        case lor:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " || ");
+          write_csharp_expression (stream, exp->val.args[1], true);
+          fprintf (stream, ")");
+          return;
+        case qmop:
+          if (is_expression_boolean (exp->val.args[1])
+              && is_expression_boolean (exp->val.args[2]))
+            {
+              fprintf (stream, "(");
+              write_csharp_expression (stream, exp->val.args[0], true);
+              fprintf (stream, " ? ");
+              write_csharp_expression (stream, exp->val.args[1], true);
+              fprintf (stream, " : ");
+              write_csharp_expression (stream, exp->val.args[2], true);
+              fprintf (stream, ")");
+              return;
+            }
+          /*FALLTHROUGH*/
+        case var:
+        case mult:
+        case divide:
+        case module:
+        case plus:
+        case minus:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp, false);
+          fprintf (stream, " != 0)");
+          return;
+        default:
+          abort ();
+        }
     }
   else
     {
       /* Emit a C# expression of type 'long'.  */
       switch (exp->operation)
-	{
-	case var:
-	  fprintf (stream, "n");
-	  return;
-	case num:
-	  fprintf (stream, "%lu", exp->val.num);
-	  return;
-	case mult:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " * ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case divide:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " / ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case module:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " %% ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case plus:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " + ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case minus:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " - ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case qmop:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " ? ");
-	  write_csharp_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, " : ");
-	  write_csharp_expression (stream, exp->val.args[2], false);
-	  fprintf (stream, ")");
-	  return;
-	case lnot:
-	case less_than:
-	case greater_than:
-	case less_or_equal:
-	case greater_or_equal:
-	case equal:
-	case not_equal:
-	case land:
-	case lor:
-	  fprintf (stream, "(");
-	  write_csharp_expression (stream, exp, true);
-	  fprintf (stream, " ? 1 : 0)");
-	  return;
-	default:
-	  abort ();
-	}
+        {
+        case var:
+          fprintf (stream, "n");
+          return;
+        case num:
+          fprintf (stream, "%lu", exp->val.num);
+          return;
+        case mult:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " * ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case divide:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " / ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case module:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " %% ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case plus:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " + ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case minus:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " - ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case qmop:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " ? ");
+          write_csharp_expression (stream, exp->val.args[1], false);
+          fprintf (stream, " : ");
+          write_csharp_expression (stream, exp->val.args[2], false);
+          fprintf (stream, ")");
+          return;
+        case lnot:
+        case less_than:
+        case greater_than:
+        case less_or_equal:
+        case greater_or_equal:
+        case equal:
+        case not_equal:
+        case land:
+        case lor:
+          fprintf (stream, "(");
+          write_csharp_expression (stream, exp, true);
+          fprintf (stream, " ? 1 : 0)");
+          return;
+        default:
+          abort ();
+        }
     }
 }
 
@@ -504,7 +504,7 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
   size_t j;
 
   fprintf (stream,
-	   "/* Automatically generated by GNU msgfmt.  Do not modify!  */\n");
+           "/* Automatically generated by GNU msgfmt.  Do not modify!  */\n");
 
   /* We have to use a "using" statement here, to avoid a bug in the pnet-0.6.0
      compiler.  */
@@ -528,7 +528,7 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
   else
     class_name_last_part = class_name;
   fprintf (stream, "public class %s : GettextResourceSet {\n",
-	   class_name_last_part);
+           class_name_last_part);
 
   /* Determine whether there are plural messages.  */
   plurals = 0;
@@ -541,22 +541,37 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
   fprintf (stream, "    : base () {\n");
   fprintf (stream, "  }\n");
 
+  /* Emit the TableInitialized field.  */
+  fprintf (stream, "  private bool TableInitialized;\n");
+
   /* Emit the ReadResources method.  */
   fprintf (stream, "  protected override void ReadResources () {\n");
+  /* In some implementations, such as mono < 2009-02-27, the ReadResources
+     method is called just once, when Table == null.  In other implementations,
+     such as mono >= 2009-02-27, it is called at every GetObject call, and it
+     is responsible for doing the initialization only once, even when called
+     simultaneously from multiple threads.  */
+  fprintf (stream, "    if (!TableInitialized) {\n");
+  fprintf (stream, "      lock (this) {\n");
+  fprintf (stream, "        if (!TableInitialized) {\n");
   /* In some implementations, the ResourceSet constructor initializes Table
      before calling ReadResources().  In other implementations, the
      ReadResources() method is expected to initialize the Table.  */
-  fprintf (stream, "    if (Table == null)\n");
-  fprintf (stream, "      Table = new System.Collections.Hashtable();\n");
-  fprintf (stream, "    System.Collections.Hashtable t = Table;\n");
+  fprintf (stream, "          if (Table == null)\n");
+  fprintf (stream, "            Table = new System.Collections.Hashtable();\n");
+  fprintf (stream, "          System.Collections.Hashtable t = Table;\n");
   for (j = 0; j < mlp->nitems; j++)
     {
-      fprintf (stream, "    t.Add(");
+      fprintf (stream, "          t.Add(");
       write_csharp_msgid (stream, mlp->item[j]);
       fprintf (stream, ",");
       write_csharp_msgstr (stream, mlp->item[j]);
       fprintf (stream, ");\n");
     }
+  fprintf (stream, "          TableInitialized = true;\n");
+  fprintf (stream, "        }\n");
+  fprintf (stream, "      }\n");
+  fprintf (stream, "    }\n");
   fprintf (stream, "  }\n");
 
   /* Emit the msgid_plural strings.  Only used by msgunfmt.  */
@@ -565,14 +580,14 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
       fprintf (stream, "  public static System.Collections.Hashtable GetMsgidPluralTable () {\n");
       fprintf (stream, "    System.Collections.Hashtable t = new System.Collections.Hashtable();\n");
       for (j = 0; j < mlp->nitems; j++)
-	if (mlp->item[j]->msgid_plural != NULL)
-	  {
-	    fprintf (stream, "    t.Add(");
-	    write_csharp_msgid (stream, mlp->item[j]);
-	    fprintf (stream, ",");
-	    write_csharp_string (stream, mlp->item[j]->msgid_plural);
-	    fprintf (stream, ");\n");
-	  }
+        if (mlp->item[j]->msgid_plural != NULL)
+          {
+            fprintf (stream, "    t.Add(");
+            write_csharp_msgid (stream, mlp->item[j]);
+            fprintf (stream, ",");
+            write_csharp_string (stream, mlp->item[j]->msgid_plural);
+            fprintf (stream, ");\n");
+          }
       fprintf (stream, "    return t;\n");
       fprintf (stream, "  }\n");
     }
@@ -586,7 +601,7 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
 
       header_entry = message_list_search (mlp, NULL, "");
       extract_plural_expression (header_entry ? header_entry->msgstr : NULL,
-				 &plural, &nplurals);
+                                 &plural, &nplurals);
 
       fprintf (stream, "  protected override long PluralEval (long n) {\n");
       fprintf (stream, "    return ");
@@ -606,8 +621,8 @@ write_csharp_code (FILE *stream, const char *culture_name, const char *class_nam
 
 int
 msgdomain_write_csharp (message_list_ty *mlp, const char *canon_encoding,
-			const char *resource_name, const char *locale_name,
-			const char *directory)
+                        const char *resource_name, const char *locale_name,
+                        const char *directory)
 {
   int retval;
   struct temp_dir *tmpdir;
@@ -650,48 +665,48 @@ msgdomain_write_csharp (message_list_ty *mlp, const char *canon_encoding,
     char *p;
     for (p = culture_name; *p != '\0'; p++)
       if (*p == '_')
-	*p = '-';
+        *p = '-';
     if (strncmp (culture_name, "sr-CS", 5) == 0)
       memcpy (culture_name, "sr-SP", 5);
     p = strchr (culture_name, '@');
     if (p != NULL)
       {
-	if (strcmp (p, "@latin") == 0)
-	  strcpy (p, "-Latn");
-	else if (strcmp (p, "@cyrillic") == 0)
-	  strcpy (p, "-Cyrl");
+        if (strcmp (p, "@latin") == 0)
+          strcpy (p, "-Latn");
+        else if (strcmp (p, "@cyrillic") == 0)
+          strcpy (p, "-Cyrl");
       }
     if (strcmp (culture_name, "sr-SP") == 0)
       {
-	free (culture_name);
-	culture_name = xstrdup ("sr-SP-Latn");
+        free (culture_name);
+        culture_name = xstrdup ("sr-SP-Latn");
       }
     else if (strcmp (culture_name, "uz-UZ") == 0)
       {
-	free (culture_name);
-	culture_name = xstrdup ("uz-UZ-Latn");
+        free (culture_name);
+        culture_name = xstrdup ("uz-UZ-Latn");
       }
   }
 
   /* Compute the output file name.  This code must be kept consistent with
      intl.cs, function GetSatelliteAssembly().  */
   {
-    char *output_dir = concatenated_filename (directory, culture_name, NULL);
+    char *output_dir = xconcatenated_filename (directory, culture_name, NULL);
     struct stat statbuf;
 
     /* Try to create the output directory if it does not yet exist.  */
     if (stat (output_dir, &statbuf) < 0 && errno == ENOENT)
       if (mkdir (output_dir, S_IRUSR | S_IWUSR | S_IXUSR
-			     | S_IRGRP | S_IWGRP | S_IXGRP
-			     | S_IROTH | S_IWOTH | S_IXOTH) < 0)
-	{
-	  error (0, errno, _("failed to create directory \"%s\""), output_dir);
-	  free (output_dir);
-	  goto quit2;
-	}
+                             | S_IRGRP | S_IWGRP | S_IXGRP
+                             | S_IROTH | S_IWOTH | S_IXOTH) < 0)
+        {
+          error (0, errno, _("failed to create directory \"%s\""), output_dir);
+          free (output_dir);
+          goto quit2;
+        }
 
     output_file =
-      concatenated_filename (output_dir, resource_name, ".resources.dll");
+      xconcatenated_filename (output_dir, resource_name, ".resources.dll");
 
     free (output_dir);
   }
@@ -707,14 +722,14 @@ msgdomain_write_csharp (message_list_ty *mlp, const char *canon_encoding,
     sprintf (class_name, "%s_%s", class_name_part1, culture_name);
     for (p = class_name + strlen (class_name_part1) + 1; *p != '\0'; p++)
       if (*p == '-')
-	*p = '_';
+        *p = '_';
     free (class_name_part1);
   }
 
   /* Compute the temporary C# file name.  It must end in ".cs", so that
      the C# compiler recognizes that it is C# source code.  */
   csharp_file_name =
-    concatenated_filename (tmpdir->dir_name, "resset.cs", NULL);
+    xconcatenated_filename (tmpdir->dir_name, "resset.cs", NULL);
 
   /* Create the C# file.  */
   register_temp_file (tmpdir, csharp_file_name);
@@ -745,12 +760,12 @@ msgdomain_write_csharp (message_list_ty *mlp, const char *canon_encoding,
   libdirs[0] = gettextlibdir;
   libraries[0] = "GNU.Gettext";
   if (compile_csharp_class (csharp_sources, 1, libdirs, 1, libraries, 1,
-			    output_file, true, false, verbose))
+                            output_file, true, false, verbose > 0))
     {
       if (!verbose)
-	error (0, 0, _("compilation of C# class failed, please try --verbose"));
+        error (0, 0, _("compilation of C# class failed, please try --verbose"));
       else
-	error (0, 0, _("compilation of C# class failed"));
+        error (0, 0, _("compilation of C# class failed"));
       goto quit3;
     }
 

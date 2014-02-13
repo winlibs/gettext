@@ -1,5 +1,5 @@
 /* Writing Java ResourceBundles.
-   Copyright (C) 2001-2003, 2005-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2005-2010 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -65,7 +65,8 @@
 #include "po-charset.h"
 #include "xalloc.h"
 #include "xmalloca.h"
-#include "filename.h"
+#include "minmax.h"
+#include "concat-filename.h"
 #include "fwriteerror.h"
 #include "clean-temp.h"
 #include "unistr.h"
@@ -87,15 +88,15 @@ check_resource_name (const char *name)
     {
       /* First character, see Character.isJavaIdentifierStart.  */
       if (!(c_isalpha (*p) || (*p == '$') || (*p == '_')))
-	return -1;
+        return -1;
       /* Following characters, see Character.isJavaIdentifierPart.  */
       do
-	p++;
+        p++;
       while (c_isalpha (*p) || (*p == '$') || (*p == '_') || c_isdigit (*p));
       if (*p == '\0')
-	break;
+        break;
       if (*p != '.')
-	return -1;
+        return -1;
       p++;
       ndots++;
     }
@@ -117,19 +118,19 @@ string_hashcode (const char *str)
   int hash = 0;
   while (str < str_limit)
     {
-      unsigned int uc;
+      ucs4_t uc;
       str += u8_mbtouc (&uc, (const unsigned char *) str, str_limit - str);
       if (uc < 0x10000)
-	/* Single UCS-2 'char'.  */
-	hash = 31 * hash + uc;
+        /* Single UCS-2 'char'.  */
+        hash = 31 * hash + uc;
       else
-	{
-	  /* UTF-16 surrogate: two 'char's.  */
-	  unsigned int uc1 = 0xd800 + ((uc - 0x10000) >> 10);
-	  unsigned int uc2 = 0xdc00 + ((uc - 0x10000) & 0x3ff);
-	  hash = 31 * hash + uc1;
-	  hash = 31 * hash + uc2;
-	}
+        {
+          /* UTF-16 surrogate: two 'char's.  */
+          ucs4_t uc1 = 0xd800 + ((uc - 0x10000) >> 10);
+          ucs4_t uc2 = 0xdc00 + ((uc - 0x10000) & 0x3ff);
+          hash = 31 * hash + uc1;
+          hash = 31 * hash + uc2;
+        }
     }
   return hash & 0x7fffffff;
 }
@@ -195,97 +196,97 @@ compute_hashsize (message_list_ty *mlp, bool *collisionp)
       unsigned int score;
 
       /* Premature end of the loop if all future scores are known to be
-	 larger than the already reached best_score.  This relies on the
-	 ascending loop and on the fact that score >= hashsize.  */
+         larger than the already reached best_score.  This relies on the
+         ascending loop and on the fact that score >= hashsize.  */
       if (hashsize >= best_score)
-	break;
+        break;
 
       bitmap = XNMALLOC (hashsize, char);
       memset (bitmap, 0, hashsize);
 
       score = 0;
       for (j = 0; j < n; j++)
-	{
-	  unsigned int idx = hashcodes[j] % hashsize;
+        {
+          unsigned int idx = hashcodes[j] % hashsize;
 
-	  if (bitmap[idx] != 0)
-	    {
-	      /* Collision.  Cannot deal with it if hashsize is even.  */
-	      if ((hashsize % 2) == 0)
-		/* Try next hashsize.  */
-		goto bad_hashsize;
-	      else
-		{
-		  unsigned int idx0 = idx;
-		  unsigned int incr = 1 + (hashcodes[j] % (hashsize - 2));
-		  score += 2;	/* Big penalty for the additional division */
-		  do
-		    {
-		      score++;	/* Small penalty for each loop round */
-		      idx += incr;
-		      if (idx >= hashsize)
-			idx -= hashsize;
-		      if (idx == idx0)
-			/* Searching for a hole, we performed a whole round
-			   across the table.  This happens particularly
-			   frequently if gcd(hashsize,incr) > 1.  Try next
-			   hashsize.  */
-			goto bad_hashsize;
-		    }
-		  while (bitmap[idx] != 0);
-		}
-	    }
-	  bitmap[idx] = 1;
-	}
+          if (bitmap[idx] != 0)
+            {
+              /* Collision.  Cannot deal with it if hashsize is even.  */
+              if ((hashsize % 2) == 0)
+                /* Try next hashsize.  */
+                goto bad_hashsize;
+              else
+                {
+                  unsigned int idx0 = idx;
+                  unsigned int incr = 1 + (hashcodes[j] % (hashsize - 2));
+                  score += 2;   /* Big penalty for the additional division */
+                  do
+                    {
+                      score++;  /* Small penalty for each loop round */
+                      idx += incr;
+                      if (idx >= hashsize)
+                        idx -= hashsize;
+                      if (idx == idx0)
+                        /* Searching for a hole, we performed a whole round
+                           across the table.  This happens particularly
+                           frequently if gcd(hashsize,incr) > 1.  Try next
+                           hashsize.  */
+                        goto bad_hashsize;
+                    }
+                  while (bitmap[idx] != 0);
+                }
+            }
+          bitmap[idx] = 1;
+        }
 
       /* Big hashsize also gives a penalty.  */
       score = XXS * score + hashsize;
 
       /* If for any incr between 1 and hashsize - 2, an whole round
-	 (idx0, idx0 + incr, ...) is occupied, and the lookup function
-	 must deal with collisions, then some inputs would lead to
-	 an endless loop in the lookup function.  */
+         (idx0, idx0 + incr, ...) is occupied, and the lookup function
+         must deal with collisions, then some inputs would lead to
+         an endless loop in the lookup function.  */
       if (score > hashsize)
-	{
-	  unsigned int incr;
+        {
+          unsigned int incr;
 
-	  /* Since the set { idx0, idx0 + incr, ... } depends only on idx0
-	     and gcd(hashsize,incr), we only need to conside incr that
-	     divides hashsize.  */
-	  for (incr = 1; incr <= hashsize / 2; incr++)
-	    if ((hashsize % incr) == 0)
-	      {
-		unsigned int idx0;
+          /* Since the set { idx0, idx0 + incr, ... } depends only on idx0
+             and gcd(hashsize,incr), we only need to conside incr that
+             divides hashsize.  */
+          for (incr = 1; incr <= hashsize / 2; incr++)
+            if ((hashsize % incr) == 0)
+              {
+                unsigned int idx0;
 
-		for (idx0 = 0; idx0 < incr; idx0++)
-		  {
-		    bool full = true;
-		    unsigned int idx;
+                for (idx0 = 0; idx0 < incr; idx0++)
+                  {
+                    bool full = true;
+                    unsigned int idx;
 
-		    for (idx = idx0; idx < hashsize; idx += incr)
-		      if (bitmap[idx] == 0)
-			{
-			  full = false;
-			  break;
-			}
-		    if (full)
-		      /* A whole round is occupied.  */
-		      goto bad_hashsize;
-		  }
-	      }
-	}
+                    for (idx = idx0; idx < hashsize; idx += incr)
+                      if (bitmap[idx] == 0)
+                        {
+                          full = false;
+                          break;
+                        }
+                    if (full)
+                      /* A whole round is occupied.  */
+                      goto bad_hashsize;
+                  }
+              }
+        }
 
       if (false)
-	bad_hashsize:
-	score = UINT_MAX;
+        bad_hashsize:
+        score = UINT_MAX;
 
       free (bitmap);
 
       if (score < best_score)
-	{
-	  best_score = score;
-	  best_hashsize = hashsize;
-	}
+        {
+          best_score = score;
+          best_hashsize = hashsize;
+        }
     }
   if (best_hashsize == 0 || best_score < best_hashsize)
     abort ();
@@ -304,7 +305,7 @@ static int
 compare_index (const void *pval1, const void *pval2)
 {
   return (int)((const struct table_item *) pval1)->index
-	 - (int)((const struct table_item *) pval2)->index;
+         - (int)((const struct table_item *) pval2)->index;
 }
 
 /* Compute the list of messages and table indices, sorted according to the
@@ -323,20 +324,20 @@ compute_table_items (message_list_ty *mlp, unsigned int hashsize)
   for (j = 0; j < n; j++)
     {
       unsigned int hashcode =
-	msgid_hashcode (mlp->item[j]->msgctxt, mlp->item[j]->msgid);
+        msgid_hashcode (mlp->item[j]->msgctxt, mlp->item[j]->msgid);
       unsigned int idx = hashcode % hashsize;
 
       if (bitmap[idx] != 0)
-	{
-	  unsigned int incr = 1 + (hashcode % (hashsize - 2));
-	  do
-	    {
-	      idx += incr;
-	      if (idx >= hashsize)
-		idx -= hashsize;
-	    }
-	  while (bitmap[idx] != 0);
-	}
+        {
+          unsigned int incr = 1 + (hashcode % (hashsize - 2));
+          do
+            {
+              idx += incr;
+              if (idx >= hashsize)
+                idx -= hashsize;
+            }
+          while (bitmap[idx] != 0);
+        }
       bitmap[idx] = 1;
 
       arr[j].index = idx;
@@ -361,38 +362,38 @@ write_java_string (FILE *stream, const char *str)
   fprintf (stream, "\"");
   while (str < str_limit)
     {
-      unsigned int uc;
+      ucs4_t uc;
       str += u8_mbtouc (&uc, (const unsigned char *) str, str_limit - str);
       if (uc < 0x10000)
-	{
-	  /* Single UCS-2 'char'.  */
-	  if (uc == 0x000a)
-	    fprintf (stream, "\\n");
-	  else if (uc == 0x000d)
-	    fprintf (stream, "\\r");
-	  else if (uc == 0x0022)
-	    fprintf (stream, "\\\"");
-	  else if (uc == 0x005c)
-	    fprintf (stream, "\\\\");
-	  else if (uc >= 0x0020 && uc < 0x007f)
-	    fprintf (stream, "%c", uc);
-	  else
-	    fprintf (stream, "\\u%c%c%c%c",
-		     hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
-		     hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
-	}
+        {
+          /* Single UCS-2 'char'.  */
+          if (uc == 0x000a)
+            fprintf (stream, "\\n");
+          else if (uc == 0x000d)
+            fprintf (stream, "\\r");
+          else if (uc == 0x0022)
+            fprintf (stream, "\\\"");
+          else if (uc == 0x005c)
+            fprintf (stream, "\\\\");
+          else if (uc >= 0x0020 && uc < 0x007f)
+            fprintf (stream, "%c", (int) uc);
+          else
+            fprintf (stream, "\\u%c%c%c%c",
+                     hexdigit[(uc >> 12) & 0x0f], hexdigit[(uc >> 8) & 0x0f],
+                     hexdigit[(uc >> 4) & 0x0f], hexdigit[uc & 0x0f]);
+        }
       else
-	{
-	  /* UTF-16 surrogate: two 'char's.  */
-	  unsigned int uc1 = 0xd800 + ((uc - 0x10000) >> 10);
-	  unsigned int uc2 = 0xdc00 + ((uc - 0x10000) & 0x3ff);
-	  fprintf (stream, "\\u%c%c%c%c",
-		   hexdigit[(uc1 >> 12) & 0x0f], hexdigit[(uc1 >> 8) & 0x0f],
-		   hexdigit[(uc1 >> 4) & 0x0f], hexdigit[uc1 & 0x0f]);
-	  fprintf (stream, "\\u%c%c%c%c",
-		   hexdigit[(uc2 >> 12) & 0x0f], hexdigit[(uc2 >> 8) & 0x0f],
-		   hexdigit[(uc2 >> 4) & 0x0f], hexdigit[uc2 & 0x0f]);
-	}
+        {
+          /* UTF-16 surrogate: two 'char's.  */
+          ucs4_t uc1 = 0xd800 + ((uc - 0x10000) >> 10);
+          ucs4_t uc2 = 0xdc00 + ((uc - 0x10000) & 0x3ff);
+          fprintf (stream, "\\u%c%c%c%c",
+                   hexdigit[(uc1 >> 12) & 0x0f], hexdigit[(uc1 >> 8) & 0x0f],
+                   hexdigit[(uc1 >> 4) & 0x0f], hexdigit[uc1 & 0x0f]);
+          fprintf (stream, "\\u%c%c%c%c",
+                   hexdigit[(uc2 >> 12) & 0x0f], hexdigit[(uc2 >> 8) & 0x0f],
+                   hexdigit[(uc2 >> 4) & 0x0f], hexdigit[uc2 & 0x0f]);
+        }
     }
   fprintf (stream, "\"");
 }
@@ -440,19 +441,19 @@ write_java_msgstr (FILE *stream, message_ty *mp)
 
       fprintf (stream, "new java.lang.String[] { ");
       for (p = mp->msgstr, first = true;
-	   p < mp->msgstr + mp->msgstr_len;
-	   p += strlen (p) + 1, first = false)
-	{
-	  if (!first)
-	    fprintf (stream, ", ");
-	  write_java_string (stream, p);
-	}
+           p < mp->msgstr + mp->msgstr_len;
+           p += strlen (p) + 1, first = false)
+        {
+          if (!first)
+            fprintf (stream, ", ");
+          write_java_string (stream, p);
+        }
       fprintf (stream, " }");
     }
   else
     {
       if (mp->msgstr_len != strlen (mp->msgstr) + 1)
-	abort ();
+        abort ();
 
       write_java_string (stream, mp->msgstr);
     }
@@ -476,7 +477,7 @@ write_lookup_code (FILE *stream, unsigned int hashsize, bool collisions)
       fprintf (stream, "        return table[idx + 1];\n");
       fprintf (stream, "    }\n");
       fprintf (stream, "    int incr = ((hash_val %% %d) + 1) << 1;\n",
-	       hashsize - 2);
+               hashsize - 2);
       fprintf (stream, "    for (;;) {\n");
       fprintf (stream, "      idx += incr;\n");
       fprintf (stream, "      if (idx >= %d)\n", 2 * hashsize);
@@ -526,7 +527,7 @@ is_expression_boolean (struct expression *exp)
       return (exp->val.num == 0 || exp->val.num == 1);
     case qmop:
       return is_expression_boolean (exp->val.args[1])
-	     && is_expression_boolean (exp->val.args[2]);
+             && is_expression_boolean (exp->val.args[2]);
     default:
       abort ();
     }
@@ -544,170 +545,212 @@ write_java_expression (FILE *stream, const struct expression *exp, bool as_boole
     {
       /* Emit a Java expression of type 'boolean'.  */
       switch (exp->operation)
-	{
-	case num:
-	  fprintf (stream, "%s", exp->val.num ? "true" : "false");
-	  return;
-	case lnot:
-	  fprintf (stream, "(!");
-	  write_java_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, ")");
-	  return;
-	case less_than:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " < ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case greater_than:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " > ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case less_or_equal:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " <= ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case greater_or_equal:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " >= ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case equal:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " == ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case not_equal:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " != ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case land:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " && ");
-	  write_java_expression (stream, exp->val.args[1], true);
-	  fprintf (stream, ")");
-	  return;
-	case lor:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " || ");
-	  write_java_expression (stream, exp->val.args[1], true);
-	  fprintf (stream, ")");
-	  return;
-	case qmop:
-	  if (is_expression_boolean (exp->val.args[1])
-	      && is_expression_boolean (exp->val.args[2]))
-	    {
-	      fprintf (stream, "(");
-	      write_java_expression (stream, exp->val.args[0], true);
-	      fprintf (stream, " ? ");
-	      write_java_expression (stream, exp->val.args[1], true);
-	      fprintf (stream, " : ");
-	      write_java_expression (stream, exp->val.args[2], true);
-	      fprintf (stream, ")");
-	      return;
-	    }
-	  /*FALLTHROUGH*/
-	case var:
-	case mult:
-	case divide:
-	case module:
-	case plus:
-	case minus:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp, false);
-	  fprintf (stream, " != 0)");
-	  return;
-	default:
-	  abort ();
-	}
+        {
+        case num:
+          fprintf (stream, "%s", exp->val.num ? "true" : "false");
+          return;
+        case lnot:
+          fprintf (stream, "(!");
+          write_java_expression (stream, exp->val.args[0], true);
+          fprintf (stream, ")");
+          return;
+        case less_than:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " < ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case greater_than:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " > ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case less_or_equal:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " <= ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case greater_or_equal:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " >= ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case equal:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " == ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case not_equal:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " != ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case land:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " && ");
+          write_java_expression (stream, exp->val.args[1], true);
+          fprintf (stream, ")");
+          return;
+        case lor:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " || ");
+          write_java_expression (stream, exp->val.args[1], true);
+          fprintf (stream, ")");
+          return;
+        case qmop:
+          if (is_expression_boolean (exp->val.args[1])
+              && is_expression_boolean (exp->val.args[2]))
+            {
+              fprintf (stream, "(");
+              write_java_expression (stream, exp->val.args[0], true);
+              fprintf (stream, " ? ");
+              write_java_expression (stream, exp->val.args[1], true);
+              fprintf (stream, " : ");
+              write_java_expression (stream, exp->val.args[2], true);
+              fprintf (stream, ")");
+              return;
+            }
+          /*FALLTHROUGH*/
+        case var:
+        case mult:
+        case divide:
+        case module:
+        case plus:
+        case minus:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp, false);
+          fprintf (stream, " != 0)");
+          return;
+        default:
+          abort ();
+        }
     }
   else
     {
       /* Emit a Java expression of type 'long'.  */
       switch (exp->operation)
-	{
-	case var:
-	  fprintf (stream, "n");
-	  return;
-	case num:
-	  fprintf (stream, "%lu", exp->val.num);
-	  return;
-	case mult:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " * ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case divide:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " / ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case module:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " %% ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case plus:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " + ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case minus:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], false);
-	  fprintf (stream, " - ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, ")");
-	  return;
-	case qmop:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp->val.args[0], true);
-	  fprintf (stream, " ? ");
-	  write_java_expression (stream, exp->val.args[1], false);
-	  fprintf (stream, " : ");
-	  write_java_expression (stream, exp->val.args[2], false);
-	  fprintf (stream, ")");
-	  return;
-	case lnot:
-	case less_than:
-	case greater_than:
-	case less_or_equal:
-	case greater_or_equal:
-	case equal:
-	case not_equal:
-	case land:
-	case lor:
-	  fprintf (stream, "(");
-	  write_java_expression (stream, exp, true);
-	  fprintf (stream, " ? 1 : 0)");
-	  return;
-	default:
-	  abort ();
-	}
+        {
+        case var:
+          fprintf (stream, "n");
+          return;
+        case num:
+          fprintf (stream, "%lu", exp->val.num);
+          return;
+        case mult:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " * ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case divide:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " / ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case module:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " %% ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case plus:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " + ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case minus:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], false);
+          fprintf (stream, " - ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, ")");
+          return;
+        case qmop:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp->val.args[0], true);
+          fprintf (stream, " ? ");
+          write_java_expression (stream, exp->val.args[1], false);
+          fprintf (stream, " : ");
+          write_java_expression (stream, exp->val.args[2], false);
+          fprintf (stream, ")");
+          return;
+        case lnot:
+        case less_than:
+        case greater_than:
+        case less_or_equal:
+        case greater_or_equal:
+        case equal:
+        case not_equal:
+        case land:
+        case lor:
+          fprintf (stream, "(");
+          write_java_expression (stream, exp, true);
+          fprintf (stream, " ? 1 : 0)");
+          return;
+        default:
+          abort ();
+        }
+    }
+}
+
+
+/* Write the Java initialization statements for the Java 1.1.x case,
+   for items j, start_index <= j < end_index.  */
+static void
+write_java1_init_statements (FILE *stream, message_list_ty *mlp,
+                             size_t start_index, size_t end_index)
+{
+  size_t j;
+
+  for (j = start_index; j < end_index; j++)
+    {
+      fprintf (stream, "    t.put(");
+      write_java_msgid (stream, mlp->item[j]);
+      fprintf (stream, ",");
+      write_java_msgstr (stream, mlp->item[j]);
+      fprintf (stream, ");\n");
+    }
+}
+
+
+/* Write the Java initialization statements for the Java 2 case,
+   for items j, start_index <= j < end_index.  */
+static void
+write_java2_init_statements (FILE *stream, message_list_ty *mlp,
+                             const struct table_item *table_items,
+                             size_t start_index, size_t end_index)
+{
+  size_t j;
+
+  for (j = start_index; j < end_index; j++)
+    {
+      const struct table_item *ti = &table_items[j];
+
+      fprintf (stream, "    t[%d] = ", 2 * ti->index);
+      write_java_msgid (stream, ti->mp);
+      fprintf (stream, ";\n");
+      fprintf (stream, "    t[%d] = ", 2 * ti->index + 1);
+      write_java_msgstr (stream, ti->mp);
+      fprintf (stream, ";\n");
     }
 }
 
@@ -718,14 +761,14 @@ write_java_expression (FILE *stream, const struct expression *exp, bool as_boole
    or X.Y.String.  */
 static void
 write_java_code (FILE *stream, const char *class_name, message_list_ty *mlp,
-		 bool assume_java2)
+                 bool assume_java2)
 {
   const char *last_dot;
   unsigned int plurals;
   size_t j;
 
   fprintf (stream,
-	   "/* Automatically generated by GNU msgfmt.  Do not modify!  */\n");
+           "/* Automatically generated by GNU msgfmt.  Do not modify!  */\n");
   last_dot = strrchr (class_name, '.');
   if (last_dot != NULL)
     {
@@ -754,90 +797,120 @@ write_java_code (FILE *stream, const char *class_name, message_list_ty *mlp,
       hashsize = compute_hashsize (mlp, &collisions);
 
       /* Determines which indices in the table contain a message.  The others
-	 are null.  */
+         are null.  */
       table_items = compute_table_items (mlp, hashsize);
 
       /* Emit the table of pairs (msgid, msgstr).  If there are plurals,
-	 it is of type Object[], otherwise of type String[].  We use a static
-	 code block because that makes less code:  The Java compilers also
-	 generate code for the 'null' entries, which is dumb.  */
+         it is of type Object[], otherwise of type String[].  We use a static
+         code block because that makes less code:  The Java compilers also
+         generate code for the 'null' entries, which is dumb.  */
       table_eltype = (plurals ? "java.lang.Object" : "java.lang.String");
       fprintf (stream, "  private static final %s[] table;\n", table_eltype);
-      fprintf (stream, "  static {\n");
-      fprintf (stream, "    %s[] t = new %s[%d];\n", table_eltype, table_eltype,
-	       2 * hashsize);
-      for (j = 0; j < mlp->nitems; j++)
-	{
-	  struct table_item *ti = &table_items[j];
+      {
+        /* With the Sun javac compiler, each assignment takes 5 to 8 bytes
+           of bytecode, therefore for each message, up to 16 bytes are needed.
+           Since the bytecode of every method, including the <clinit> method
+           that contains the static initializers, is limited to 64 KB, only ca,
+           65536 / 16 = 4096 messages can be initialized in a single method.
+           Account for other Java compilers and for plurals by limiting it to
+           1000.  */
+        const size_t max_items_per_method = 1000;
 
-	  fprintf (stream, "    t[%d] = ", 2 * ti->index);
-	  write_java_msgid (stream, ti->mp);
-	  fprintf (stream, ";\n");
-	  fprintf (stream, "    t[%d] = ", 2 * ti->index + 1);
-	  write_java_msgstr (stream, ti->mp);
-	  fprintf (stream, ";\n");
-	}
-      fprintf (stream, "    table = t;\n");
-      fprintf (stream, "  }\n");
+        if (mlp->nitems > max_items_per_method)
+          {
+            unsigned int k;
+            size_t start_j;
+            size_t end_j;
+
+            for (k = 0, start_j = 0, end_j = start_j + max_items_per_method;
+                 start_j < mlp->nitems;
+                 k++, start_j = end_j, end_j = start_j + max_items_per_method)
+              {
+                fprintf (stream, "  static void clinit_part_%u (%s[] t) {\n",
+                         k, table_eltype);
+                write_java2_init_statements (stream, mlp, table_items,
+                                             start_j, MIN (end_j, mlp->nitems));
+                fprintf (stream, "  }\n");
+              }
+          }
+        fprintf (stream, "  static {\n");
+        fprintf (stream, "    %s[] t = new %s[%d];\n", table_eltype,
+                 table_eltype, 2 * hashsize);
+        if (mlp->nitems > max_items_per_method)
+          {
+            unsigned int k;
+            size_t start_j;
+
+            for (k = 0, start_j = 0;
+                 start_j < mlp->nitems;
+                 k++, start_j += max_items_per_method)
+              fprintf (stream, "    clinit_part_%u(t);\n", k);
+          }
+        else
+          write_java2_init_statements (stream, mlp, table_items,
+                                       0, mlp->nitems);
+        fprintf (stream, "    table = t;\n");
+        fprintf (stream, "  }\n");
+      }
 
       /* Emit the msgid_plural strings.  Only used by msgunfmt.  */
       if (plurals)
-	{
-	  bool first;
-	  fprintf (stream, "  public static final java.lang.String[] get_msgid_plural_table () {\n");
-	  fprintf (stream, "    return new java.lang.String[] { ");
-	  first = true;
-	  for (j = 0; j < mlp->nitems; j++)
-	    {
-	      struct table_item *ti = &table_items[j];
-	      if (ti->mp->msgid_plural != NULL)
-		{
-		  if (!first)
-		    fprintf (stream, ", ");
-		  write_java_string (stream, ti->mp->msgid_plural);
-		  first = false;
-		}
-	    }
-	  fprintf (stream, " };\n");
-	  fprintf (stream, "  }\n");
-	}
+        {
+          bool first;
+          fprintf (stream, "  public static final java.lang.String[] get_msgid_plural_table () {\n");
+          fprintf (stream, "    return new java.lang.String[] { ");
+          first = true;
+          for (j = 0; j < mlp->nitems; j++)
+            {
+              struct table_item *ti = &table_items[j];
+              if (ti->mp->msgid_plural != NULL)
+                {
+                  if (!first)
+                    fprintf (stream, ", ");
+                  write_java_string (stream, ti->mp->msgid_plural);
+                  first = false;
+                }
+            }
+          fprintf (stream, " };\n");
+          fprintf (stream, "  }\n");
+        }
 
       if (plurals)
-	{
-	  /* Emit the lookup function.  It is a common subroutine for
-	     handleGetObject and ngettext.  */
-	  fprintf (stream, "  public java.lang.Object lookup (java.lang.String msgid) {\n");
-	  write_lookup_code (stream, hashsize, collisions);
-	  fprintf (stream, "  }\n");
-	}
+        {
+          /* Emit the lookup function.  It is a common subroutine for
+             handleGetObject and ngettext.  */
+          fprintf (stream, "  public java.lang.Object lookup (java.lang.String msgid) {\n");
+          write_lookup_code (stream, hashsize, collisions);
+          fprintf (stream, "  }\n");
+        }
 
       /* Emit the handleGetObject function.  It is declared abstract in
-	 ResourceBundle.  It implements a local version of gettext.  */
+         ResourceBundle.  It implements a local version of gettext.  */
       fprintf (stream, "  public java.lang.Object handleGetObject (java.lang.String msgid) throws java.util.MissingResourceException {\n");
       if (plurals)
-	{
-	  fprintf (stream, "    java.lang.Object value = lookup(msgid);\n");
-	  fprintf (stream, "    return (value instanceof java.lang.String[] ? ((java.lang.String[])value)[0] : value);\n");
-	}
+        {
+          fprintf (stream, "    java.lang.Object value = lookup(msgid);\n");
+          fprintf (stream, "    return (value instanceof java.lang.String[] ? ((java.lang.String[])value)[0] : value);\n");
+        }
       else
-	write_lookup_code (stream, hashsize, collisions);
+        write_lookup_code (stream, hashsize, collisions);
       fprintf (stream, "  }\n");
 
       /* Emit the getKeys function.  It is declared abstract in ResourceBundle.
-	 The inner class is not avoidable.  */
+         The inner class is not avoidable.  */
       fprintf (stream, "  public java.util.Enumeration getKeys () {\n");
       fprintf (stream, "    return\n");
       fprintf (stream, "      new java.util.Enumeration() {\n");
       fprintf (stream, "        private int idx = 0;\n");
       fprintf (stream, "        { while (idx < %d && table[idx] == null) idx += 2; }\n",
-	       2 * hashsize);
+               2 * hashsize);
       fprintf (stream, "        public boolean hasMoreElements () {\n");
       fprintf (stream, "          return (idx < %d);\n", 2 * hashsize);
       fprintf (stream, "        }\n");
       fprintf (stream, "        public java.lang.Object nextElement () {\n");
       fprintf (stream, "          java.lang.Object key = table[idx];\n");
       fprintf (stream, "          do idx += 2; while (idx < %d && table[idx] == null);\n",
-	       2 * hashsize);
+               2 * hashsize);
       fprintf (stream, "          return key;\n");
       fprintf (stream, "        }\n");
       fprintf (stream, "      };\n");
@@ -846,63 +919,95 @@ write_java_code (FILE *stream, const char *class_name, message_list_ty *mlp,
   else
     {
       /* Java 1.1.x uses a different hash function.  If compatibility with
-	 this Java version is required, the hash table must be built at run time,
-	 not at compile time.  */
+         this Java version is required, the hash table must be built at run time,
+         not at compile time.  */
       fprintf (stream, "  private static final java.util.Hashtable table;\n");
-      fprintf (stream, "  static {\n");
-      fprintf (stream, "    java.util.Hashtable t = new java.util.Hashtable();\n");
-      for (j = 0; j < mlp->nitems; j++)
-	{
-	  fprintf (stream, "    t.put(");
-	  write_java_msgid (stream, mlp->item[j]);
-	  fprintf (stream, ",");
-	  write_java_msgstr (stream, mlp->item[j]);
-	  fprintf (stream, ");\n");
-	}
-      fprintf (stream, "    table = t;\n");
-      fprintf (stream, "  }\n");
+      {
+        /* With the Sun javac compiler, each 'put' call takes 9 to 11 bytes
+           of bytecode, therefore for each message, up to 11 bytes are needed.
+           Since the bytecode of every method, including the <clinit> method
+           that contains the static initializers, is limited to 64 KB, only ca,
+           65536 / 11 = 5958 messages can be initialized in a single method.
+           Account for other Java compilers and for plurals by limiting it to
+           1500.  */
+        const size_t max_items_per_method = 1500;
+
+        if (mlp->nitems > max_items_per_method)
+          {
+            unsigned int k;
+            size_t start_j;
+            size_t end_j;
+
+            for (k = 0, start_j = 0, end_j = start_j + max_items_per_method;
+                 start_j < mlp->nitems;
+                 k++, start_j = end_j, end_j = start_j + max_items_per_method)
+              {
+                fprintf (stream, "  static void clinit_part_%u (java.util.Hashtable t) {\n",
+                         k);
+                write_java1_init_statements (stream, mlp,
+                                             start_j, MIN (end_j, mlp->nitems));
+                fprintf (stream, "  }\n");
+              }
+          }
+        fprintf (stream, "  static {\n");
+        fprintf (stream, "    java.util.Hashtable t = new java.util.Hashtable();\n");
+        if (mlp->nitems > max_items_per_method)
+          {
+            unsigned int k;
+            size_t start_j;
+
+            for (k = 0, start_j = 0;
+                 start_j < mlp->nitems;
+                 k++, start_j += max_items_per_method)
+              fprintf (stream, "    clinit_part_%u(t);\n", k);
+          }
+        else
+          write_java1_init_statements (stream, mlp, 0, mlp->nitems);
+        fprintf (stream, "    table = t;\n");
+        fprintf (stream, "  }\n");
+      }
 
       /* Emit the msgid_plural strings.  Only used by msgunfmt.  */
       if (plurals)
-	{
-	  fprintf (stream, "  public static final java.util.Hashtable get_msgid_plural_table () {\n");
-	  fprintf (stream, "    java.util.Hashtable p = new java.util.Hashtable();\n");
-	  for (j = 0; j < mlp->nitems; j++)
-	    if (mlp->item[j]->msgid_plural != NULL)
-	      {
-		fprintf (stream, "    p.put(");
-		write_java_msgid (stream, mlp->item[j]);
-		fprintf (stream, ",");
-		write_java_string (stream, mlp->item[j]->msgid_plural);
-		fprintf (stream, ");\n");
-	      }
-	  fprintf (stream, "    return p;\n");
-	  fprintf (stream, "  }\n");
-	}
+        {
+          fprintf (stream, "  public static final java.util.Hashtable get_msgid_plural_table () {\n");
+          fprintf (stream, "    java.util.Hashtable p = new java.util.Hashtable();\n");
+          for (j = 0; j < mlp->nitems; j++)
+            if (mlp->item[j]->msgid_plural != NULL)
+              {
+                fprintf (stream, "    p.put(");
+                write_java_msgid (stream, mlp->item[j]);
+                fprintf (stream, ",");
+                write_java_string (stream, mlp->item[j]->msgid_plural);
+                fprintf (stream, ");\n");
+              }
+          fprintf (stream, "    return p;\n");
+          fprintf (stream, "  }\n");
+        }
 
       if (plurals)
-	{
-	  /* Emit the lookup function.  It is a common subroutine for
-	     handleGetObject and ngettext.  */
-	  fprintf (stream, "  public java.lang.Object lookup (java.lang.String msgid) {\n");
-	  fprintf (stream, "    return table.get(msgid);\n");
-	  fprintf (stream, "  }\n");
-	}
+        {
+          /* Emit the lookup function.  It is a common subroutine for
+             handleGetObject and ngettext.  */
+          fprintf (stream, "  public java.lang.Object lookup (java.lang.String msgid) {\n");
+          fprintf (stream, "    return table.get(msgid);\n");
+          fprintf (stream, "  }\n");
+        }
 
       /* Emit the handleGetObject function.  It is declared abstract in
-	 ResourceBundle.  It implements a local version of gettext.  */
+         ResourceBundle.  It implements a local version of gettext.  */
       fprintf (stream, "  public java.lang.Object handleGetObject (java.lang.String msgid) throws java.util.MissingResourceException {\n");
       if (plurals)
-	{
-	  fprintf (stream, "    java.lang.Object value = table.get(msgid);\n");
-	  fprintf (stream, "    return (value instanceof java.lang.String[] ? ((java.lang.String[])value)[0] : value);\n");
-	}
+        {
+          fprintf (stream, "    java.lang.Object value = table.get(msgid);\n");
+          fprintf (stream, "    return (value instanceof java.lang.String[] ? ((java.lang.String[])value)[0] : value);\n");
+        }
       else
-	fprintf (stream, "    return table.get(msgid);\n");
+        fprintf (stream, "    return table.get(msgid);\n");
       fprintf (stream, "  }\n");
 
       /* Emit the getKeys function.  It is declared abstract in
-	 ResourceBundle.  */
+         ResourceBundle.  */
       fprintf (stream, "  public java.util.Enumeration getKeys () {\n");
       fprintf (stream, "    return table.keys();\n");
       fprintf (stream, "  }\n");
@@ -917,7 +1022,7 @@ write_java_code (FILE *stream, const char *class_name, message_list_ty *mlp,
 
       header_entry = message_list_search (mlp, NULL, "");
       extract_plural_expression (header_entry ? header_entry->msgstr : NULL,
-				 &plural, &nplurals);
+                                 &plural, &nplurals);
 
       fprintf (stream, "  public static long pluralEval (long n) {\n");
       fprintf (stream, "    return ");
@@ -937,9 +1042,9 @@ write_java_code (FILE *stream, const char *class_name, message_list_ty *mlp,
 
 int
 msgdomain_write_java (message_list_ty *mlp, const char *canon_encoding,
-		      const char *resource_name, const char *locale_name,
-		      const char *directory,
-		      bool assume_java2)
+                      const char *resource_name, const char *locale_name,
+                      const char *directory,
+                      bool assume_java2)
 {
   int retval;
   struct temp_dir *tmpdir;
@@ -991,25 +1096,25 @@ msgdomain_write_java (message_list_ty *mlp, const char *canon_encoding,
     p = resource_name;
     for (i = 0; i < ndots; i++)
       {
-	const char *q = strchr (p, '.');
-	size_t n = q - p;
-	char *part = (char *) xmalloca (n + 1);
-	memcpy (part, p, n);
-	part[n] = '\0';
-	subdirs[i] = concatenated_filename (last_dir, part, NULL);
-	freea (part);
-	last_dir = subdirs[i];
-	p = q + 1;
+        const char *q = strchr (p, '.');
+        size_t n = q - p;
+        char *part = (char *) xmalloca (n + 1);
+        memcpy (part, p, n);
+        part[n] = '\0';
+        subdirs[i] = xconcatenated_filename (last_dir, part, NULL);
+        freea (part);
+        last_dir = subdirs[i];
+        p = q + 1;
       }
 
     if (locale_name != NULL)
       {
-	char *suffix = xasprintf ("_%s.java", locale_name);
-	java_file_name = concatenated_filename (last_dir, p, suffix);
-	free (suffix);
+        char *suffix = xasprintf ("_%s.java", locale_name);
+        java_file_name = xconcatenated_filename (last_dir, p, suffix);
+        free (suffix);
       }
     else
-      java_file_name = concatenated_filename (last_dir, p, ".java");
+      java_file_name = xconcatenated_filename (last_dir, p, ".java");
   }
 
   /* Create the subdirectories.  This is needed because some older Java
@@ -1020,13 +1125,13 @@ msgdomain_write_java (message_list_ty *mlp, const char *canon_encoding,
 
     for (i = 0; i < ndots; i++)
       {
-	register_temp_subdir (tmpdir, subdirs[i]);
-	if (mkdir (subdirs[i], S_IRUSR | S_IWUSR | S_IXUSR) < 0)
-	  {
-	    error (0, errno, _("failed to create \"%s\""), subdirs[i]);
-	    unregister_temp_subdir (tmpdir, subdirs[i]);
-	    goto quit3;
-	  }
+        register_temp_subdir (tmpdir, subdirs[i]);
+        if (mkdir (subdirs[i], S_IRUSR | S_IWUSR | S_IXUSR) < 0)
+          {
+            error (0, errno, _("failed to create \"%s\""), subdirs[i]);
+            unregister_temp_subdir (tmpdir, subdirs[i]);
+            goto quit3;
+          }
       }
   }
 
@@ -1054,13 +1159,13 @@ msgdomain_write_java (message_list_ty *mlp, const char *canon_encoding,
      which is in a temporary directory in our case.  */
   java_sources[0] = java_file_name;
   if (compile_java_class (java_sources, 1, NULL, 0, "1.3", "1.1", directory,
-			  true, false, true, verbose))
+                          true, false, true, verbose > 0))
     {
       if (!verbose)
-	error (0, 0, _("\
+        error (0, 0, _("\
 compilation of Java class failed, please try --verbose or set $JAVAC"));
       else
-	error (0, 0, _("\
+        error (0, 0, _("\
 compilation of Java class failed, please try to set $JAVAC"));
       goto quit3;
     }

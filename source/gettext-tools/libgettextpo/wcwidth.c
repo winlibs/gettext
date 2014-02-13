@@ -1,5 +1,5 @@
 /* Determine the number of screen columns needed for a character.
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2010-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,17 +26,16 @@
 #include "streq.h"
 #include "uniwidth.h"
 
-#undef wcwidth
-
 int
-rpl_wcwidth (wchar_t wc)
+wcwidth (wchar_t wc)
+#undef wcwidth
 {
   /* In UTF-8 locales, use a Unicode aware width function.  */
   const char *encoding = locale_charset ();
-  if (STREQ (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0 ,0))
+  if (STREQ_OPT (encoding, "UTF-8", 'U', 'T', 'F', '-', '8', 0, 0, 0 ,0))
     {
       /* We assume that in a UTF-8 locale, a wide character is the same as a
-	 Unicode character.  */
+         Unicode character.  */
       return uc_width (wc, encoding);
     }
   else

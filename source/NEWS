@@ -1,3 +1,182 @@
+Version 0.18.3 - July 2013
+
+* Runtime behaviour:
+  On Mac OS X systems, the setlocale() function now properly
+  invalidates loaded message catalogs when a locale has been set.
+
+* Programming languages support:
+
+  - C++:
+    The gnu::autosprintf class now provides an assignment operator.
+
+  - Glade:
+    xgettext now supports GtkBuider file format used by Glade 3.
+    xgettext now also extracts contexts (msgctxt) from Glade 2 and
+    GtkBuider files.
+
+  - JavaScript:
+    xgettext now partially supports JavaScript.  Since the current
+    JavaScript specification (ECMA-262) does not define the standard
+    set of formatting methods nor translation functions, the
+    implementation supports only a limited set of formatting methods
+    and translation functions commonly used in Gjs and other popular
+    JavaScript implemenations and libraries.
+
+  - Lua:
+    xgettext now supports Lua, using Ľubomír Remák's lua-gettext.
+
+  - Python:
+    xgettext and msgfmt's format string checking now recognize Python
+    format string in braced syntax (PEP 3101).  xgettext now also
+    supports explicit string concatenation with '+' and handles
+    platform dependent line terminators (LF/CR/CRLF) transparently.
+
+  - Tcl:
+    Bug fix in xgettext Unicode escape handling.
+
+  - Vala:
+    xgettext now supports Vala.
+
+* msgattrib now has --previous option to keep previous msgid when
+  making messages fuzzy, similar to msgmerge --previous.
+
+* msgfmt now checks PO file headers more strictly with less
+  false-positives.
+
+* 'gettextize' now checks macro directories specified with
+  AC_CONFIGURE_MACRO_DIRS in configure.ac.
+
+* Portability:
+  - msginit now does not require GNU sed.
+  - The Makefile rule for generating en@quot and en@boldquot now uses
+    @SED@ variable instead of hard-coded 'sed' command to allow users
+    to supply GNU sed.
+
+* Future backward-incompatibilities:
+  - In future Gettext versions, the files installed by 'gettextize'
+    will require Automake 1.10 or later.  This will improve the
+    compatibility of user projects with newer Automake versions.
+
+Version 0.18.2 - December 2012
+
+* xgettext now understands the block comment syntax of Guile 2.0.
+
+* libgettextpo library:
+  - The initial msgstr of a new message is now "", not NULL.
+  - Bug fixes in the functions po_message_is_range, po_file_check_all,
+    po_message_check_all.
+
+* Installation options:
+  The configure options --with-xz and --with-bzip2 can be used to specify
+  alternate compression methods for the archive used by the 'autopoint'
+  program. These options, together with --with-git, allow to trade
+  dependencies against installed package size. --with-xz has the highest
+  compression rate, followed by --with-git, followed by --with-bzip2.
+
+* Autoconf macros:
+  - The autoconf macros installed by 'gettextize' now work with the
+    forthcoming Automake 1.14 and require Autoconf version 2.60 or
+    newer.
+
+* Portability:
+  - Building on MacOS X 10.7, Cygwin 1.7.10, and newer 64-bit mingw is
+    now supported.
+
+Version 0.18.1 - June 2010
+
+* msggrep: A '$' anchor in a regular expression now also matches the end of
+  the string, even if it does not end in a newline.
+
+* Dependencies:
+  The libraries and programs are now linked with libunistring if this library
+  is already installed.
+
+* Installation options:
+  The configure option --with-cvs is deprecated. The 'autopoint' program will
+  now use the 'git' program by default to compress its archive. If the
+  configure option --without-git is specified, 'autopoint' will not rely on
+  'git', but will instead rely on a locally installed a 3 MB large archive.
+
+Version 0.18 - May 2010
+
+* Runtime behaviour:
+  - On MacOS X and Windows systems, <libintl.h> now extends setlocale() and
+    newlocale() so that their determination of the default locale considers
+    the choice the user has made in the system control panels.
+  - On MacOS X systems, the gettext()/dgettext()/... functions now respect the
+    locale of the current thread, if a thread-specific locale has been set.
+
+* PO file format:
+  There is a new field 'Language' in the header entry.  It denotes the language
+  code (plus optional country code) for the PO file.  This field can be used
+  by automated tools, such as spell checkers.  It is expected to be more
+  reliable than looking at the file name or at the 'Language-Team' field in
+  the header entry.
+  msgmerge, msgcat, msgen have a new option --lang that allows to specify
+  this field.  Additionally, msgmerge fills in this new field by looking at
+  the 'Language-Team' field (if the --lang option is not given).
+
+* xgettext and PO file format:
+  For messages with plural forms, programmers can inform the translators
+  about the range of possible values of the numeric argument, like this:
+    /* xgettext: range: 0..15 */
+  This information 'range: 0..15' is stored in the PO file as a flag attached
+  to the message.  Translators can produce better translations when they know
+  that the numeric argument is small.
+
+* Colorized PO files:
+  msgattrib, msgcomm, msgconv, msgen, msgfilter, msggrep, msginit, msgmerge,
+  msgunfmt, msguniq, xgettext now have options --color and --style, like msgcat
+  has since version 0.17.
+
+* msgmerge is up to 10 times faster when the PO and POT files are large.
+  This speedup was contributed by Ralf Wildenhues.
+
+* msgcmp has a new option -N/--no-fuzzy-matching, like msgmerge has since
+  version 0.12.
+
+* msgfilter now sets environment variables during the invocation of the
+  filter, indicating the msgid and location of the messge being processed.
+
+* xgettext now can extract plural forms from Qt 4 programs. The recommended
+  xgettext command-line options for this case are:
+    --qt --keyword=tr:1,1t --keyword=tr:1,2c,2t --keyword=tr:1,1,2c,3t
+
+* xgettext --language=GCC-source now recognizes also the format strings
+  used in the Fortran front-end of the GCC compiler, and marks them as
+  'gfc-internal-format'.
+
+* autopoint can now be used to update several PO directories all together.
+
+* PO mode changes:
+  - PO files with plural entries are now correctly handled.
+  - Editing a message with previous msgid (in comments) removes these
+    comments.  Contributed by Noritada Kobayashi.
+
+* The po/Makevars file has a new field MSGMERGE_OPTIONS, that can be used
+  to adjust msgmerge's operation.
+
+* The use of the macro AM_GNU_GETTEXT without 'external' argument and the
+  --intl option of the gettextize program are deprecated and will be removed
+  in the next release. Instead of including the intl sources in your package,
+  we suggest making the libintl library an (optional) prerequisite of your
+  package.
+
+* Updated the meaning of 'gcc-internal-format' to match GCC 4.3.
+
+* Installation options:
+  The configure options --without-cvs and --with-git can be used to specify
+  whether 'autopoint' will use the 'cvs' program, or the 'git' program, or
+  none at all. These options allow to trade dependencies against installed
+  package size: If --without-cvs is specified and --with-git is not specified,
+  'autopoint' will not rely on 'cvs' or 'git', but will instead rely on a
+  locally installed a 3 MB large archive.
+
+* Portability:
+  - The msgfilter program now also works on native Woe32 platforms.
+  - Compiled C# message catalogs now also work with 'mono' versions from 2009
+    or newer.
+
 Version 0.17 - November 2007
 
 * License:
@@ -657,7 +836,7 @@ Version 0.10.35 - April 1998, by Ulrich Drepper
 * better C format string implementation.  The xgettext will classify
   strings as being a format string, or not, in the .po file.  The
   programmer can override the decision explicitly for each string
-  by specifying `xgettext:c-format' and `xgettext:no-c-format'
+  by specifying 'xgettext:c-format' and 'xgettext:no-c-format'
   respectively in a C comment preceding the string.
 
 * msgmerge program now always produces output.  Fuzzy or non-existing
@@ -667,11 +846,11 @@ Version 0.10.35 - April 1998, by Ulrich Drepper
 
 * Norwegian translation by Karl Anders �gard
 
-* Configure command line option `--with-gnu-gettext' is renamed to
-  `--with-included-gettext'
+* Configure command line option '--with-gnu-gettext' is renamed to
+  '--with-included-gettext'
 
 * gettextize now can determine whether the aclocal.m4 of the project
-  is sufficent
+  is sufficient
 
 * use automake for Makefile.in generation
 
@@ -717,7 +896,7 @@ Version 0.10 - December 1995, by Ulrich Drepper
 
 * msgcmp program to find matches in two .po files
 
-* programs now have exit status != 0 if errors occured
+* programs now have exit status != 0 if errors occurred
 
 * libintl.a is now selfcontained and can be used without context in
   other projects (even on systems missing alloca)

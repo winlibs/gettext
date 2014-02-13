@@ -1,3 +1,486 @@
+2013-06-10  Daiki Ueno  <ueno@gnu.org>
+
+	* Makefile.am: Use $(MKDIR_P) instead of $(mkdir_p).
+	Suggested by Stefano Lattarini in
+	<https://lists.gnu.org/archive/html/bug-gettext/2013-04/msg00044.html>.
+
+2013-03-07  Miguel Angel Arruga Vivas  <rosen644835@gmail.com>  (tiny change)
+
+	Fix '__attribute__' definition.
+	Reported at <https://savannah.gnu.org/bugs/?35313>
+	* autosprintf.in.h (_AUTOSPRINTF_ATTRIBUTE_FORMAT): New macro
+	instead of redefine __attribute__.
+
+2013-03-04  Miguel Angel Arruga Vivas  <rosen644835@gmail.com>  (tiny change)
+
+	Add 'autosprintf::operator='. Needed because destructor
+	is not trivial.
+	Reported at <https://savannah.gnu.org/bugs/?33102>
+	* autosprintf.in.h (autosprintf::operator=): New function.
+	Thanks to Daiki Ueno for pointing a better copy-and-swap
+	idiom use.
+	* autosprintf.cc (autosprintf::operator=): Likewise.
+
+2013-01-17  Daiki Ueno  <ueno@gnu.org>
+
+	Fix link errors related to C99-style extern inline.
+	Reported by Sam Thursfield <sam.thursfield@codethink.co.uk>.
+	* Makefile.am (libasprintf_la_SOURCES): Add xsize.h and xsize.c.
+	(lib_asprintf_EXTRASOURCES): Remove xsize.h.
+	* xsize.h: Remove, replacing with the one from gnulib when
+	bootstrapping.
+
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2012-12-17  Daiki Ueno  <ueno@unixuser.org>
+
+	* configure.ac: Use AC_CONFIG_HEADERS instead of AM_CONFIG_HEADER.
+	Suggested by Stefano Lattarini <stefano.lattarini@gmail.com>.
+
+2012-11-29  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* vasnprintf.c (MAX_ROOM_NEEDED): Now static, not static
+	inline.
+
+2012-06-22  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c: Write "Mac OS X" instead of "MacOS X".
+
+2012-02-09  Paul Eggert  <eggert@cs.ucla.edu>
+
+	maint: replace FSF snail-mail addresses with URLs
+	* vasnprintf.c, xsize.h:
+	Replace FSF snail mail addresses with URLs, as per GNU coding
+	standards.  See glibc bug
+	<http://sourceware.org/bugzilla/show_bug.cgi?id=13673>.
+
+2012-02-05  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* vasnprintf.c: Spelling fixes.
+
+2012-01-26  Bruno Haible  <bruno@clisp.org>
+
+	Modernize quoting.
+	* autosprintf.in.h: Quote 'like this', not `like this', as per the
+	recent change to the GNU coding standards.
+	* vasnprintf.h: Likewise.
+	* vasprintf.h: Likewise.
+	* INSTALL: Process through sed -e "s/\`\([^']*\)'/‘\1’/g"
+
+2012-01-04  Bruno Haible  <bruno@clisp.org>
+
+	Talk about "native Windows API", not "Win32".
+	* vasnprintf.c: Update comments to mention native Windows.
+
+2011-10-15  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Optimize bit search operation.
+	* vasnprintf.c (divide): Use optimizations from gnulib's
+	integer_length.c.
+
+2011-10-15  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Fix comments.
+	* vasnprintf.c (decode_long_double, decode_double): Fix comments.
+
+2011-06-06  Bruno Haible  <bruno@clisp.org>
+
+	Ensure mbstate_t gets defined in libasprintf.
+	* configure.ac: Invoke AC_TYPE_MBSTATE_T. Needed on HP-UX 11.31.
+
+2011-06-04  Bruno Haible  <bruno@clisp.org>
+
+	Ensure intmax_t gets defined in libasprintf.
+	* configure.ac: Invoke gl_AC_TYPE_INTMAX_T instead of gt_TYPE_INTMAX_T.
+
+2011-06-03  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (lib_asprintf_EXTRASOURCES): Add verify.h.
+
+2010-10-10  Paul Eggert  <eggert@cs.ucla.edu>
+
+	rewrite int foo[2*X-1] to verify(X) or to int foo[X?1:-1]
+	* vasnprintf.c: Include "verify.h".
+	(mp_limb_verify, mp_twolimb_verify, TCHAR_T_verify): Remove, replacing
+	with a verify call.
+
+2011-06-03  Bruno Haible  <bruno@clisp.org>
+
+	Copyright: Use LGPL 2.1 instead of LGPL 2.0.
+	* COPYING.LIB: Replace with text of LGPL 2.1.
+	* *.h, *.c, *.cc, Makefile.am: Update copyright header.
+
+2011-02-23  Bruno Haible  <bruno@clisp.org>
+
+	Fix misindentation of preprocessor directives.
+	* vasnprintf.c (decode_long_double): Reindent preprocessor directives.
+
+2011-02-04  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Reduce use of malloc for small format strings.
+	* printf-args.h (N_DIRECT_ALLOC_ARGUMENTS): New macro.
+	(arguments): Add room for the first 7 arguments.
+	* printf-parse.h (N_DIRECT_ALLOC_DIRECTIVES): New macro.
+	(char_directives, u8_directives, u16_directives, u32_directives): Add
+	room for the first 7 directives.
+	* printf-parse.c: Include <string.h>.
+	(PRINTF_PARSE): Change memory handling code so that it uses the first
+	7 preallocated elements in an 'arguments' or 'DIRECTIVES' struct.
+	* vasnprintf.c (VASNPRINTF): Update memory handling code.
+	Reported by Pádraig Brady <P@draigbrady.com>.
+
+2010-11-20  Bruno Haible  <bruno@clisp.org>
+
+	Ensure that <features.h> is included before __GLIBC__ is tested.
+	* printf-parse.h: Include <features.h>.
+	* configure.ac: Test for <features.h>.
+	Reported by Mike Frysinger <vapier@gentoo.org>.
+
+2010-11-20  Bruno Haible  <bruno@clisp.org>
+
+	Port to uClibc.
+	* printf-parse.h (FLAG_LOCALIZED): Treat uClibc like a non-glibc platform.
+	* printf-parse.c (PRINTF_PARSE): Likewise.
+	* vasnprintf.c (decimal_point_char): Treat uClibc like glibc.
+	(VASNPRINTF): Treat uClibc like a non-glibc platform.
+	Reported by Mike Frysinger <vapier@gentoo.org>.
+
+2010-11-20  Bruno Haible  <bruno@clisp.org>
+
+	Fix a comment.
+	* vasnprintf.c (VASNPRINTF): Fix comment.
+
+2010-11-07  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Support I flag on glibc systems.
+	* printf-parse.h (FLAG_LOCALIZED): New macro.
+	* printf-parse.c (PRINTF_PARSE): Handle the 'I' flag.
+	* vasnprintf.c (VASNPRINTF): Pass the 'I' flag on to the system's
+	snprintf function.
+
+2010-11-07  Bruno Haible  <bruno@clisp.org>
+
+	Rename autosprintf.h.in to autosprintf.in.h.
+	* autosprintf.in.h: New file, renamed from autosprintf.h.in.
+	* Makefile.am (autosprintf.h, EXTRA_DIST): Update.
+
+2010-10-14  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Don't set errno to 0.
+	* vasnprintf.c (VASNPRINTF): Save and restore errno around the block
+	that sets it to 0.
+	Reported by Gianluigi Tiesi <sherpya@netfarm.it>.
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Fix syntax errors in libintl build on mingw.
+	* vasnprintf.c (VASNPRINTF): Move a closing brace. Undefine
+	pad_ourselves and prec_ourselves after use.
+
+2010-04-24  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Correct errno value in case of out-of-memory.
+	* vasnprintf.c (VASNPRINTF): Set errno to 0 before calling SNPRINTF or
+	sprintf. Use the errno value from SNPRINTF or sprintf.
+	Reported by Ian Beckwith <ianb@erislabs.net>.
+
+2010-04-10  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Correct handling of unconvertible wide string arguments.
+	* vasnprintf.c (MAX_ROOM_NEEDED): New function, extracted from
+	VASNPRINTF.
+	(VASNPRINTF): Use it. After snprintf failed, allocate more memory only
+	if HAVE_SNPRINTF_RETVAL_C99 is false and the allocated memory is
+	smaller than the expected maximum need for the directive. Set errno to
+	EILSEQ, not EINVAL, when the directive is 'c' or 's'.
+	(local_strnlen, local_wcslen, local_wcsnlen): Update conditions.
+	Reported by Jarno Rajahalme <jarno.rajahalme@nsn.com>.
+
+2010-04-10  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Fix crash in %ls directive.
+	* vasnprintf.c (VASNPRINTF): Don't abort when a unconvertible wide
+	string is passed as argument to %ls, with no precision and no width.
+	Reported by Jarno Rajahalme <jarno.rajahalme@nsn.com>.
+
+2010-04-10  Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: Fix multiple test failures on mingw.
+	* vasnprintf.c (SNPRINTF) [mingw]: Define to snprintf, not _snprintf,
+	or snwprintf, not _snwprintf.
+
+2010-01-01  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): If GNULIB_defined_mbstate_t is defined,
+	use wctomb instead of wcrtomb.
+
+2009-12-12  Bruno Haible  <bruno@clisp.org>
+
+	* *.h, *.c: Untabify.
+
+2009-11-22  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (decimal_point_char): Choose the fast path also on
+	MacOS X.
+
+2009-11-17  Eric Blake  <ebb9@byu.net>
+
+	* vasnprintf.c (VASNPRINTF): Avoid shadowing our own local variables.
+
+2009-08-20  Eric Blake  <ebb9@byu.net>
+
+	* vasnprintf.c (decimal_point_char): Avoid warning on old-style
+	declaration.
+
+2009-08-14  Bruno Haible  <bruno@clisp.org>
+
+	Use the gnulib module 'errno'.
+	* Makefile.am: Include Makefile.gnulib.
+	(ACLOCAL_AMFLAGS): Add -I gnulib-m4.
+	(EXTRA_DIST): Add gnulib-m4/gnulib-cache.m4.
+	(BUILT_SOURCES, noinst_LTLIBRARIES): New variables.
+	* configure.ac (AC_PREREQ): Require autoconf 2.59 or newer.
+	Invoke gl_EARLY, gl_INIT. Don't invoke gl_EOVERFLOW. Remove the alloca
+	tests.
+
+2009-08-10  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (DCHAR_SET): Undefine at the end.
+
+2009-06-06  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac (AM_INIT_AUTOMAKE): Add 'silent-rules' option.
+	* Makefile.am (libasprintf.la): Silence 'make' output if silent-rules.
+
+2009-06-06  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Pass package and version to AC_INIT instead of
+	AM_INIT_AUTOMAKE.
+
+2009-05-21  Bruno Haible  <bruno@clisp.org>
+
+	Assume automake >= 1.10.2.
+	* configure.ac (AC_CONFIG_FILES): Remove FIX_MAKEFILE_COMPILE,
+	FIX_MAKEFILE_INFO invocations.
+
+2009-04-26  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): Update after the calling convention of
+	u*_conv_from_encoding and u*_conv_to_encoding changed.
+
+2009-04-08  Bruno Haible  <bruno@clisp.org>
+
+	* Makefile.am (SUFFIXES, CLEANFILES): Remove variables. Not needed any
+	more.
+
+2009-03-23  Jim Meyering  <meyering@redhat.com>
+
+	* vasnprintf.c (divide): Fix typo in comment.
+
+2009-02-26  Bruno Haible  <bruno@clisp.org>
+
+	Fix *printf behaviour regarding the %ls directive.
+	* vasnprintf.c (local_wcslen, VASNPRINTF): Handle
+	NEED_PRINTF_DIRECTIVE_LS.
+
+2009-02-23  Bruno Haible  <bruno@clisp.org>
+
+	Fix invalid read past end of memory block.
+	* vasnprintf.c (DCHAR_SET): Define.
+	(local_wcslen): Define only when needed.
+	(local_strnlen, local_wcsnlen): New functions.
+	(VASNPRINTF) [!USE_SNPRINTF && HAVE_WCHAR_T]: Implement the %s and %ls
+	directives that involve a conversion ourselves.
+	* configure.ac: Also check for strnlen, wcsnlen, mbrtowc, wcrtomb.
+
+2009-01-14  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: More consistent m4 quoting.
+
+2008-09-22  Eric Blake  <ebb9@byu.net>
+	    Bruno Haible  <bruno@clisp.org>
+
+	vasnprintf: fix x86/glibc regression on printf("%La", 0.0L)
+	* vasnprintf.c (VASNPRINTF): Support 0.0 on platforms that supply %A
+	but mishandle pseudo-NaN.
+	Reported by Simon Josefsson.
+
+2008-09-18  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): When printing ±0.0L in
+	NEED_PRINTF_INFINITE_LONG_DOUBLE case with 'e' format, always use two
+	digits for the exponent.
+
+2008-09-18  Jim Meyering  <meyering@redhat.com>
+	    Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (decimal_point_char): Define also if
+	NEED_PRINTF_INFINITE_LONG_DOUBLE.
+
+2008-09-16  Bruno Haible  <bruno@clisp.org>
+	and Eric Blake  <ebb9@byu.net>
+
+	vasnprintf: support Irix 5.3
+	* vasnprintf.c (VASNPRINTF): Also handle -0.0L on platforms that
+	mishandle long double infinity.
+	Reported by Tom G. Christensen.
+
+2008-09-02  Eric Blake  <ebb9@byu.net>
+
+	vasnprintf-posix: handle large precision via %.*d
+	* vasnprintf.c (VASNPRINTF): Don't pass precision to snprintf
+	when handling it ourselves.
+	Reported by Alain Guibert.
+
+2008-07-10  Ben Pfaff  <blp@gnu.org>
+
+	* vasnprintf.c: Update references to renamed include files.
+
+2008-05-21  Bruno Haible  <bruno@clisp.org>
+
+	Avoid one more warning from gcc.
+	* vasnprintf.c (IF_LINT): Update comments.
+	(VASNPRINTF): Use it also for the 'prefix' array initializer.
+
+2008-05-21  Jim Meyering  <meyering@redhat.com>
+
+	avoid a warning from gcc
+	* vasnprintf.c (IF_LINT): Define.
+	(scale10_round_decimal_long_double):
+	Use it to avoid a "may be used uninitialized" warning.
+	(scale10_round_decimal_double): Likewise.
+
+2008-05-16  Jim Meyering  <meyering@redhat.com>
+	    Bruno Haible  <bruno@clisp.org>
+
+	Avoid some warnings from "gcc -Wshadow".
+	* vasnprintf.c (exp, remainder): Define to different identifiers.
+
+2008-04-19  Bruno Haible  <bruno@clisp.org>
+
+	Work around snprintf bug on Linux libc5.
+	* vasnprintf.c (USE_SNPRINTF): Set to 0 on Linux libc5 systems.
+
+2008-04-19  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (floorlog10l, floorlog10): Reduce maximum error from
+	0.0058 to less than 10^-7.
+
+2008-04-19  Bruno Haible  <bruno@clisp.org>
+
+	Fix rounding when a precision is given.
+	* vasnprintf.c (is_borderline): New function.
+	(VASNPRINTF): For %e and %g, consider replacing the digits 10....0 with
+	9...9x.
+	Reported by John Darrington <john@darrington.wattle.id.au> via
+	Ben Pfaff <blp@cs.stanford.edu>.
+
+2008-03-30  Bruno Haible  <bruno@clisp.org>
+
+	Fix buffer overrun.
+	* vasnprintf.c (VASNPRINTF): If !USE_SNPRINTF && pad_ourselves:
+	Don't consider the width for tmp_length. Check count against tmp_length
+	before doing the padding. Ensure enough allocation during padding.
+
+2008-03-30  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (EOVERFLOW): Remove fallback.
+
+2008-03-30  Bruno Haible  <bruno@clisp.org>
+
+	Fix bug introduced on 2007-06-10.
+	* vasnprintf.c (VASNPRINTF): When performing zero-padding, use
+	spaces instead of 0 digits for 's' also when ENABLE_UNISTDIO.
+
+2008-02-28  Atsushi SAKAI  <sakaia@jp.fujitsu.com>
+
+	* xsize.h: Fix typo in comment: s/tupe/type/.
+
+2008-02-07  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): Don't use %n on native Woe32 systems.
+	Avoids a crash on Windows Vista.
+	Reported by Adam Strzelecki <ono@java.pl> via
+	Simon Josefsson <simon@josefsson.org>.
+
+2008-02-06  Bruno Haible  <bruno@clisp.org>
+
+	Fix *printf behaviour regarding the left-adjust flag on HP-UX 10.20.
+	* vasnprintf.c (VASNPRINTF): Handle NEED_PRINTF_FLAG_LEFTADJUST.
+	Reported by Peter Fales <psfales@alcatel-lucent.com>.
+
+2008-02-06  Bruno Haible  <bruno@clisp.org>
+
+	Fix bug introduced on 2007-06-10.
+	* vasnprintf.c (VASNPRINTF): Perform zero-padding also if
+	!NEED_PRINTF_FLAG_ZERO.
+
+2008-01-29  Jim Meyering  <meyering@redhat.com>
+
+	vasnprintf.c: Avoid warning about unused label
+	* vasnprintf.c (VASNPRINTF) [!USE_SNPRINTF]: Guard the
+	"overflow" label definition and associated code with the
+	same cpp condition that guards the sole use of that label.
+
+2008-01-26  Bruno Haible  <bruno@clisp.org>
+
+	Rename isnan, applicable to 'double' only, to isnand.
+	* vasnprintf.c: Include isnand.h instead of isnan.h.
+	(is_infinite_or_zero, VASNPRINTF): Use isnand instead of isnan.
+
+2008-01-08  Jim Meyering  <meyering@redhat.com>
+	    Bruno Haible  <bruno@clisp.org>
+
+	* printf-parse.c (PRINTF_PARSE): Handle a size specifier "q" on MacOS X
+	and a size specifier "I64" on mingw. Needed for PRIdMAX.
+	Reported by Peter Fales in
+	<http://lists.gnu.org/archive/html/bug-coreutils/2007-12/msg00148.html>.
+
+2008-04-20  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Use LT_INIT instead of AC_PROG_LIBTOOL.
+
+2007-11-26  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (decode_long_double): Don't abort if the 'long double'
+	type has excess precision.
+	Reported by Jim Meyering in
+	<http://lists.gnu.org/archive/html/bug-gnulib/2007-11/msg00120.html>.
+
+2007-11-10  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Do _snprintf check like gnulib's vasnprintf.m4 does.
+
+2007-11-10  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Invoke AC_TYPE_LONG_LONG_INT instead of
+	gl_AC_TYPE_LONG_LONG. Don't invoke gt_TYPE_LONGDOUBLE.
+	Report and patch by Kacper.
+
+2007-11-10  Bruno Haible  <bruno@clisp.org>
+
+	* configure.ac: Invoke gl_EOVERFLOW.
+
+2007-11-09  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): Ensure that we never call snprintf with a
+	size argument < 2.
+
+2007-11-09  Bruno Haible  <bruno@clisp.org>
+
+	* vasnprintf.c (VASNPRINTF): Increase reallocation of snprintf buffer.
+	Fixes an inefficiency introduced on 2007-11-03.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.
@@ -248,7 +731,7 @@
 2007-03-24  Bruno Haible  <bruno@clisp.org>
 
 	* vasnprintf.c: Include float+.h.
-	(VASNPRINTF): When comparing agains +0.0L or +0.0, compare only
+	(VASNPRINTF): When comparing against +0.0L or +0.0, compare only
 	SIZEOF_LDBL or SIZEOF_DBL bytes.
 
 2007-03-24  Bruno Haible  <bruno@clisp.org>

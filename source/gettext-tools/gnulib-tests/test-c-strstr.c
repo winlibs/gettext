@@ -1,5 +1,5 @@
 /* Test of searching in a string.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,20 +20,10 @@
 
 #include "c-strstr.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-        {								     \
-          fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-          abort ();							     \
-        }								     \
-    }									     \
-  while (0)
+#include "macros.h"
 
 int
 main ()
@@ -67,22 +57,22 @@ main ()
   {
     size_t repeat = 10000;
     size_t m = 1000000;
-    char *needle =
+    const char *needle =
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     char *haystack = (char *) malloc (m + 1);
     if (haystack != NULL)
       {
-	memset (haystack, 'A', m);
-	haystack[0] = 'B';
-	haystack[m] = '\0';
+        memset (haystack, 'A', m);
+        haystack[0] = 'B';
+        haystack[m] = '\0';
 
-	for (; repeat > 0; repeat--)
-	  {
-	    ASSERT (c_strstr (haystack, needle) == haystack + 1);
-	  }
+        for (; repeat > 0; repeat--)
+          {
+            ASSERT (c_strstr (haystack, needle) == haystack + 1);
+          }
 
-	free (haystack);
+        free (haystack);
       }
   }
 
@@ -91,21 +81,21 @@ main ()
   {
     size_t repeat = 10000;
     size_t m = 1000000;
-    char *haystack =
+    const char *haystack =
       "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       "ABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABABAB";
     char *needle = (char *) malloc (m + 1);
     if (needle != NULL)
       {
-	memset (needle, 'A', m);
-	needle[m] = '\0';
+        memset (needle, 'A', m);
+        needle[m] = '\0';
 
-	for (; repeat > 0; repeat--)
-	  {
-	    ASSERT (c_strstr (haystack, needle) == NULL);
-	  }
+        for (; repeat > 0; repeat--)
+          {
+            ASSERT (c_strstr (haystack, needle) == NULL);
+          }
 
-	free (needle);
+        free (needle);
       }
   }
 
@@ -116,23 +106,21 @@ main ()
     char *needle = (char *) malloc (m + 2);
     if (haystack != NULL && needle != NULL)
       {
-	const char *result;
+        const char *result;
 
-	memset (haystack, 'A', 2 * m);
-	haystack[2 * m] = 'B';
-	haystack[2 * m + 1] = '\0';
+        memset (haystack, 'A', 2 * m);
+        haystack[2 * m] = 'B';
+        haystack[2 * m + 1] = '\0';
 
-	memset (needle, 'A', m);
-	needle[m] = 'B';
-	needle[m + 1] = '\0';
+        memset (needle, 'A', m);
+        needle[m] = 'B';
+        needle[m + 1] = '\0';
 
-	result = c_strstr (haystack, needle);
-	ASSERT (result == haystack + m);
+        result = c_strstr (haystack, needle);
+        ASSERT (result == haystack + m);
       }
-    if (needle != NULL)
-      free (needle);
-    if (haystack != NULL)
-      free (haystack);
+    free (needle);
+    free (haystack);
   }
 
   return 0;

@@ -1,5 +1,5 @@
 /* Test of opening a file descriptor.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,24 +20,22 @@
 
 #include <fcntl.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include "signature.h"
+SIGNATURE_CHECK (open, int, (char const *, int, ...));
 
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-        {								     \
-          fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-          abort ();							     \
-        }								     \
-    }									     \
-  while (0)
+#include <errno.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#include "macros.h"
+
+#define BASE "test-open.t"
+
+#include "test-open.h"
 
 int
-main ()
+main (void)
 {
-  ASSERT (open ("/dev/null", O_RDONLY) >= 0);
-
-  return 0;
+  return test_open (open, true);
 }

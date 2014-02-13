@@ -1,5 +1,5 @@
 /* GNU gettext - internationalization aids
-   Copyright (C) 1995-1998, 2000-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2003, 2006, 2008 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -50,6 +50,9 @@ struct catalog_output_format
   /* Whether the format supports plurals.  */
   bool supports_plurals;
 
+  /* Whether the formats sorts obsolete messages at the end.  */
+  bool sorts_obsoletes_to_end;
+
   /* Whether the PO file format is a suitable alternative output format for
      this one.  */
   bool alternative_is_po;
@@ -69,9 +72,9 @@ extern void
    parameters set by the functions above.  */
 extern void
        msgdomain_list_print (msgdomain_list_ty *mdlp,
-			     const char *filename,
-			     catalog_output_format_ty output_syntax,
-			     bool force, bool debug);
+                             const char *filename,
+                             catalog_output_format_ty output_syntax,
+                             bool force, bool debug);
 
 /* Sort MDLP destructively according to the given criterion.  */
 extern void

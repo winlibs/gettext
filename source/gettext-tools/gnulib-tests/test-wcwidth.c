@@ -1,5 +1,5 @@
 /* Test of wcwidth() function.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,20 +20,14 @@
 
 #include <wchar.h>
 
-#include <locale.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "signature.h"
+SIGNATURE_CHECK (wcwidth, int, (wchar_t));
 
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-        {								     \
-          fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-          abort ();							     \
-        }								     \
-    }									     \
-  while (0)
+#include <locale.h>
+#include <string.h>
+
+#include "localcharset.h"
+#include "macros.h"
 
 int
 main ()
@@ -45,11 +39,17 @@ main ()
     ASSERT (wcwidth (wc) == 1);
 
   /* Switch to an UTF-8 locale.  */
-  if (setlocale (LC_ALL, "fr_FR.UTF-8") != NULL)
+  if (setlocale (LC_ALL, "fr_FR.UTF-8") != NULL
+      /* Check whether it's really an UTF-8 locale.
+         On OpenBSD 4.0, the setlocale call succeeds only for the LC_CTYPE
+         category and therefore returns "C/fr_FR.UTF-8/C/C/C/C", but the
+         LC_CTYPE category is effectively set to an ASCII LC_CTYPE category;
+         in particular, locale_charset() returns "ASCII".  */
+      && strcmp (locale_charset (), "UTF-8") == 0)
     {
       /* Test width of ASCII characters.  */
       for (wc = 0x20; wc < 0x7F; wc++)
-	ASSERT (wcwidth (wc) == 1);
+        ASSERT (wcwidth (wc) == 1);
 
       /* Test width of some non-spacing characters.  */
       ASSERT (wcwidth (0x0301) == 0);
@@ -57,7 +57,7 @@ main ()
 
       /* Test width of some format control characters.  */
       ASSERT (wcwidth (0x200E) <= 0);
-      ASSERT (wcwidth (0x2060) == 0);
+      ASSERT (wcwidth (0x2060) <= 0);
 #if 0  /* wchar_t may be only 16 bits.  */
       ASSERT (wcwidth (0xE0001) <= 0);
       ASSERT (wcwidth (0xE0044) <= 0);

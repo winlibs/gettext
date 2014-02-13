@@ -36,11 +36,11 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "warning: file `%s' extension `%s' is unknown; will try C"
+msgid "warning: file '%s' extension '%s' is unknown; will try C"
 msgstr ""
 
 #, c-format
-msgid "Try `%s --help' for more information.\n"
+msgid "Try '%s --help' for more information.\n"
 msgstr ""
 
 #, c-format
@@ -113,7 +113,8 @@ msgid ""
 "                                EmacsLisp, librep, Scheme, Smalltalk, Java,\n"
 "                                JavaProperties, C#, awk, YCP, Tcl, Perl, "
 "PHP,\n"
-"                                GCC-source, NXStringTable, RST, Glade)\n"
+"                                GCC-source, NXStringTable, RST, Glade, Lua,\n"
+"                                JavaScript, Vala)\n"
 msgstr ""
 
 #, c-format
@@ -154,8 +155,11 @@ msgstr ""
 
 #, c-format
 msgid ""
-"  -c, --add-comments[=TAG]    place comment block with TAG (or those\n"
-"                              preceding keyword lines) in output file\n"
+"  -cTAG, --add-comments=TAG   place comment blocks starting with TAG and\n"
+"                                preceding keyword lines in output file\n"
+"  -c, --add-comments          place all comment blocks preceding keyword "
+"lines\n"
+"                                in output file\n"
 msgstr ""
 
 #, c-format
@@ -171,13 +175,14 @@ msgid ""
 "                                (only languages C, C++, ObjectiveC, Shell,\n"
 "                                Python, Lisp, EmacsLisp, librep, Scheme, "
 "Java,\n"
-"                                C#, awk, Tcl, Perl, PHP, GCC-source, Glade)\n"
+"                                C#, awk, Tcl, Perl, PHP, GCC-source, Glade,\n"
+"                                Lua, JavaScript, Vala)\n"
 msgstr ""
 
 #, c-format
 msgid ""
-"  -k, --keyword[=WORD]        additional keyword to be looked for (without\n"
-"                              WORD means not to use default keywords)\n"
+"  -kWORD, --keyword=WORD      look for WORD as an additional keyword\n"
+"  -k, --keyword               do not to use default keywords\n"
 msgstr ""
 
 #, c-format
@@ -192,7 +197,8 @@ msgid ""
 "                                (only languages C, C++, ObjectiveC, Shell,\n"
 "                                Python, Lisp, EmacsLisp, librep, Scheme, "
 "Java,\n"
-"                                C#, awk, YCP, Tcl, Perl, PHP, GCC-source)\n"
+"                                C#, awk, YCP, Tcl, Perl, PHP, GCC-source,\n"
+"                                Lua, JavaScript, Vala)\n"
 msgstr ""
 
 #, c-format
@@ -226,6 +232,18 @@ msgstr ""
 
 #, c-format
 msgid "Output details:\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      --color                 use colors and other text attributes always\n"
+"      --color=WHEN            use colors and other text attributes if WHEN.\n"
+"                              WHEN may be 'always', 'never', 'auto', or "
+"'html'.\n"
+msgstr ""
+
+#, c-format
+msgid "      --style=STYLEFILE       specify CSS style rule file for --color\n"
 msgstr ""
 
 #, c-format
@@ -289,7 +307,7 @@ msgstr ""
 
 #, c-format
 msgid ""
-"      --omit-header           don't write header with `msgid \"\"' entry\n"
+"      --omit-header           don't write header with 'msgid \"\"' entry\n"
 msgstr ""
 
 #, c-format
@@ -316,14 +334,16 @@ msgstr ""
 
 #, c-format
 msgid ""
-"  -m, --msgstr-prefix[=STRING]  use STRING or \"\" as prefix for msgstr "
-"entries\n"
+"  -m[STRING], --msgstr-prefix[=STRING]  use STRING or \"\" as prefix for "
+"msgstr\n"
+"                                values\n"
 msgstr ""
 
 #, c-format
 msgid ""
-"  -M, --msgstr-suffix[=STRING]  use STRING or \"\" as suffix for msgstr "
-"entries\n"
+"  -M[STRING], --msgstr-suffix[=STRING]  use STRING or \"\" as suffix for "
+"msgstr\n"
+"                                values\n"
 msgstr ""
 
 #, c-format
@@ -346,8 +366,8 @@ msgstr ""
 
 #, c-format
 msgid ""
-"A --flag argument doesn't have the <keyword>:<argnum>:[pass-]<flag> syntax: %"
-"s"
+"A --flag argument doesn't have the <keyword>:<argnum>:[pass-]<flag> syntax: "
+"%s"
 msgstr ""
 
 msgid "standard input"
@@ -358,9 +378,18 @@ msgid "error while opening \"%s\" for reading"
 msgstr ""
 
 #, c-format
-msgid ""
-"Non-ASCII string at %s%s.\n"
-"Please specify the source encoding through --from-code.\n"
+msgid "Non-ASCII character at %s%s."
+msgstr ""
+
+#, c-format
+msgid "Non-ASCII comment at or before %s%s."
+msgstr ""
+
+#, c-format
+msgid "Non-ASCII string at %s%s."
+msgstr ""
+
+msgid "Please specify the source encoding through --from-code."
 msgstr ""
 
 #, c-format
@@ -375,8 +404,8 @@ msgstr ""
 
 #, c-format
 msgid ""
-"Although declared as such, the %s is not a valid %s format string. Reason: %"
-"s\n"
+"Although declared as such, the %s is not a valid %s format string. Reason: "
+"%s\n"
 msgstr ""
 
 #, c-format
@@ -413,13 +442,13 @@ msgstr ""
 
 msgid ""
 "The option --msgid-bugs-address was not specified.\n"
-"If you are using a `Makevars' file, please specify\n"
+"If you are using a 'Makevars' file, please specify\n"
 "the MSGID_BUGS_ADDRESS variable there; otherwise please\n"
 "specify an --msgid-bugs-address command line option.\n"
 msgstr ""
 
 #, c-format
-msgid "language `%s' unknown"
+msgid "language '%s' unknown"
 msgstr ""
 
 #, c-format
@@ -451,6 +480,10 @@ msgid "found %d fatal error"
 msgid_plural "found %d fatal errors"
 msgstr[0] ""
 msgstr[1] ""
+
+#, c-format
+msgid "%s: "
+msgstr ""
 
 #, c-format
 msgid "%d translated message"
@@ -640,6 +673,14 @@ msgstr ""
 
 #, c-format
 msgid ""
+"      --endianness=BYTEORDER  write out 32-bit numbers in the given byte "
+"order\n"
+"                                (big or little, default depends on "
+"platform)\n"
+msgstr ""
+
+#, c-format
+msgid ""
 "      --no-hash               binary file will not include the hash table\n"
 msgstr ""
 
@@ -672,13 +713,13 @@ msgid "domain name \"%s\" not suitable as file name: will use prefix"
 msgstr ""
 
 #, c-format
-msgid "`domain %s' directive ignored"
+msgid "'domain %s' directive ignored"
 msgstr ""
 
-msgid "empty `msgstr' entry ignored"
+msgid "empty 'msgstr' entry ignored"
 msgstr ""
 
-msgid "fuzzy `msgstr' entry ignored"
+msgid "fuzzy 'msgstr' entry ignored"
 msgstr ""
 
 #, c-format

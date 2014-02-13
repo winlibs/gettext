@@ -1,5 +1,5 @@
 /* Test program, used by the plural-1 test.
-   Copyright (C) 2001-2002 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@
 #undef _LIBINTL_H
 #include "libgnuintl.h"
 
+/* Disable the override of setlocale that libgnuintl.h activates on MacOS X
+   and Windows.  This test relies on the fake setlocale function in
+   setlocale.c.  */
+#undef setlocale
+
 int
 main (int argc, char *argv[])
 {
@@ -37,7 +42,7 @@ main (int argc, char *argv[])
     return 1;
 
   textdomain ("cake");
-  bindtextdomain ("cake", ".");
+  bindtextdomain ("cake", "plural-1-dir");
   printf (ngettext ("a piece of cake", "%d pieces of cake", n), n);
   printf ("\n");
   return 0;

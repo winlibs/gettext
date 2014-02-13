@@ -1,7 +1,7 @@
 <HTML>
 <HEAD>
 <!-- This HTML file has been created by texi2html 1.52b
-     from gettext.texi on 4 November 2007 -->
+     from gettext.texi on 7 July 2013 -->
 
 <META HTTP-EQUIV="content-type" CONTENT="text/html; charset=UTF-8">
 <TITLE>GNU gettext utilities - 12  The Translator's View</TITLE>
@@ -211,12 +211,12 @@ ready to work together at improving the results they obtain.
 
 Some people wonder if using GNU <CODE>gettext</CODE> necessarily brings their
 package under the protective wing of the GNU General Public License or
-the GNU Library General Public License, when they do not want to make
+the GNU Lesser General Public License, when they do not want to make
 their program free, or want other kinds of freedom.  The simplest
 answer is “normally not”.
 
 The <CODE>gettext-runtime</CODE> part of GNU <CODE>gettext</CODE>, i.e. the
-contents of <CODE>libintl</CODE>, is covered by the GNU Library General Public
+contents of <CODE>libintl</CODE>, is covered by the GNU Lesser General Public
 License.  The <CODE>gettext-tools</CODE> part of GNU <CODE>gettext</CODE>, i.e. the
 rest of the GNU <CODE>gettext</CODE> package, is covered by the GNU General
 Public License.
@@ -518,7 +518,7 @@ all of GNU, giving myself the duty of one small GNU package per week
 or so, taking many weeks or months for bigger packages.  But it does
 not work this way.  I first did all the things I'm responsible for.
 I've nothing against some missionary work on other maintainers, but
-I'm also loosing a lot of energy over it--same debates over again.
+I'm also losing a lot of energy over it--same debates over again.
 
 </P>
 <P>
@@ -540,7 +540,131 @@ have more information about this.
 </P>
 
 
-<H2><A NAME="SEC209" HREF="gettext_toc.html#TOC209">12.6  Prioritizing messages: How to determine which messages to translate first</A></H2>
+<H2><A NAME="SEC209" HREF="gettext_toc.html#TOC209">12.6  Translating plural forms</A></H2>
+
+<P>
+<A NAME="IDX1119"></A>
+Suppose you are translating a PO file, and it contains an entry like this:
+
+</P>
+
+<PRE>
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] ""
+msgstr[1] ""
+</PRE>
+
+<P>
+What does this mean? How do you fill it in?
+
+</P>
+<P>
+Such an entry denotes a message with plural forms, that is, a message where
+the text depends on a cardinal number.  The general form of the message,
+in English, is the <CODE>msgid_plural</CODE> line.  The <CODE>msgid</CODE> line is the
+English singular form, that is, the form for when the number is equal to 1.
+More details about plural forms are explained in section <A HREF="gettext_11.html#SEC188">11.2.6  Additional functions for plural forms</A>.
+
+</P>
+<P>
+The first thing you need to look at is the <CODE>Plural-Forms</CODE> line in the
+header entry of the PO file.  It contains the number of plural forms and a
+formula.  If the PO file does not yet have such a line, you have to add it.
+It only depends on the language into which you are translating.  You can
+get this info by using the <CODE>msginit</CODE> command (see section <A HREF="gettext_6.html#SEC37">6  Creating a New PO File</A>) --
+it contains a database of known plural formulas -- or by asking other
+members of your translation team.
+
+</P>
+<P>
+Suppose the line looks as follows:
+
+</P>
+
+<PRE>
+"Plural-Forms: nplurals=3; plural=n%10==1 &#38;&#38; n%100!=11 ? 0 : n%10&#62;=2 &#38;&#38; n"
+"%10&#60;=4 &#38;&#38; (n%100&#60;10 || n%100&#62;=20) ? 1 : 2;\n"
+</PRE>
+
+<P>
+It's logically one line; recall that the PO file formatting is allowed to
+break long lines so that each physical line fits in 80 monospaced columns.
+
+</P>
+<P>
+The value of <CODE>nplurals</CODE> here tells you that there are three plural
+forms.  The first thing you need to do is to ensure that the entry contains
+an <CODE>msgstr</CODE> line for each of the forms:
+
+</P>
+
+<PRE>
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+</PRE>
+
+<P>
+Then translate the <CODE>msgid_plural</CODE> line and fill it in into each
+<CODE>msgstr</CODE> line:
+
+</P>
+
+<PRE>
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] "%d slika uklonjenih"
+msgstr[1] "%d slika uklonjenih"
+msgstr[2] "%d slika uklonjenih"
+</PRE>
+
+<P>
+Now you can refine the translation so that it matches the plural form.
+According to the formula above, <CODE>msgstr[0]</CODE> is used when the number
+ends in 1 but does not end in 11; <CODE>msgstr[1]</CODE> is used when the number
+ends in 2, 3, 4, but not in 12, 13, 14; and <CODE>msgstr[2]</CODE> is used in
+all other cases.  With this knowledge, you can refine the translations:
+
+</P>
+
+<PRE>
+#, c-format
+msgid "One file removed"
+msgid_plural "%d files removed"
+msgstr[0] "%d slika je uklonjena"
+msgstr[1] "%d datoteke uklonjenih"
+msgstr[2] "%d slika uklonjenih"
+</PRE>
+
+<P>
+You noticed that in the English singular form (<CODE>msgid</CODE>) the number
+placeholder could be omitted and replaced by the numeral word “one”.
+Can you do this in your translation as well?
+
+</P>
+
+<PRE>
+msgstr[0] "jednom datotekom je uklonjen"
+</PRE>
+
+<P>
+Well, it depends on whether <CODE>msgstr[0]</CODE> applies only to the number 1,
+or to other numbers as well.  If, according to the plural formula,
+<CODE>msgstr[0]</CODE> applies only to <CODE>n == 1</CODE>, then you can use the
+specialized translation without the number placeholder.  In our case,
+however, <CODE>msgstr[0]</CODE> also applies to the numbers 21, 31, 41, etc.,
+and therefore you cannot omit the placeholder.
+
+</P>
+
+
+<H2><A NAME="SEC210" HREF="gettext_toc.html#TOC210">12.7  Prioritizing messages: How to determine which messages to translate first</A></H2>
 
 <P>
 A translator sometimes has only a limited amount of time per week to
@@ -564,7 +688,7 @@ of messages.
 
 </P>
 <P>
-<A NAME="IDX1076"></A>
+<A NAME="IDX1120"></A>
 Here a more details.  The GNU <CODE>libintl</CODE> library (but not the
 corresponding functions in GNU <CODE>libc</CODE>) supports an environment variable
 <CODE>GETTEXT_LOG_UNTRANSLATED</CODE>.  The GNU <CODE>libintl</CODE> library will

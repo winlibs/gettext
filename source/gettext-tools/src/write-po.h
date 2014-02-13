@@ -1,5 +1,5 @@
 /* GNU gettext - internationalization aids
-   Copyright (C) 1995-1998, 2000-2003, 2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2003, 2006, 2008 Free Software Foundation, Inc.
 
    This file was written by Peter Miller <millerp@canb.auug.org.au>
 
@@ -33,10 +33,12 @@ extern "C" {
 /* These functions are used to output a #, flags line.  */
 extern const char *
        make_format_description_string (enum is_format is_format,
-				       const char *lang, bool debug);
+                                       const char *lang, bool debug);
 extern bool
        significant_format_p (enum is_format is_format);
 
+extern char *
+       make_range_description_string (struct argument_range range);
 
 /* These functions output parts of a message, as comments.  */
 extern void
@@ -45,10 +47,10 @@ extern void
        message_print_comment_dot (const message_ty *mp, ostream_t stream);
 extern void
        message_print_comment_filepos (const message_ty *mp, ostream_t stream,
-				      bool uniforum, size_t page_width);
+                                      bool uniforum, size_t page_width);
 extern void
        message_print_comment_flags (const message_ty *mp, ostream_t stream,
-				    bool debug);
+                                    bool debug);
 
 /* These functions set some parameters for use by 'output_format_po.print'.  */
 extern void

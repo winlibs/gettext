@@ -1,6 +1,6 @@
 /* Return the number of entries in an ACL.
 
-   Copyright (C) 2002, 2003, 2005, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,18 +21,55 @@
 
 #include "acl-internal.h"
 
-/* Return the number of entries in ACL.  */
+/* This file assumes POSIX-draft like ACLs
+   (Linux, FreeBSD, Mac OS X, IRIX, Tru64).  */
+
+/* Return the number of entries in ACL.
+   Return -1 and set errno upon failure to determine it.  */
 
 int
 acl_entries (acl_t acl)
 {
-  char *t;
-  int entries = 0;
-  char *text = acl_to_text (acl, NULL);
-  if (! text)
-    return -1;
-  for (t = text; *t; t++)
-    entries += (*t == '\n');
-  acl_free (text);
-  return entries;
+  int count = 0;
+
+  if (acl != NULL)
+    {
+#if HAVE_ACL_FIRST_ENTRY /* Linux, FreeBSD, Mac OS X */
+# if HAVE_ACL_TYPE_EXTENDED /* Mac OS X */
+      /* acl_get_entry returns 0 when it successfully fetches an entry,
+         and -1/EINVAL at the end.  */
+      acl_entry_t ace;
+      int got_one;
+
+      for (got_one = acl_get_entry (acl, ACL_FIRST_ENTRY, &ace);
+           got_one >= 0;
+           got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
+        count++;
+# else /* Linux, FreeBSD */
+      /* acl_get_entry returns 1 when it successfully fetches an entry,
+         and 0 at the end.  */
+      acl_entry_t ace;
+      int got_one;
+
+      for (got_one = acl_get_entry (acl, ACL_FIRST_ENTRY, &ace);
+           got_one > 0;
+           got_one = acl_get_entry (acl, ACL_NEXT_ENTRY, &ace))
+        count++;
+      if (got_one < 0)
+        return -1;
+# endif
+#else /* IRIX, Tru64 */
+# if HAVE_ACL_TO_SHORT_TEXT /* IRIX */
+      /* Don't use acl_get_entry: it is undocumented.  */
+      count = acl->acl_cnt;
+# endif
+# if HAVE_ACL_FREE_TEXT /* Tru64 */
+      /* Don't use acl_get_entry: it takes only one argument and does not
+         work.  */
+      count = acl->acl_num;
+# endif
+#endif
+    }
+
+  return count;
 }

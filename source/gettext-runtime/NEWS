@@ -1,3 +1,18 @@
+Version 0.18.3 - July 2013
+
+* On Mac OS X systems, the setlocale() function now properly
+  invalidates loaded message catalogs when a locale has been set.
+
+
+Version 0.18 - May 2010
+
+* On MacOS X and Windows systems, <libintl.h> now extends setlocale() and
+  newlocale() so that their determination of the default locale considers
+  the choice the user has made in the system control panels.
+
+* On MacOS X systems, the gettext()/dgettext()/... functions now respect the
+  locale of the current thread, if a thread-specific locale has been set.
+
 Version 0.16.1 - November 2006
 
 * Bug fix in the gettext.m4 autoconf macros.

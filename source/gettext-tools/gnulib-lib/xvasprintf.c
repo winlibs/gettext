@@ -1,5 +1,5 @@
 /* vasprintf and asprintf with out-of-memory checking.
-   Copyright (C) 1999, 2002-2004, 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 1999, 2002-2004, 2006-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,12 +29,7 @@
 /* Checked size_t computations.  */
 #include "xsize.h"
 
-/* Some systems, like OSF/1 4.0 and Woe32, don't have EOVERFLOW.  */
-#ifndef EOVERFLOW
-# define EOVERFLOW E2BIG
-#endif
-
-static inline char *
+static char *
 xstrcat (size_t argcount, va_list args)
 {
   char *result;
@@ -91,23 +86,23 @@ xvasprintf (const char *format, va_list args)
 
     for (f = format;;)
       {
-	if (*f == '\0')
-	  /* Recognized the special case of string concatenation.  */
-	  return xstrcat (argcount, args);
-	if (*f != '%')
-	  break;
-	f++;
-	if (*f != 's')
-	  break;
-	f++;
-	argcount++;
+        if (*f == '\0')
+          /* Recognized the special case of string concatenation.  */
+          return xstrcat (argcount, args);
+        if (*f != '%')
+          break;
+        f++;
+        if (*f != 's')
+          break;
+        f++;
+        argcount++;
       }
   }
 
   if (vasprintf (&result, format, args) < 0)
     {
       if (errno == ENOMEM)
-	xalloc_die ();
+        xalloc_die ();
       return NULL;
     }
 

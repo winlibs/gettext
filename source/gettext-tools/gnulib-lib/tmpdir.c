@@ -1,4 +1,5 @@
-/* Copyright (C) 1999, 2001-2002, 2006 Free Software Foundation, Inc.
+/* Copyright (C) 1999, 2001-2002, 2006, 2009-2013 Free Software Foundation,
+   Inc.
    This file is part of the GNU C Library.
 
    This program is free software: you can redistribute it and/or modify
@@ -32,27 +33,35 @@
 
 #include <stdio.h>
 #ifndef P_tmpdir
-# define P_tmpdir "/tmp"
+# ifdef _P_tmpdir /* native Windows */
+#  define P_tmpdir _P_tmpdir
+# else
+#  define P_tmpdir "/tmp"
+# endif
 #endif
 
 #include <sys/stat.h>
+
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+# define WIN32_LEAN_AND_MEAN  /* avoid including junk */
+# include <windows.h>
+#endif
+
+#include "pathmax.h"
 
 #if _LIBC
 # define struct_stat64 struct stat64
 #else
 # define struct_stat64 struct stat
+# define __secure_getenv secure_getenv
 # define __xstat64(version, path, buf) stat (path, buf)
-#endif
-
-#if ! (HAVE___SECURE_GETENV || _LIBC)
-# define __secure_getenv getenv
 #endif
 
 /* Pathname support.
    ISSLASH(C)           tests whether C is a directory separator character.
  */
 #if defined _WIN32 || defined __WIN32__ || defined __CYGWIN__ || defined __EMX__ || defined __DJGPP__
-  /* Win32, Cygwin, OS/2, DOS */
+  /* Native Windows, Cygwin, OS/2, DOS */
 # define ISSLASH(C) ((C) == '/' || (C) == '\\')
 #else
   /* Unix */
@@ -76,7 +85,7 @@ direxists (const char *dir)
    enough space in TMPL. */
 int
 path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
-	     bool try_tmpdir)
+             bool try_tmpdir)
 {
   const char *d;
   size_t dlen, plen;
@@ -90,35 +99,48 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
     {
       plen = strlen (pfx);
       if (plen > 5)
-	plen = 5;
+        plen = 5;
     }
 
   if (try_tmpdir)
     {
       d = __secure_getenv ("TMPDIR");
       if (d != NULL && direxists (d))
-	dir = d;
+        dir = d;
       else if (dir != NULL && direxists (dir))
-	/* nothing */ ;
+        /* nothing */ ;
       else
-	dir = NULL;
+        dir = NULL;
     }
   if (dir == NULL)
     {
-      if (direxists (P_tmpdir))
-	dir = P_tmpdir;
-      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
-	dir = "/tmp";
+#if (defined _WIN32 || defined __WIN32__) && ! defined __CYGWIN__
+      char dirbuf[PATH_MAX];
+      DWORD retval;
+
+      /* Find Windows temporary file directory.
+         We try this before P_tmpdir because Windows defines P_tmpdir to "\\"
+         and will therefore try to put all temporary files in the root
+         directory (unless $TMPDIR is set).  */
+      retval = GetTempPath (PATH_MAX, dirbuf);
+      if (retval > 0 && retval < PATH_MAX && direxists (dirbuf))
+        dir = dirbuf;
       else
-	{
-	  __set_errno (ENOENT);
-	  return -1;
-	}
+#endif
+      if (direxists (P_tmpdir))
+        dir = P_tmpdir;
+      else if (strcmp (P_tmpdir, "/tmp") != 0 && direxists ("/tmp"))
+        dir = "/tmp";
+      else
+        {
+          __set_errno (ENOENT);
+          return -1;
+        }
     }
 
   dlen = strlen (dir);
   while (dlen >= 1 && ISSLASH (dir[dlen - 1]))
-    dlen--;			/* remove trailing slashes */
+    dlen--;                     /* remove trailing slashes */
 
   /* check we have room for "${dir}/${pfx}XXXXXX\0" */
   if (tmpl_len < dlen + 1 + plen + 6 + 1)

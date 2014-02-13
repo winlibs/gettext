@@ -1,5 +1,5 @@
 /* List of exported symbols of libgettextsrc on Cygwin.
-   Copyright (C) 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009, 2011 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -19,6 +19,7 @@
 
 VARIABLE(allow_duplicates)
 VARIABLE(color_mode)
+VARIABLE(color_test_mode)
 VARIABLE(format_language)
 VARIABLE(format_language_pretty)
 VARIABLE(formatstring_awk)
@@ -27,10 +28,13 @@ VARIABLE(formatstring_c)
 VARIABLE(formatstring_csharp)
 VARIABLE(formatstring_elisp)
 VARIABLE(formatstring_gcc_internal)
+VARIABLE(formatstring_gfc_internal)
 VARIABLE(formatstring_java)
+VARIABLE(formatstring_javascript)
 VARIABLE(formatstring_kde)
 VARIABLE(formatstring_librep)
 VARIABLE(formatstring_lisp)
+VARIABLE(formatstring_lua)
 VARIABLE(formatstring_objc)
 VARIABLE(formatstring_parsers)
 VARIABLE(formatstring_pascal)
@@ -38,7 +42,9 @@ VARIABLE(formatstring_perl)
 VARIABLE(formatstring_perl_brace)
 VARIABLE(formatstring_php)
 VARIABLE(formatstring_python)
+VARIABLE(formatstring_python_brace)
 VARIABLE(formatstring_qt)
+VARIABLE(formatstring_qt_plural)
 VARIABLE(formatstring_scheme)
 VARIABLE(formatstring_sh)
 VARIABLE(formatstring_smalltalk)

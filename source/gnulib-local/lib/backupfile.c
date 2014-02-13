@@ -1,5 +1,5 @@
 /* backupfile.c -- make Emacs style backup file names
-   Copyright (C) 1990-1999, 2000-2003, 2005-2006 Free Software Foundation, Inc.
+   Copyright (C) 1990-1999, 2000-2003, 2005-2006, 2012 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@
    - It's typically faster.
    Posix 1003.2-1992 section 2.5.2.1 page 50 lines 1556-1558 says that
    only '0' through '9' are digits.  Prefer ISDIGIT to isdigit unless
-   it's important to use the locale's definition of `digit' even when the
+   it's important to use the locale's definition of 'digit' even when the
    host does not conform to Posix.  */
 #define ISDIGIT(c) ((unsigned) (c) - '0' <= 9)
 
@@ -90,33 +90,33 @@ find_backup_file_name (const char *file, enum backup_type backup_type)
   char *s;
   const char *suffix = simple_backup_suffix;
 
-  /* Allow room for simple or `.~N~' backups.  */
+  /* Allow room for simple or '.~N~' backups.  */
   backup_suffix_size_max = strlen (simple_backup_suffix) + 1;
   if (HAVE_DIR && backup_suffix_size_max < numbered_suffix_size_max)
     backup_suffix_size_max = numbered_suffix_size_max;
 
   s = (char *) malloc (file_len + backup_suffix_size_max
-		       + numbered_suffix_size_max);
+                       + numbered_suffix_size_max);
   if (s)
     {
       strcpy (s, file);
 
 #if HAVE_DIR
       if (backup_type != simple)
-	{
-	  int highest_backup;
-	  size_t dir_len = basename (s) - s;
+        {
+          int highest_backup;
+          size_t dir_len = basename (s) - s;
 
-	  strcpy (s + dir_len, ".");
-	  highest_backup = max_backup_version (file + dir_len, s);
-	  if (! (backup_type == numbered_existing && highest_backup == 0))
-	    {
-	      char *numbered_suffix = s + (file_len + backup_suffix_size_max);
-	      sprintf (numbered_suffix, ".~%d~", highest_backup + 1);
-	      suffix = numbered_suffix;
-	    }
-	  strcpy (s, file);
-	}
+          strcpy (s + dir_len, ".");
+          highest_backup = max_backup_version (file + dir_len, s);
+          if (! (backup_type == numbered_existing && highest_backup == 0))
+            {
+              char *numbered_suffix = s + (file_len + backup_suffix_size_max);
+              sprintf (numbered_suffix, ".~%d~", highest_backup + 1);
+              suffix = numbered_suffix;
+            }
+          strcpy (s, file);
+        }
 #endif /* HAVE_DIR */
 
       addext (s, suffix, '~');
@@ -150,11 +150,11 @@ max_backup_version (const char *file, const char *dir)
   while ((dp = readdir (dirp)) != 0)
     {
       if (!REAL_DIR_ENTRY (dp) || strlen (dp->d_name) < file_name_length + 4)
-	continue;
+        continue;
 
       this_version = version_number (file, dp->d_name, file_name_length);
       if (this_version > highest_version)
-	highest_version = this_version;
+        highest_version = this_version;
     }
   if (closedir (dirp))
     return 0;
@@ -177,9 +177,9 @@ version_number (const char *base, const char *backup, size_t base_length)
       && backup[base_length + 1] == '~')
     {
       for (p = &backup[base_length + 2]; ISDIGIT (*p); ++p)
-	version = version * 10 + *p - '0';
+        version = version * 10 + *p - '0';
       if (p[0] != '~' || p[1])
-	version = 0;
+        version = 0;
     }
   return version;
 }

@@ -62,7 +62,7 @@ tmpfiles="$tmpfiles mm-test14.tmp mm-test14.out"
 : ${MSGMERGE=msgmerge}
 ${MSGMERGE} -q -o mm-test14.tmp mm-test14-ru.po mm-test14.pot
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
-tr -d '\r' < mm-test14.tmp > mm-test14.out
+LC_ALL=C tr -d '\r' < mm-test14.tmp > mm-test14.out
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
 
 tmpfiles="$tmpfiles mm-test14.ok"
@@ -79,6 +79,7 @@ msgstr ""
 "PO-Revision-Date: 2002-11-01 01:23+0100\n"
 "Last-Translator: Arseny Slobodjuck <ampy@ich.dvo.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

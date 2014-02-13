@@ -146,6 +146,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ProgramDataBaseFileName>$(IntDir)libintl_debug.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <OutputFile>x64\Debug\libintl_debug.dll</OutputFile>
@@ -154,6 +155,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
+      <ProgramDatabaseFile>$(OutDir)libintl_debug.pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(OutDir)libintl_debug.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

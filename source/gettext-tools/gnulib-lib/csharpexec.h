@@ -1,5 +1,5 @@
 /* Execute a C# program.
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -21,8 +21,8 @@
 #include <stdbool.h>
 
 typedef bool execute_fn (const char *progname,
-			 const char *prog_path, char **prog_argv,
-			 void *private_data);
+                         const char *prog_path, char **prog_argv,
+                         void *private_data);
 
 /* Execute a C# program.
    assembly_path is the assembly's pathname (= program name with .exe).
@@ -34,10 +34,10 @@ typedef bool execute_fn (const char *progname,
    Return false if OK, true on error.
    If quiet, error messages will not be printed.  */
 extern bool execute_csharp_program (const char *assembly_path,
-				    const char * const *libdirs,
-				    unsigned int libdirs_count,
-				    const char * const *args,
-				    bool verbose, bool quiet,
-				    execute_fn *executer, void *private_data);
+                                    const char * const *libdirs,
+                                    unsigned int libdirs_count,
+                                    const char * const *args,
+                                    bool verbose, bool quiet,
+                                    execute_fn *executer, void *private_data);
 
 #endif /* _CSHARPEXEC_H */

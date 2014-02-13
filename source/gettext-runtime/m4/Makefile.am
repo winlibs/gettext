@@ -3,8 +3,8 @@
 # Generate this list with
 # find . -type f -name '*.m4' -printf '%f\n' | sort | tr '\012' @ | sed 's/@$/%/;s/@/ \\@/g' | tr @% '\012\012'
 EXTRA_DIST = README \
-ansi-c++.m4 \
 codeset.m4 \
+fcntl-o.m4 \
 gettext.m4 \
 glibc2.m4 \
 glibc21.m4 \
@@ -25,6 +25,7 @@ printf-posix.m4 \
 progtest.m4 \
 size_max.m4 \
 stdint_h.m4 \
+threadlib.m4 \
 uintmax_t.m4 \
 visibility.m4 \
 wchar_t.m4 \

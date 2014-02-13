@@ -1,5 +1,5 @@
 /* Test program, used by the format-c-3 test.
-   Copyright (C) 2002 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2009 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,6 +31,11 @@
 #undef _LIBINTL_H
 #include "libgnuintl.h"
 
+/* Disable the override of setlocale that libgnuintl.h activates on MacOS X
+   and Windows.  This test relies on the fake setlocale function in
+   setlocale.c.  */
+#undef setlocale
+
 #define _(string) gettext (string)
 
 /* Fallback definition.  */
@@ -56,14 +61,14 @@ main (int argc, char *argv[])
     }
 
   textdomain ("fc3");
-  bindtextdomain ("fc3", ".");
+  bindtextdomain ("fc3", "fc3-dir");
 
   s = gettext ("father of %"PRId8" children");
   c1 = "Vater von %"; c2 = " Kindern";
 
   if (!(strlen (s) > strlen (c1) + strlen (c2)
-	&& memcmp (s, c1, strlen (c1)) == 0
-	&& memcmp (s + strlen (s) - strlen (c2), c2, strlen (c2)) == 0))
+        && memcmp (s, c1, strlen (c1)) == 0
+        && memcmp (s + strlen (s) - strlen (c2), c2, strlen (c2)) == 0))
     {
       fprintf (stderr, "String not translated.\n");
       exit (1);

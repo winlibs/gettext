@@ -1,5 +1,5 @@
 /* Java CLASSPATH handling.
-   Copyright (C) 2003 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -21,13 +21,13 @@
    the current CLASSPATH value.   If use_minimal_classpath, the current
    CLASSPATH is ignored.  */
 extern char * new_classpath (const char * const *classpaths,
-			     unsigned int classpaths_count,
-			     bool use_minimal_classpath);
+                             unsigned int classpaths_count,
+                             bool use_minimal_classpath);
 
 /* Set CLASSPATH and returns a safe copy of its old value.  */
 extern char * set_classpath (const char * const *classpaths,
-			     unsigned int classpaths_count,
-			     bool use_minimal_classpath, bool verbose);
+                             unsigned int classpaths_count,
+                             bool use_minimal_classpath, bool verbose);
 
 /* Restore CLASSPATH to its previous value.  */
 extern void reset_classpath (char *old_classpath);

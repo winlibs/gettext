@@ -1,5 +1,5 @@
 /* Test of execution of program termination handlers.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,12 +19,16 @@
 #include <config.h>
 
 #include <stdlib.h>
+
+#include "signature.h"
+SIGNATURE_CHECK (atexit, int, (void (*) (void)));
+
 #include <unistd.h>
 
 #define TEMPFILE "t-atexit.tmp"
 
 static void
-clear_temp_file ()
+clear_temp_file (void)
 {
   unlink (TEMPFILE);
 }

@@ -4,10 +4,11 @@
 
 aclocaldir = @aclocaldir@
 aclocal_DATA = \
-  ../../autoconf-lib-link/m4/lib-ld.m4 \
-  ../../autoconf-lib-link/m4/lib-link.m4 \
-  ../../autoconf-lib-link/m4/lib-prefix.m4 \
+  ../../gettext-runtime/gnulib-m4/lib-ld.m4 \
+  ../../gettext-runtime/gnulib-m4/lib-link.m4 \
+  ../../gettext-runtime/gnulib-m4/lib-prefix.m4 \
   ../../gettext-runtime/m4/codeset.m4 \
+  ../../gettext-runtime/m4/fcntl-o.m4 \
   ../../gettext-runtime/m4/gettext.m4 \
   ../../gettext-runtime/m4/glibc2.m4 \
   ../../gettext-runtime/m4/glibc21.m4 \
@@ -28,6 +29,7 @@ aclocal_DATA = \
   ../../gettext-runtime/m4/progtest.m4 \
   ../../gettext-runtime/m4/size_max.m4 \
   ../../gettext-runtime/m4/stdint_h.m4 \
+  ../../gettext-runtime/m4/threadlib.m4 \
   ../../gettext-runtime/m4/uintmax_t.m4 \
   ../../gettext-runtime/m4/visibility.m4 \
   ../../gettext-runtime/m4/wchar_t.m4 \
@@ -44,9 +46,7 @@ examplesbuildaux_DATA = \
 # Generate this list with
 # find . -type f -name '*.m4' -printf '%f\n' | sort | tr '\012' @ | sed 's/@$/%/;s/@/ \\@/g' | tr @% '\012\012'
 EXTRA_DIST = README csharpexec-test.exe \
+exported.m4 \
 hostname.m4 \
-libgrep.m4 \
-locale-ja.m4 \
-regex.m4 \
 setlocale.m4 \
 siginfo.m4

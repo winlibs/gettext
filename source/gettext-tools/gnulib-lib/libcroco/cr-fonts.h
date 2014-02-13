@@ -4,7 +4,7 @@
  * This file is part of The Croco Library
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of version 2.1 of 
+ * modify it under the terms of version 3 of 
  * the GNU General Public
  * License as published by the Free Software Foundation.
  *

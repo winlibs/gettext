@@ -1,5 +1,5 @@
 /* GNU gettext - internationalization aids
-   Copyright (C) 1995-1998, 2000-2007 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2010, 2012 Free Software Foundation, Inc.
    This file was written by Peter Miller <millerp@canb.auug.org.au>
 
    This program is free software: you can redistribute it and/or modify
@@ -38,7 +38,10 @@
 #include "read-po.h"
 #include "read-properties.h"
 #include "read-stringtable.h"
+#include "xmalloca.h"
+#include "po-charset.h"
 #include "msgl-iconv.h"
+#include "msgl-fsearch.h"
 #include "c-strstr.h"
 #include "c-strcase.h"
 #include "propername.h"
@@ -49,6 +52,9 @@
 
 /* Apply the .pot file to each of the domains in the PO file.  */
 static bool multi_domain_mode = false;
+
+/* Determines whether to use fuzzy matching.  */
+static bool use_fuzzy_matching = true;
 
 /* Whether to consider fuzzy messages as translations.  */
 static bool include_fuzzies = false;
@@ -62,6 +68,7 @@ static const struct option long_options[] =
   { "directory", required_argument, NULL, 'D' },
   { "help", no_argument, NULL, 'h' },
   { "multi-domain", no_argument, NULL, 'm' },
+  { "no-fuzzy-matching", no_argument, NULL, 'N' },
   { "properties-input", no_argument, NULL, 'P' },
   { "stringtable-input", no_argument, NULL, CHAR_MAX + 1 },
   { "use-fuzzy", no_argument, NULL, CHAR_MAX + 2 },
@@ -74,11 +81,11 @@ static const struct option long_options[] =
 /* Forward declaration of local functions.  */
 static void usage (int status)
 #if defined __GNUC__ && ((__GNUC__ == 2 && __GNUC_MINOR__ >= 5) || __GNUC__ > 2)
-	__attribute__ ((noreturn))
+        __attribute__ ((noreturn))
 #endif
 ;
 static void compare (const char *fn1, const char *fn2,
-		     catalog_input_format_ty input_syntax);
+                     catalog_input_format_ty input_syntax);
 
 
 int
@@ -109,48 +116,52 @@ main (int argc, char *argv[])
 
   do_help = false;
   do_version = false;
-  while ((optchar = getopt_long (argc, argv, "D:hmPV", long_options, NULL))
-	 != EOF)
+  while ((optchar = getopt_long (argc, argv, "D:hmNPV", long_options, NULL))
+         != EOF)
     switch (optchar)
       {
-      case '\0':		/* long option */
-	break;
+      case '\0':                /* long option */
+        break;
 
       case 'D':
-	dir_list_append (optarg);
-	break;
+        dir_list_append (optarg);
+        break;
 
       case 'h':
-	do_help = true;
-	break;
+        do_help = true;
+        break;
 
       case 'm':
-	multi_domain_mode = true;
-	break;
+        multi_domain_mode = true;
+        break;
+
+      case 'N':
+        use_fuzzy_matching = false;
+        break;
 
       case 'P':
-	input_syntax = &input_format_properties;
-	break;
+        input_syntax = &input_format_properties;
+        break;
 
       case 'V':
-	do_version = true;
-	break;
+        do_version = true;
+        break;
 
-      case CHAR_MAX + 1:	/* --stringtable-input */
-	input_syntax = &input_format_stringtable;
-	break;
+      case CHAR_MAX + 1:        /* --stringtable-input */
+        input_syntax = &input_format_stringtable;
+        break;
 
-      case CHAR_MAX + 2:	/* --use-fuzzy */
-	include_fuzzies = true;
-	break;
+      case CHAR_MAX + 2:        /* --use-fuzzy */
+        include_fuzzies = true;
+        break;
 
-      case CHAR_MAX + 3:	/* --use-untranslated */
-	include_untranslated = true;
-	break;
+      case CHAR_MAX + 3:        /* --use-untranslated */
+        include_untranslated = true;
+        break;
 
       default:
-	usage (EXIT_FAILURE);
-	break;
+        usage (EXIT_FAILURE);
+        break;
       }
 
   /* Version information is requested.  */
@@ -163,7 +174,7 @@ License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 "),
-	      "1995-1998, 2000-2007");
+              "1995-1998, 2000-2010");
       printf (_("Written by %s.\n"), proper_name ("Peter Miller"));
       exit (EXIT_SUCCESS);
     }
@@ -195,8 +206,8 @@ static void
 usage (int status)
 {
   if (status != EXIT_SUCCESS)
-    fprintf (stderr, _("Try `%s --help' for more information.\n"),
-	     program_name);
+    fprintf (stderr, _("Try '%s --help' for more information.\n"),
+             program_name);
   else
     {
       printf (_("\
@@ -229,6 +240,8 @@ Input file location:\n"));
 Operation modifiers:\n"));
       printf (_("\
   -m, --multi-domain          apply ref.pot to each of the domains in def.po\n"));
+      printf (_("\
+  -N, --no-fuzzy-matching     do not use fuzzy matching\n"));
       printf (_("\
       --use-fuzzy             consider fuzzy entries\n"));
       printf (_("\
@@ -287,8 +300,10 @@ remove_obsoletes (msgdomain_list_ty *mdlp)
 
 static void
 match_domain (const char *fn1, const char *fn2,
-	      message_list_ty *defmlp, message_list_ty *refmlp,
-	      int *nerrors)
+              message_list_ty *defmlp, message_fuzzy_index_ty **defmlp_findex,
+              const char *def_canon_charset,
+              message_list_ty *refmlp,
+              int *nerrors)
 {
   size_t j;
 
@@ -302,43 +317,66 @@ match_domain (const char *fn1, const char *fn2,
       /* See if it is in the other file.  */
       defmsg = message_list_search (defmlp, refmsg->msgctxt, refmsg->msgid);
       if (defmsg)
-	{
-	  if (!include_untranslated && defmsg->msgstr[0] == '\0')
-	    {
-	      (*nerrors)++;
-	      po_gram_error_at_line (&defmsg->pos, _("\
+        {
+          if (!include_untranslated && defmsg->msgstr[0] == '\0')
+            {
+              (*nerrors)++;
+              po_gram_error_at_line (&defmsg->pos, _("\
 this message is untranslated"));
-	    }
-	  else if (!include_fuzzies && defmsg->is_fuzzy && !is_header (defmsg))
-	    {
-	      (*nerrors)++;
-	      po_gram_error_at_line (&defmsg->pos, _("\
+            }
+          else if (!include_fuzzies && defmsg->is_fuzzy && !is_header (defmsg))
+            {
+              (*nerrors)++;
+              po_gram_error_at_line (&defmsg->pos, _("\
 this message needs to be reviewed by the translator"));
-	    }
-	  else
-	    defmsg->used = 1;
-	}
+            }
+          else
+            defmsg->used = 1;
+        }
       else
-	{
-	  /* If the message was not defined at all, try to find a very
-	     similar message, it could be a typo, or the suggestion may
-	     help.  */
-	  (*nerrors)++;
-	  defmsg =
-	    message_list_search_fuzzy (defmlp, refmsg->msgctxt, refmsg->msgid);
-	  if (defmsg)
-	    {
-	      po_gram_error_at_line (&refmsg->pos, _("\
+        {
+          /* If the message was not defined at all, try to find a very
+             similar message, it could be a typo, or the suggestion may
+             help.  */
+          (*nerrors)++;
+          if (use_fuzzy_matching)
+            {
+              if (false)
+                {
+                  /* Old, slow code.  */
+                  defmsg =
+                    message_list_search_fuzzy (defmlp,
+                                               refmsg->msgctxt, refmsg->msgid);
+                }
+              else
+                {
+                  /* Speedup through early abort in fstrcmp(), combined with
+                     pre-sorting of the messages through a hashed index.  */
+                  /* Create the fuzzy index lazily.  */
+                  if (*defmlp_findex == NULL)
+                    *defmlp_findex =
+                      message_fuzzy_index_alloc (defmlp, def_canon_charset);
+                  defmsg =
+                    message_fuzzy_index_search (*defmlp_findex,
+                                                refmsg->msgctxt, refmsg->msgid,
+                                                FUZZY_THRESHOLD, false);
+                }
+            }
+          else
+            defmsg = NULL;
+          if (defmsg)
+            {
+              po_gram_error_at_line (&refmsg->pos, _("\
 this message is used but not defined..."));
-	      error_message_count--;
-	      po_gram_error_at_line (&defmsg->pos, _("\
+              error_message_count--;
+              po_gram_error_at_line (&defmsg->pos, _("\
 ...but this definition is similar"));
-	      defmsg->used = 1;
-	    }
-	  else
-	    po_gram_error_at_line (&refmsg->pos, _("\
+              defmsg->used = 1;
+            }
+          else
+            po_gram_error_at_line (&refmsg->pos, _("\
 this message is used but not defined in %s"), fn1);
-	}
+        }
     }
 }
 
@@ -350,6 +388,7 @@ compare (const char *fn1, const char *fn2, catalog_input_format_ty input_syntax)
   msgdomain_list_ty *ref;
   int nerrors;
   size_t j, k;
+  const char *def_canon_charset;
   message_list_ty *empty_list;
 
   /* This is the master file, created by a human.  */
@@ -365,33 +404,82 @@ compare (const char *fn1, const char *fn2, catalog_input_format_ty input_syntax)
     bool was_utf8 = false;
     for (k = 0; k < ref->nitems; k++)
       {
-	message_list_ty *mlp = ref->item[k]->messages;
+        message_list_ty *mlp = ref->item[k]->messages;
 
-	for (j = 0; j < mlp->nitems; j++)
-	  if (is_header (mlp->item[j]) /* && !mlp->item[j]->obsolete */)
-	    {
-	      const char *header = mlp->item[j]->msgstr;
+        for (j = 0; j < mlp->nitems; j++)
+          if (is_header (mlp->item[j]) /* && !mlp->item[j]->obsolete */)
+            {
+              const char *header = mlp->item[j]->msgstr;
 
-	      if (header != NULL)
-		{
-		  const char *charsetstr = c_strstr (header, "charset=");
+              if (header != NULL)
+                {
+                  const char *charsetstr = c_strstr (header, "charset=");
 
-		  if (charsetstr != NULL)
-		    {
-		      size_t len;
+                  if (charsetstr != NULL)
+                    {
+                      size_t len;
 
-		      charsetstr += strlen ("charset=");
-		      len = strcspn (charsetstr, " \t\n");
-		      if (len == strlen ("UTF-8")
-			  && c_strncasecmp (charsetstr, "UTF-8", len) == 0)
-			was_utf8 = true;
-		    }
-		}
-	    }
-	}
+                      charsetstr += strlen ("charset=");
+                      len = strcspn (charsetstr, " \t\n");
+                      if (len == strlen ("UTF-8")
+                          && c_strncasecmp (charsetstr, "UTF-8", len) == 0)
+                        was_utf8 = true;
+                    }
+                }
+            }
+        }
     if (was_utf8)
       def = iconv_msgdomain_list (def, "UTF-8", true, fn1);
   }
+
+  /* Determine canonicalized encoding name of the definitions now, after
+     conversion.  Only used for fuzzy matching.  */
+  if (use_fuzzy_matching)
+    {
+      def_canon_charset = def->encoding;
+      if (def_canon_charset == NULL)
+        {
+          char *charset = NULL;
+
+          /* Get the encoding of the definitions file.  */
+          for (k = 0; k < def->nitems; k++)
+            {
+              message_list_ty *mlp = def->item[k]->messages;
+
+              for (j = 0; j < mlp->nitems; j++)
+                if (is_header (mlp->item[j]) && !mlp->item[j]->obsolete)
+                  {
+                    const char *header = mlp->item[j]->msgstr;
+
+                    if (header != NULL)
+                      {
+                        const char *charsetstr = c_strstr (header, "charset=");
+
+                        if (charsetstr != NULL)
+                          {
+                            size_t len;
+
+                            charsetstr += strlen ("charset=");
+                            len = strcspn (charsetstr, " \t\n");
+                            charset = (char *) xmalloca (len + 1);
+                            memcpy (charset, charsetstr, len);
+                            charset[len] = '\0';
+                            break;
+                          }
+                      }
+                  }
+              if (charset != NULL)
+                break;
+            }
+          if (charset != NULL)
+            def_canon_charset = po_charset_canonicalize (charset);
+          if (def_canon_charset == NULL)
+            /* Unspecified encoding.  Assume unibyte encoding.  */
+            def_canon_charset = po_charset_ascii;
+        }
+    }
+  else
+    def_canon_charset = NULL;
 
   empty_list = message_list_alloc (false);
 
@@ -401,30 +489,45 @@ compare (const char *fn1, const char *fn2, catalog_input_format_ty input_syntax)
   if (!multi_domain_mode)
     for (k = 0; k < ref->nitems; k++)
       {
-	const char *domain = ref->item[k]->domain;
-	message_list_ty *refmlp = ref->item[k]->messages;
-	message_list_ty *defmlp;
+        const char *domain = ref->item[k]->domain;
+        message_list_ty *refmlp = ref->item[k]->messages;
+        message_list_ty *defmlp;
+        message_fuzzy_index_ty *defmlp_findex;
 
-	defmlp = msgdomain_list_sublist (def, domain, false);
-	if (defmlp == NULL)
-	  defmlp = empty_list;
+        defmlp = msgdomain_list_sublist (def, domain, false);
+        if (defmlp == NULL)
+          defmlp = empty_list;
 
-	match_domain (fn1, fn2, defmlp, refmlp, &nerrors);
+        defmlp_findex = NULL;
+
+        match_domain (fn1, fn2, defmlp, &defmlp_findex, def_canon_charset,
+                      refmlp, &nerrors);
+
+        if (defmlp_findex != NULL)
+          message_fuzzy_index_free (defmlp_findex);
       }
   else
     {
       /* Apply the references messages in the default domain to each of
-	 the definition domains.  */
+         the definition domains.  */
       message_list_ty *refmlp = ref->item[0]->messages;
 
       for (k = 0; k < def->nitems; k++)
-	{
-	  message_list_ty *defmlp = def->item[k]->messages;
+        {
+          message_list_ty *defmlp = def->item[k]->messages;
 
-	  /* Ignore the default message domain if it has no messages.  */
-	  if (k > 0 || defmlp->nitems > 0)
-	    match_domain (fn1, fn2, defmlp, refmlp, &nerrors);
-	}
+          /* Ignore the default message domain if it has no messages.  */
+          if (k > 0 || defmlp->nitems > 0)
+            {
+              message_fuzzy_index_ty *defmlp_findex = NULL;
+
+              match_domain (fn1, fn2, defmlp, &defmlp_findex, def_canon_charset,
+                            refmlp, &nerrors);
+
+              if (defmlp_findex != NULL)
+                message_fuzzy_index_free (defmlp_findex);
+            }
+        }
     }
 
   /* Look for messages in the definition file, which are not present
@@ -435,18 +538,18 @@ compare (const char *fn1, const char *fn2, catalog_input_format_ty input_syntax)
       message_list_ty *defmlp = def->item[k]->messages;
 
       for (j = 0; j < defmlp->nitems; j++)
-	{
-	  message_ty *defmsg = defmlp->item[j];
+        {
+          message_ty *defmsg = defmlp->item[j];
 
-	  if (!defmsg->used)
-	    po_gram_error_at_line (&defmsg->pos,
-				   _("warning: this message is not used"));
-	}
+          if (!defmsg->used)
+            po_gram_error_at_line (&defmsg->pos,
+                                   _("warning: this message is not used"));
+        }
     }
 
   /* Exit with status 1 on any error.  */
   if (nerrors > 0)
     error (EXIT_FAILURE, 0,
-	   ngettext ("found %d fatal error", "found %d fatal errors", nerrors),
-	   nerrors);
+           ngettext ("found %d fatal error", "found %d fatal errors", nerrors),
+           nerrors);
 }

@@ -39,6 +39,12 @@ COPYRIGHT_HOLDER = Yoyodyne, Inc.
 # which the translators can contact you.
 MSGID_BUGS_ADDRESS = bug-gnu-gettext@gnu.org
 
+# These options get passed to msgmerge.
+# Useful options are in particular:
+#   --previous            to keep previous msgids of translated messages,
+#   --quiet               to reduce the verbosity.
+MSGMERGE_OPTIONS = --quiet
+
 MSGMERGE = msgmerge
 MSGMERGE_UPDATE = @MSGMERGE@ --update
 MSGCAT = msgcat
@@ -158,8 +164,15 @@ $(POFILES): $(srcdir)/$(DOMAIN).pot
 	@lang=`echo $@ | sed -e 's,.*/,,' -e 's/\.po$$//'`; \
 	if test -f "$(srcdir)/$${lang}.po"; then \
 	  test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
-	  echo "$${cdcmd}$(MSGMERGE_UPDATE) $${lang}.po $(DOMAIN).pot"; \
-	  cd $(srcdir) && $(MSGMERGE_UPDATE) $${lang}.po $(DOMAIN).pot; \
+	  echo "$${cdcmd}$(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot"; \
+	  cd $(srcdir) \
+	    && { case `$(MSGMERGE_UPDATE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	           '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) $${lang}.po $(DOMAIN).pot;; \
+	           *) \
+	             $(MSGMERGE_UPDATE) $(MSGMERGE_OPTIONS) --lang=$${lang} $${lang}.po $(DOMAIN).pot;; \
+	         esac; \
+	       }; \
 	else \
 	  $(MAKE) $${lang}.po-create; \
 	fi
@@ -206,9 +219,15 @@ update-po: Makefile
 	tmpdir=`pwd`; \
 	echo "$$lang:"; \
 	test "$(srcdir)" = . && cdcmd="" || cdcmd="cd $(srcdir) && "; \
-	echo "$${cdcmd}$(MSGMERGE) $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
+	echo "$${cdcmd}$(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang $$lang.po $(DOMAIN).pot -o $$lang.new.po"; \
 	cd $(srcdir); \
-	if $(MSGMERGE) $$lang.po $(DOMAIN).pot -o $$tmpdir/$$lang.new.po; then \
+	if { case `$(MSGMERGE) --version | sed 1q | sed -e 's,^[^0-9]*,,'` in \
+	       '' | 0.[0-9] | 0.[0-9].* | 0.1[0-7] | 0.1[0-7].*) \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	       *) \
+	         $(MSGMERGE) $(MSGMERGE_OPTIONS) --lang=$$lang -o $$tmpdir/$$lang.new.po $$lang.po $(DOMAIN).pot;; \
+	     esac; \
+	   }; then \
 	  if cmp $$lang.po $$tmpdir/$$lang.new.po >/dev/null 2>&1; then \
 	    rm -f $$tmpdir/$$lang.new.po; \
 	  else \
@@ -231,8 +250,8 @@ update-properties: Makefile $(DOMAIN).pot $(POFILES)
 	$(MSGINIT) -i $(DOMAIN).pot --no-translator -l en --properties-output -o $(top_srcdir)/$(DOMAIN).properties || { rm -f $(top_srcdir)/$(DOMAIN).properties; exit 1; }
 	@for f in $(POFILES); do \
 	  lang=`echo $$f | sed -e 's,.*/,,' -e 's,\.po$$,,'`; \
-	  echo "$(GMSGFMT) -c --statistics -o /dev/null $(srcdir)/$${lang}.po"; \
-	  $(GMSGFMT) -c --statistics -o /dev/null $(srcdir)/$${lang}.po || exit 1; \
+	  echo "$(GMSGFMT) -c --statistics --verbose -o /dev/null $(srcdir)/$${lang}.po"; \
+	  $(GMSGFMT) -c --statistics --verbose -o /dev/null $(srcdir)/$${lang}.po || exit 1; \
 	  echo "$(MSGCAT) --properties-output -o $(top_srcdir)/$(DOMAIN)_$$lang.properties $(srcdir)/$${lang}.po"; \
 	  $(MSGCAT) --properties-output -o $(top_srcdir)/$(DOMAIN)_$$lang.properties.tmp $(srcdir)/$${lang}.po || exit 1; \
 	  mv $(top_srcdir)/$(DOMAIN)_$$lang.properties.tmp $(top_srcdir)/$(DOMAIN)_$$lang.properties || exit 1; \
@@ -244,8 +263,8 @@ update-classes: Makefile $(DOMAIN).pot $(POFILES)
 	$(MSGINIT) -i $(DOMAIN).pot --no-translator -l en --properties-output -o $(top_srcdir)/$(DOMAIN).properties || { rm -f $(top_srcdir)/$(DOMAIN).properties; exit 1; }
 	@for f in $(POFILES); do \
 	  lang=`echo $$f | sed -e 's,.*/,,' -e 's,\.po$$,,'`; \
-	  echo "$(GMSGFMT) -c --statistics -j -d $(top_srcdir) -r $(DOMAIN) -l $${lang} $(srcdir)/$${lang}.po"; \
-	  $(GMSGFMT) -c --statistics -j -d $(top_srcdir) -r $(DOMAIN) -l $${lang} $(srcdir)/$${lang}.po || exit 1; \
+	  echo "$(GMSGFMT) -c --statistics --verbose -j -d $(top_srcdir) -r $(DOMAIN) -l $${lang} $(srcdir)/$${lang}.po"; \
+	  $(GMSGFMT) -c --statistics --verbose -j -d $(top_srcdir) -r $(DOMAIN) -l $${lang} $(srcdir)/$${lang}.po || exit 1; \
 	done
 
 echo-catalogs:

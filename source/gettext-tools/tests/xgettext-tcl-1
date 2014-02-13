@@ -28,7 +28,9 @@ tmpfiles="$tmpfiles xg-t-1.err xg-t-1.tmp xg-t-1.pot"
 : ${XGETTEXT=xgettext}
 ${XGETTEXT} --add-comments --no-location -k_ -o xg-t-1.tmp xg-t-1.tcl 2>xg-t-1.err
 test $? = 0 || { cat xg-t-1.err; rm -fr $tmpfiles; exit 1; }
-grep -v 'POT-Creation-Date' < xg-t-1.tmp | tr -d '\r' > xg-t-1.pot
+# Don't simplify this to "grep ... < xg-t-1.tmp", otherwise OpenBSD 4.0 grep
+# only outputs "Binary file (standard input) matches".
+cat xg-t-1.tmp | grep -v 'POT-Creation-Date' | LC_ALL=C tr -d '\r' > xg-t-1.pot
 
 tmpfiles="$tmpfiles xg-t-1.ok"
 cat <<\EOF > xg-t-1.ok
@@ -45,6 +47,7 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"

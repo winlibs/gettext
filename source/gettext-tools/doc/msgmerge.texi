@@ -155,6 +155,25 @@ Assume the input files are NeXTstep/GNUstep localized resource files in
 @c --no-escape and --escape omitted on purpose.  They are not useful.
 
 @table @samp
+@item --lang=@var{catalogname}
+@opindex --lang@r{, @code{msgmerge} option}
+Specify the @samp{Language} field to be used in the header entry.  See
+@ref{Header Entry} for the meaning of this field.  Note: The
+@samp{Language-Team} and @samp{Plural-Forms} fields are left unchanged.
+If this option is not specified, the @samp{Language} field is inferred, as
+best as possible, from the @samp{Language-Team} field.
+
+@item --color
+@itemx --color=@var{when}
+@opindex --color@r{, @code{msgmerge} option}
+Specify whether or when to use colors and other text attributes.
+See @ref{The --color option} for details.
+
+@item --style=@var{style_file}
+@opindex --style@r{, @code{msgmerge} option}
+Specify the CSS style rule file to use for @code{--color}.
+See @ref{The --style option} for details.
+
 @item --force-po
 @opindex --force-po@r{, @code{msgmerge} option}
 Always write an output file even if it contains no message.

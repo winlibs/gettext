@@ -91,7 +91,7 @@ typedef ostream_t term_ostream_t;
 extern        void term_ostream_write_mem (term_ostream_t first_arg, const void *data, size_t len);
 extern         void term_ostream_flush (term_ostream_t first_arg);
 extern         void term_ostream_free (term_ostream_t first_arg);
-extern         term_color_t term_ostream_rgb_to_color (term_ostream_t first_arg, 			     int red, int green, int blue);
+extern         term_color_t term_ostream_rgb_to_color (term_ostream_t first_arg,                              int red, int green, int blue);
 extern         term_color_t term_ostream_get_color (term_ostream_t first_arg);
 extern    void         term_ostream_set_color (term_ostream_t first_arg, term_color_t color);
 extern         term_color_t term_ostream_get_bgcolor (term_ostream_t first_arg);
@@ -101,7 +101,7 @@ extern    void          term_ostream_set_weight (term_ostream_t first_arg, term_
 extern         term_posture_t term_ostream_get_posture (term_ostream_t first_arg);
 extern    void           term_ostream_set_posture (term_ostream_t first_arg, term_posture_t posture);
 extern         term_underline_t term_ostream_get_underline (term_ostream_t first_arg);
-extern    void             term_ostream_set_underline (term_ostream_t first_arg, 				  term_underline_t underline);
+extern    void             term_ostream_set_underline (term_ostream_t first_arg,                                   term_underline_t underline);
 
 /* Type representing an implementation of term_ostream_t.  */
 struct term_ostream_implementation
@@ -155,7 +155,7 @@ term_ostream_free (term_ostream_t first_arg)
 
 # define term_ostream_rgb_to_color term_ostream_rgb_to_color_inline
 static inline term_color_t
-term_ostream_rgb_to_color (term_ostream_t first_arg, 			     int red, int green, int blue)
+term_ostream_rgb_to_color (term_ostream_t first_arg,                              int red, int green, int blue)
 {
   const struct term_ostream_implementation *vtable =
     ((struct term_ostream_representation_header *) (struct term_ostream_representation *) first_arg)->vtable;
@@ -245,7 +245,7 @@ term_ostream_get_underline (term_ostream_t first_arg)
 
 # define term_ostream_set_underline term_ostream_set_underline_inline
 static inline void
-term_ostream_set_underline (term_ostream_t first_arg, 				  term_underline_t underline)
+term_ostream_set_underline (term_ostream_t first_arg,                                   term_underline_t underline)
 {
   const struct term_ostream_implementation *vtable =
     ((struct term_ostream_representation_header *) (struct term_ostream_representation *) first_arg)->vtable;

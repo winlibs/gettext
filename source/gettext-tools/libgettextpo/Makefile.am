@@ -1,5 +1,5 @@
 ## Makefile for the gettext-tools/libgettextpo subdirectory of GNU gettext
-## Copyright (C) 1995-1998, 2000-2007 Free Software Foundation, Inc.
+## Copyright (C) 1995-1998, 2000-2011 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ AUTOMAKE_OPTIONS = 1.5 gnits no-dependencies
 EXTRA_DIST =
 BUILT_SOURCES =
 MOSTLYCLEANFILES = core *.stackdump
+MOSTLYCLEANDIRS =
 CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
@@ -64,11 +65,13 @@ libgettextpo_la_AUXSOURCES = \
   ../src/format-c.c \
   ../src/format-sh.c \
   ../src/format-python.c \
+  ../src/format-python-brace.c \
   ../src/format-lisp.c \
   ../src/format-elisp.c \
   ../src/format-librep.c \
   ../src/format-scheme.c \
   ../src/format-java.c \
+  ../src/format-javascript.c \
   ../src/format-csharp.c \
   ../src/format-awk.c \
   ../src/format-pascal.c \
@@ -78,9 +81,12 @@ libgettextpo_la_AUXSOURCES = \
   ../src/format-perl-brace.c \
   ../src/format-php.c \
   ../src/format-gcc-internal.c \
+  ../src/format-gfc-internal.c \
   ../src/format-qt.c \
+  ../src/format-qt-plural.c \
   ../src/format-kde.c \
   ../src/format-boost.c \
+  ../src/format-lua.c \
   ../src/format.c \
   ../src/plural-exp.c \
   ../src/plural-eval.c \
@@ -88,18 +94,18 @@ libgettextpo_la_AUXSOURCES = \
 
 # Libtool's library version information for libgettextpo.
 # See the libtool documentation, section "Library interface versions".
-LTV_CURRENT=4
-LTV_REVISION=0
-LTV_AGE=4
+LTV_CURRENT=5
+LTV_REVISION=2
+LTV_AGE=5
 
 # How to build libgettextpo.la.
 # Don't make it depend on libgettextsrc.la or libgettextlib.la, since they
 # define an uncontrolled amount of symbols.
-libgettextpo_la_LIBADD = libgnu.la $(WOE32_LDADD)
+libgettextpo_la_LIBADD = libgnu.la $(WOE32_LIBADD) $(LTLIBUNISTRING)
 libgettextpo_la_LDFLAGS = \
   -version-info $(LTV_CURRENT):$(LTV_REVISION):$(LTV_AGE) \
   -rpath $(libdir) \
-  @LTLIBINTL@ @LTLIBICONV@ -lc @LTNOUNDEF@
+  @LTLIBINTL@ @LTLIBICONV@ -lc -no-undefined
 
 # Tell the mingw or Cygwin linker which symbols to export.
 if WOE32DLL
@@ -110,12 +116,12 @@ endif
 # Version information according to Woe32 conventions.
 EXTRA_DIST += libgettextpo.rc
 if WOE32
-WOE32_LDADD = libgettextpo.res
-libgettextpo.res : $(srcdir)/libgettextpo.rc
-	$(WINDRES) `$(SHELL) $(top_srcdir)/../windows/windres-options --escape $(VERSION)` -i $(srcdir)/libgettextpo.rc -o libgettextpo.res --output-format=coff
-MOSTLYCLEANFILES += libgettextpo.res
+WOE32_LIBADD = libgettextpo.res.lo
+libgettextpo.res.lo : $(srcdir)/libgettextpo.rc
+	$(LIBTOOL) --tag=RC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(RC) `$(SHELL) $(top_srcdir)/../windows/windres-options --escape $(VERSION)` -i $(srcdir)/libgettextpo.rc -o libgettextpo.res.lo --output-format=coff
+MOSTLYCLEANFILES += libgettextpo.res.lo
 else
-WOE32_LDADD =
+WOE32_LIBADD =
 endif
 
 # Hide symbols that are defined by libgettextpo_la_AUXSOURCES or libgnu.la
@@ -167,16 +173,19 @@ MOSTLYCLEANFILES += config.h config.h-t
 
 # Special rules for installable include files that export variables.
 
-EXTRA_DIST += gettext-po.h.in
+EXTRA_DIST += gettext-po.in.h
 BUILT_SOURCES += gettext-po.h
 CLEANFILES += gettext-po.h
-gettext-po.h: gettext-po.h.in
+gettext-po.h: gettext-po.in.h
 if WOE32DLL
-	sed -e 's/extern \([^()]*\);/extern __declspec (dllimport) \1;/' $(srcdir)/gettext-po.h.in > gettext-po.h-tmp
+	sed -e 's/extern \([^()]*\);/extern __declspec (dllimport) \1;/' $(srcdir)/gettext-po.in.h > gettext-po.h-tmp
 else
-	cp $(srcdir)/gettext-po.h.in gettext-po.h-tmp
+	cp $(srcdir)/gettext-po.in.h gettext-po.h-tmp
 endif
 	mv gettext-po.h-tmp gettext-po.h
+
+# Allow users to use "gnulib-tool --update".
+EXTRA_DIST += gnulib-m4/gnulib-cache.m4
 
 # A small set of gnulib modules is needed here as well.
 include Makefile.gnulib

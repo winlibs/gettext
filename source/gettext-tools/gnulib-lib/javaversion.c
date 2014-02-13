@@ -1,5 +1,5 @@
 /* Determine the Java version supported by javaexec.
-   Copyright (C) 2006, 2007 Free Software Foundation, Inc.
+   Copyright (C) 2006-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -30,16 +30,16 @@
 # define relocate(pathname) (pathname)
 #endif
 
-/* Get PKGDATADIR.  */
-#include "configmake.h"
-
 #include "javaexec.h"
-#include "pipe.h"
+#include "spawn-pipe.h"
 #include "wait-process.h"
 #include "error.h"
 #include "gettext.h"
 
 #define _(str) gettext (str)
+
+/* Get PKGDATADIR.  */
+#include "configmake.h"
 
 
 struct locals
@@ -50,8 +50,8 @@ struct locals
 
 static bool
 execute_and_read_line (const char *progname,
-		       const char *prog_path, char **prog_argv,
-		       void *private_data)
+                       const char *prog_path, char **prog_argv,
+                       void *private_data)
 {
   struct locals *l = (struct locals *) private_data;
   pid_t child;
@@ -64,7 +64,7 @@ execute_and_read_line (const char *progname,
 
   /* Open a pipe to the JVM.  */
   child = create_pipe_in (progname, prog_path, prog_argv, DEV_NULL, false,
-			  true, false, fd);
+                          true, false, fd);
 
   if (child == -1)
     return false;
@@ -90,7 +90,8 @@ execute_and_read_line (const char *progname,
   fclose (fp);
 
   /* Remove zombie process from process list, and retrieve exit status.  */
-  exitstatus = wait_subprocess (child, progname, true, false, true, false);
+  exitstatus =
+    wait_subprocess (child, progname, true, false, true, false, NULL);
   if (exitstatus != 0)
     {
       free (line);
@@ -112,7 +113,7 @@ javaexec_version (void)
   args[0] = NULL;
   locals.line = NULL;
   execute_java_class (class_name, &pkgdatadir, 1, true, NULL, args,
-		      false, false, execute_and_read_line, &locals);
+                      false, false, execute_and_read_line, &locals);
 
   return locals.line;
 }

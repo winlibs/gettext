@@ -646,7 +646,7 @@ typedef int (*hasExternalSubsetSAXFunc) (void *ctx);
 
 /************************************************************************
  *									*
- *			The SAX version 2 API extensions		*
+ *			The SAX version 3 API extensions		*
  *									*
  ************************************************************************/
 /**
@@ -731,7 +731,7 @@ struct _xmlSAXHandler {
     cdataBlockSAXFunc cdataBlock;
     externalSubsetSAXFunc externalSubset;
     unsigned int initialized;
-    /* The following fields are extensions available only on version 2 */
+    /* The following fields are extensions available only on version 3 */
     void *_private;
     startElementNsSAX2Func startElementNs;
     endElementNsSAX2Func endElementNs;

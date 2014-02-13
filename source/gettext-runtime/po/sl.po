@@ -1,17 +1,19 @@
-# -*- mode:po; coding:utf-8; -*- Slovenian messages for GNU gettext package
-# Copyright (C) 1995, 1996, 1997, 1998, 2000, 2001, 2002, 2005, 2006, 2007 Free Software Foundation, Inc.
-# Primož Peterlin <primoz.peterlin@biofiz.mf.uni-lj.si>, 1996, 1999-2002, 2005-2007.
+# -*- mode:po; coding:utf-8; -*- Slovenian messages for GNU gettext-runtime
+# Copyright (C) 1995, 1996, 1997, 1998, 2000, 2001, 2002, 2005, 2006, 2007, 2011, 2013 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gettext package.
+# Primož Peterlin <primozz.peterlin@gmail.com>, 1996, 1999-2002, 2005-2007, 2011, 2013.
 #
-# $Id: gettext-runtime-0.16.2-pre5.sl.po,v 1.2 2007/10/16 07:39:06 peterlin Exp $
+# $Id: gettext-runtime-0.18.2.sl.po,v 1.2 2013/03/07 22:03:55 peterlin Exp $
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: GNU gettext-runtime 0.16.2-pre5\n"
+"Project-Id-Version: GNU gettext-runtime 0.18.2\n"
 "Report-Msgid-Bugs-To: bug-gnu-gettext@gnu.org\n"
-"POT-Creation-Date: 2007-11-02 03:22+0100\n"
-"PO-Revision-Date: 2007-10-16 09:38+0200\n"
-"Last-Translator: Primož Peterlin <primoz.peterlin@biofiz.mf.uni-lj.si>\n"
+"POT-Creation-Date: 2013-07-07 18:18+0900\n"
+"PO-Revision-Date: 2013-03-07 23:03+0100\n"
+"Last-Translator: Primoz PETERLIN <primozz.peterlin@gmail.com>\n"
 "Language-Team: Slovenian <translation-team-sl@lists.sourceforge.net>\n"
+"Language: sl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
@@ -22,66 +24,65 @@ msgstr ""
 msgid "write error"
 msgstr "napaka pri pisanju"
 
-#: gnulib-lib/error.c:125
+#: gnulib-lib/error.c:188
 msgid "Unknown system error"
 msgstr "Neznana sistemska napaka"
 
-#: gnulib-lib/getopt.c:530 gnulib-lib/getopt.c:546
+#: gnulib-lib/getopt.c:547 gnulib-lib/getopt.c:576
 #, c-format
-msgid "%s: option `%s' is ambiguous\n"
-msgstr "%s: izbira »%s« je dvoumna\n"
+msgid "%s: option '%s' is ambiguous; possibilities:"
+msgstr "%s: izbira '%s ni enopomenska; možnosti so:"
 
-#: gnulib-lib/getopt.c:579 gnulib-lib/getopt.c:583
+#: gnulib-lib/getopt.c:624 gnulib-lib/getopt.c:628
 #, c-format
-msgid "%s: option `--%s' doesn't allow an argument\n"
-msgstr "%s: izbira »--%s« ne dovoljuje argumenta\n"
+msgid "%s: option '--%s' doesn't allow an argument\n"
+msgstr "%s: izbira '--%s' ne dovoljuje argumenta\n"
 
-#: gnulib-lib/getopt.c:592 gnulib-lib/getopt.c:597
+#: gnulib-lib/getopt.c:637 gnulib-lib/getopt.c:642
 #, c-format
-msgid "%s: option `%c%s' doesn't allow an argument\n"
-msgstr "%s: izbira »%c%s« ne dovoljuje argumenta\n"
+msgid "%s: option '%c%s' doesn't allow an argument\n"
+msgstr "%s: izbira '%c%s' ne dovoljuje argumenta\n"
 
-#: gnulib-lib/getopt.c:640 gnulib-lib/getopt.c:659 gnulib-lib/getopt.c:975
-#: gnulib-lib/getopt.c:994
+#: gnulib-lib/getopt.c:685 gnulib-lib/getopt.c:704
 #, c-format
-msgid "%s: option `%s' requires an argument\n"
-msgstr "%s: izbira »%s« zahteva argument\n"
+msgid "%s: option '--%s' requires an argument\n"
+msgstr "%s: izbira '--%s' zahteva argument\n"
 
-#: gnulib-lib/getopt.c:697 gnulib-lib/getopt.c:700
+#: gnulib-lib/getopt.c:742 gnulib-lib/getopt.c:745
 #, c-format
-msgid "%s: unrecognized option `--%s'\n"
-msgstr "%s: neprepoznana izbira »--%s«\n"
+msgid "%s: unrecognized option '--%s'\n"
+msgstr "%s: neprepoznana izbira '--%s'\n"
 
-#: gnulib-lib/getopt.c:708 gnulib-lib/getopt.c:711
+#: gnulib-lib/getopt.c:753 gnulib-lib/getopt.c:756
 #, c-format
-msgid "%s: unrecognized option `%c%s'\n"
-msgstr "%s: neprepoznana izbira »%c%s«\n"
+msgid "%s: unrecognized option '%c%s'\n"
+msgstr "%s: neprepoznana izbira '%c%s'\n"
 
-#: gnulib-lib/getopt.c:763 gnulib-lib/getopt.c:766
+#: gnulib-lib/getopt.c:805 gnulib-lib/getopt.c:808
 #, c-format
-msgid "%s: illegal option -- %c\n"
-msgstr "%s: nedovoljena izbira -- %c\n"
+msgid "%s: invalid option -- '%c'\n"
+msgstr "%s: neveljavna izbira -- '%c'\n"
 
-#: gnulib-lib/getopt.c:772 gnulib-lib/getopt.c:775
+#: gnulib-lib/getopt.c:861 gnulib-lib/getopt.c:878 gnulib-lib/getopt.c:1088
+#: gnulib-lib/getopt.c:1106
 #, c-format
-msgid "%s: invalid option -- %c\n"
-msgstr "%s: neveljavna izbira -- %c\n"
+msgid "%s: option requires an argument -- '%c'\n"
+msgstr "%s: izbira zahteva argument -- '%c'\n"
 
-#: gnulib-lib/getopt.c:827 gnulib-lib/getopt.c:843 gnulib-lib/getopt.c:1047
-#: gnulib-lib/getopt.c:1065
+#: gnulib-lib/getopt.c:934 gnulib-lib/getopt.c:950
 #, c-format
-msgid "%s: option requires an argument -- %c\n"
-msgstr "%s: izbira zahteva argument -- %c\n"
+msgid "%s: option '-W %s' is ambiguous\n"
+msgstr "%s: izbira '-W %s' ni enopomenska\n"
 
-#: gnulib-lib/getopt.c:896 gnulib-lib/getopt.c:912
+#: gnulib-lib/getopt.c:974 gnulib-lib/getopt.c:992
 #, c-format
-msgid "%s: option `-W %s' is ambiguous\n"
-msgstr "%s: izbira »-W %s« je dvoumna\n"
+msgid "%s: option '-W %s' doesn't allow an argument\n"
+msgstr "%s: izbira '-W %s' ne dovoljuje argumenta\n"
 
-#: gnulib-lib/getopt.c:936 gnulib-lib/getopt.c:954
+#: gnulib-lib/getopt.c:1013 gnulib-lib/getopt.c:1031
 #, c-format
-msgid "%s: option `-W %s' doesn't allow an argument\n"
-msgstr "%s: izbira »-W %s« ne dovoljuje argumenta\n"
+msgid "%s: option '-W %s' requires an argument\n"
+msgstr "%s: izbira '-W %s' zahteva argument\n"
 
 #: gnulib-lib/xmalloc.c:37
 #, c-format
@@ -123,7 +124,7 @@ msgstr "argumenti manjkajo"
 
 #: src/envsubst.c:171 src/gettext.c:238 src/ngettext.c:207
 #, c-format
-msgid "Try `%s --help' for more information.\n"
+msgid "Try '%s --help' for more information.\n"
 msgstr "Poskusite »%s --help« za izčrpnejša navodila\n"
 
 #: src/envsubst.c:176
@@ -249,7 +250,7 @@ msgid ""
 "environment variable TEXTDOMAIN.  If the message catalog is not found in the\n"
 "regular directory, another location can be specified with the environment\n"
 "variable TEXTDOMAINDIR.\n"
-"When used with the -s option the program behaves like the `echo' command.\n"
+"When used with the -s option the program behaves like the 'echo' command.\n"
 "But it does not simply copy its arguments to stdout.  Instead those messages\n"
 "found in the selected catalog are translated.\n"
 "Standard search directory: %s\n"
@@ -310,6 +311,9 @@ msgstr ""
 "iz okolja. Če kataloga sporočil ni moč najti na običajnem mestu, lahko \n"
 "določimo alternativno lokacijo s spremenljivko TEXTDOMAINDIR.\n"
 "Privzet imenik s katalogom sporočil: %s\n"
+
+#~ msgid "%s: illegal option -- %c\n"
+#~ msgstr "%s: nedovoljena izbira -- %c\n"
 
 #~ msgid ""
 #~ "Copyright (C) %s Free Software Foundation, Inc.\n"
@@ -976,8 +980,8 @@ msgstr ""
 #~ msgid ""
 #~ "A special builtin command called '0' outputs the translation, followed by "
 #~ "a\n"
-#~ "null byte.  The output of \"msgexec 0\" is suitable as input for \"xargs -"
-#~ "0\".\n"
+#~ "null byte.  The output of \"msgexec 0\" is suitable as input for \"xargs "
+#~ "-0\".\n"
 #~ msgstr ""
 #~ "Poseben vgrajen ukaz ,0` izpiše prevod in izpis zaključi z znakom s kodo "
 #~ "nič.\n"
@@ -1243,8 +1247,8 @@ msgstr ""
 
 #~ msgid ""
 #~ "Output details:\n"
-#~ "  -a, --alignment=NUMBER      align strings to NUMBER bytes (default: %"
-#~ "d)\n"
+#~ "  -a, --alignment=NUMBER      align strings to NUMBER bytes (default: "
+#~ "%d)\n"
 #~ "      --no-hash               binary file will not include the hash "
 #~ "table\n"
 #~ msgstr ""
@@ -2473,8 +2477,8 @@ msgstr ""
 #~ "Generate binary message catalog from textual translation description.\n"
 #~ "\n"
 #~ "Mandatory arguments to long options are mandatory for short options too.\n"
-#~ "  -a, --alignment=NUMBER      align strings to NUMBER bytes (default: %"
-#~ "d)\n"
+#~ "  -a, --alignment=NUMBER      align strings to NUMBER bytes (default: "
+#~ "%d)\n"
 #~ "  -c, --check                 perform language dependent checks on "
 #~ "strings\n"
 #~ "  -D, --directory=DIRECTORY   add DIRECTORY to list for input files "

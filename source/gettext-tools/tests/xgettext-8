@@ -40,7 +40,7 @@ ${XGETTEXT} -a -j -o xg-test8.po xg-test8.in.c
 test $? = 0 || { rm -fr $tmpfiles; exit 1; }
 
 tmpfiles="$tmpfiles xg-test8.pot"
-sed -e '/POT-Creation-Date/d' < xg-test8.po | tr -d '\r' > xg-test8.pot
+sed -e '/POT-Creation-Date/d' < xg-test8.po | LC_ALL=C tr -d '\r' > xg-test8.pot
 
 tmpfiles="$tmpfiles xg-test8.ok"
 cat <<\EOF > xg-test8.ok
@@ -57,6 +57,7 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"

@@ -1,5 +1,5 @@
 /* Test of vsnprintf() function.
-   Copyright (C) 2007 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,20 +20,13 @@
 
 #include <stdio.h>
 
+#include "signature.h"
+SIGNATURE_CHECK (vsnprintf, int, (char *, size_t, char const *, va_list));
+
 #include <stdarg.h>
-#include <stdlib.h>
 #include <string.h>
 
-#define ASSERT(expr) \
-  do									     \
-    {									     \
-      if (!(expr))							     \
-        {								     \
-          fprintf (stderr, "%s:%d: assertion failed\n", __FILE__, __LINE__); \
-          abort ();							     \
-        }								     \
-    }									     \
-  while (0)
+#include "macros.h"
 
 static int
 my_snprintf (char *buf, int size, const char *format, ...)
@@ -54,31 +47,39 @@ main (int argc, char *argv[])
   int size;
   int retval;
 
+  retval = my_snprintf (NULL, 0, "%d", 12345);
+  ASSERT (retval == 5);
+
   for (size = 0; size <= 8; size++)
     {
       memcpy (buf, "DEADBEEF", 8);
       retval = my_snprintf (buf, size, "%d", 12345);
+      ASSERT (retval == 5);
       if (size < 6)
-	{
-#if CHECK_VSNPRINTF_POSIX
-	  ASSERT (retval < 0 || retval >= size);
-#endif
-	  if (size > 0)
-	    {
-	      ASSERT (memcmp (buf, "12345", size - 1) == 0);
-	      ASSERT (buf[size - 1] == '\0' || buf[size - 1] == '0' + size);
-	    }
+        {
+          if (size > 0)
+            {
+              ASSERT (memcmp (buf, "12345", size - 1) == 0);
+              ASSERT (buf[size - 1] == '\0' || buf[size - 1] == '0' + size);
+            }
 #if !CHECK_VSNPRINTF_POSIX
-	  if (size > 0)
+          if (size > 0)
 #endif
-	    ASSERT (memcmp (buf + size, "DEADBEEF" + size, 8 - size) == 0);
-	}
+            ASSERT (memcmp (buf + size, &"DEADBEEF"[size], 8 - size) == 0);
+        }
       else
-	{
-	  ASSERT (retval == 5);
-	  ASSERT (memcmp (buf, "12345\0EF", 8) == 0);
-	}
+        {
+          ASSERT (memcmp (buf, "12345\0EF", 8) == 0);
+        }
     }
+
+  /* Test the support of the POSIX/XSI format strings with positions.  */
+  {
+    char result[100];
+    retval = my_snprintf (result, sizeof (result), "%2$d %1$d", 33, 55);
+    ASSERT (strcmp (result, "55 33") == 0);
+    ASSERT (retval == strlen (result));
+  }
 
   return 0;
 }

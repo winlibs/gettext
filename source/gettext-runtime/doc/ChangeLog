@@ -1,3 +1,54 @@
+2012-12-25  Daiki Ueno  <ueno@gnu.org>
+
+	* gettext-0.18.2 released.
+
+2012-12-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* matrix.texi: Update.
+	* nls.texi (STATUS): Likewise.
+
+2011-06-03  Bruno Haible  <bruno@clisp.org>
+
+	Copyright: Use LGPL 2.1 instead of LGPL 2.0.
+	* nls.texi (Using gettext in own code): Write "GNU Lesser General
+	Public License".
+
+2010-06-04  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18.1 released.
+
+2010-06-03  Bruno Haible  <bruno@clisp.org>
+
+	De-emphasize the intl/ subdirectory.
+	* nls.texi (Translation Intro): Remove paragraph about the version.
+	(Configuration advice): Remove section.
+	(INSTALL Matters): Don't explain --with-included-gettext. Don't mention
+	catgets.
+
+2010-06-03  Bruno Haible  <bruno@clisp.org>
+
+	* matrix.texi: Update.
+	* nls.texi (STATUS): Likewise.
+
+2010-05-09  Bruno Haible  <bruno@clisp.org>
+
+	* gettext-0.18 released.
+
+2010-05-08  Bruno Haible  <bruno@clisp.org>
+
+	* matrix.texi: Update.
+	* nls.texi (STATUS): Likewise.
+
+2010-03-27  Bruno Haible  <bruno@clisp.org>
+
+	* matrix.texi: Update.
+	* nls.texi (STATUS): Likewise.
+
+2008-09-27  Bruno Haible  <bruno@clisp.org>
+
+	* matrix.texi: Update.
+	* nls.texi (STATUS): Likewise.
+
 2007-11-07  Bruno Haible  <bruno@clisp.org>
 
 	* gettext-0.17 released.

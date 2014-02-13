@@ -40,24 +40,28 @@ static const typeinfo_t * const styled_ostream_superclasses[] =
 #line 28 "styled-ostream.oo.c"
 
 #line 43 "styled-ostream.c"
+void styled_ostream__write_mem (styled_ostream_t first_arg, const void *data, size_t len);
 void
 styled_ostream__write_mem (styled_ostream_t first_arg, const void *data, size_t len)
 {
   super.write_mem (first_arg,data,len);
 }
 
+void styled_ostream__flush (styled_ostream_t first_arg);
 void
 styled_ostream__flush (styled_ostream_t first_arg)
 {
   super.flush (first_arg);
 }
 
+void styled_ostream__free (styled_ostream_t first_arg);
 void
 styled_ostream__free (styled_ostream_t first_arg)
 {
   super.free (first_arg);
 }
 
+void styled_ostream__begin_use_class (styled_ostream_t first_arg, const char *classname);
 void
 styled_ostream__begin_use_class (styled_ostream_t first_arg, const char *classname)
 {
@@ -68,6 +72,7 @@ styled_ostream__begin_use_class (styled_ostream_t first_arg, const char *classna
   #endif
 }
 
+void styled_ostream__end_use_class (styled_ostream_t first_arg, const char *classname);
 void
 styled_ostream__end_use_class (styled_ostream_t first_arg, const char *classname)
 {

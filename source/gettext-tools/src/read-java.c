@@ -1,5 +1,5 @@
 /* Reading Java ResourceBundles.
-   Copyright (C) 2001-2003, 2006-2007 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006-2008, 2011 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 #include "msgunfmt.h"
 #include "relocatable.h"
 #include "javaexec.h"
-#include "pipe.h"
+#include "spawn-pipe.h"
 #include "wait-process.h"
 #include "read-catalog.h"
 #include "read-po.h"
@@ -52,8 +52,8 @@ struct locals
 
 static bool
 execute_and_read_po_output (const char *progname,
-			    const char *prog_path, char **prog_argv,
-			    void *private_data)
+                            const char *prog_path, char **prog_argv,
+                            void *private_data)
 {
   struct locals *l = (struct locals *) private_data;
   pid_t child;
@@ -63,7 +63,7 @@ execute_and_read_po_output (const char *progname,
 
   /* Open a pipe to the JVM.  */
   child = create_pipe_in (progname, prog_path, prog_argv, DEV_NULL, false,
-			  true, true, fd);
+                          true, true, fd);
 
   fp = fdopen (fd[0], "r");
   if (fp == NULL)
@@ -75,10 +75,11 @@ execute_and_read_po_output (const char *progname,
   fclose (fp);
 
   /* Remove zombie process from process list, and retrieve exit status.  */
-  exitstatus = wait_subprocess (child, progname, false, false, true, true);
+  exitstatus =
+    wait_subprocess (child, progname, false, false, true, true, NULL);
   if (exitstatus != 0)
     error (EXIT_FAILURE, 0, _("%s subprocess failed with exit code %d"),
-	   progname, exitstatus);
+           progname, exitstatus);
 
   return false;
 }
@@ -127,9 +128,9 @@ msgdomain_read_java (const char *resource_name, const char *locale_name)
      Here we use the user's CLASSPATH, not a minimal one, so that the
      resource can be found.  */
   if (execute_java_class (class_name, &gettextjar, 1, false, gettextjexedir,
-			  args,
-			  verbose, false,
-			  execute_and_read_po_output, &locals))
+                          args,
+                          verbose, false,
+                          execute_and_read_po_output, &locals))
     /* An error message should already have been provided.  */
     exit (EXIT_FAILURE);
 

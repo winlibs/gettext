@@ -1,20 +1,19 @@
 /* Implementation of the bindtextdomain(3) function
-   Copyright (C) 1995-1998, 2000-2003, 2005-2006 Free Software Foundation, Inc.
+   Copyright (C) 1995-1998, 2000-2003, 2005-2006, 2008 Free Software
+   Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU Library General Public License as published
-   by the Free Software Foundation; either version 2, or (at your option)
-   any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as published by
+   the Free Software Foundation; either version 2.1 of the License, or
+   (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Library General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU Library General Public
-   License along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-   USA.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -129,9 +128,7 @@ set_binding_values (const char *domainname,
 		    result = (char *) _nl_default_dirname;
 		  else
 		    {
-#ifdef _MSC_VER
-			  result = _strdup (dirname);
-#elif defined _LIBC || defined HAVE_STRDUP
+#if defined _LIBC || defined HAVE_STRDUP
 		      result = strdup (dirname);
 #else
 		      size_t len = strlen (dirname) + 1;
@@ -169,9 +166,7 @@ set_binding_values (const char *domainname,
 	      char *result = binding->codeset;
 	      if (result == NULL || strcmp (codeset, result) != 0)
 		{
-#ifdef _MSC_VER
-		  result = _strdup (codeset);
-#elif defined _LIBC || defined HAVE_STRDUP
+#if defined _LIBC || defined HAVE_STRDUP
 		  result = strdup (codeset);
 #else
 		  size_t len = strlen (codeset) + 1;
@@ -182,8 +177,7 @@ set_binding_values (const char *domainname,
 
 		  if (__builtin_expect (result != NULL, 1))
 		    {
-		      if (binding->codeset != NULL)
-			free (binding->codeset);
+		      free (binding->codeset);
 
 		      binding->codeset = result;
 		      modified = 1;
@@ -228,11 +222,7 @@ set_binding_values (const char *domainname,
 	      else
 		{
 		  char *result;
-#ifdef _MSC_VER
-			  result = _strdup (dirname);
-			  if (__builtin_expect (result == NULL, 0))
-				goto failed_dirname;
-#elif defined _LIBC || defined HAVE_STRDUP
+#if defined _LIBC || defined HAVE_STRDUP
 		  result = strdup (dirname);
 		  if (__builtin_expect (result == NULL, 0))
 		    goto failed_dirname;
@@ -260,11 +250,8 @@ set_binding_values (const char *domainname,
 	  if (codeset != NULL)
 	    {
 	      char *result;
-#ifdef _MSC_VER
-			  result = _strdup (codeset);
-			  if (__builtin_expect (result == NULL, 0))
-				goto failed_codeset;
-#elif defined _LIBC || defined HAVE_STRDUP
+
+#if defined _LIBC || defined HAVE_STRDUP
 	      result = strdup (codeset);
 	      if (__builtin_expect (result == NULL, 0))
 		goto failed_codeset;

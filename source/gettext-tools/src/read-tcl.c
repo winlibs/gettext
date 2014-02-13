@@ -1,5 +1,5 @@
 /* Reading tcl/msgcat .msg files.
-   Copyright (C) 2002-2003, 2005-2007 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2008, 2011 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This program is free software: you can redistribute it and/or modify
@@ -29,9 +29,9 @@
 
 #include "msgunfmt.h"
 #include "relocatable.h"
-#include "filename.h"
+#include "concat-filename.h"
 #include "sh-quote.h"
-#include "pipe.h"
+#include "spawn-pipe.h"
 #include "wait-process.h"
 #include "read-catalog.h"
 #include "read-po.h"
@@ -69,7 +69,7 @@ msgdomain_read_tcl (const char *locale_name, const char *directory)
   if (gettextdatadir == NULL || gettextdatadir[0] == '\0')
     gettextdatadir = relocate (GETTEXTDATADIR);
 
-  tclscript = concatenated_filename (gettextdatadir, "msgunfmt.tcl", NULL);
+  tclscript = xconcatenated_filename (gettextdatadir, "msgunfmt.tcl", NULL);
 
   /* Convert the locale name to lowercase and remove any encoding.  */
   len = strlen (locale_name);
@@ -80,11 +80,11 @@ msgdomain_read_tcl (const char *locale_name, const char *directory)
       *p = *p - 'A' + 'a';
     else if (*p == '.')
       {
-	*p = '\0';
-	break;
+        *p = '\0';
+        break;
       }
 
-  file_name = concatenated_filename (directory, frobbed_locale_name, ".msg");
+  file_name = xconcatenated_filename (directory, frobbed_locale_name, ".msg");
 
   freea (frobbed_locale_name);
 
@@ -103,7 +103,7 @@ msgdomain_read_tcl (const char *locale_name, const char *directory)
 
   /* Open a pipe to the Tcl interpreter.  */
   child = create_pipe_in ("tclsh", "tclsh", argv, DEV_NULL, false, true, true,
-			  fd);
+                          fd);
 
   fp = fdopen (fd[0], "r");
   if (fp == NULL)
@@ -115,16 +115,17 @@ msgdomain_read_tcl (const char *locale_name, const char *directory)
   fclose (fp);
 
   /* Remove zombie process from process list, and retrieve exit status.  */
-  exitstatus = wait_subprocess (child, "tclsh", false, false, true, true);
+  exitstatus =
+    wait_subprocess (child, "tclsh", false, false, true, true, NULL);
   if (exitstatus != 0)
     {
       if (exitstatus == 2)
-	/* Special exitcode provided by msgunfmt.tcl.  */
-	error (EXIT_FAILURE, ENOENT,
-	       _("error while opening \"%s\" for reading"), file_name);
+        /* Special exitcode provided by msgunfmt.tcl.  */
+        error (EXIT_FAILURE, ENOENT,
+               _("error while opening \"%s\" for reading"), file_name);
       else
-	error (EXIT_FAILURE, 0, _("%s subprocess failed with exit code %d"),
-	       "tclsh", exitstatus);
+        error (EXIT_FAILURE, 0, _("%s subprocess failed with exit code %d"),
+               "tclsh", exitstatus);
     }
 
   free (tclscript);
@@ -136,20 +137,20 @@ msgdomain_read_tcl (const char *locale_name, const char *directory)
       size_t j;
 
       for (j = 0; j < mlp->nitems; j++)
-	if (is_header (mlp->item[j]))
-	  {
-	    /* Found the header entry.  */
-	    if (j > 0)
-	      {
-		message_ty *header = mlp->item[j];
-		size_t i;
+        if (is_header (mlp->item[j]))
+          {
+            /* Found the header entry.  */
+            if (j > 0)
+              {
+                message_ty *header = mlp->item[j];
+                size_t i;
 
-		for (i = j; i > 0; i--)
-		  mlp->item[i] = mlp->item[i - 1];
-		mlp->item[0] = header;
-	      }
-	    break;
-	  }
+                for (i = j; i > 0; i--)
+                  mlp->item[i] = mlp->item[i - 1];
+                mlp->item[0] = header;
+              }
+            break;
+          }
     }
 
   return mdlp;
