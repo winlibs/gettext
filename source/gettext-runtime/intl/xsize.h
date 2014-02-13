@@ -27,6 +27,12 @@
 # include <stdint.h>
 #endif
 
+#ifdef _WIN32
+# define _GL_INLINE_HEADER_BEGIN
+# define _GL_INLINE_HEADER_END
+# define _GL_INLINE static inline
+#endif
+
 _GL_INLINE_HEADER_BEGIN
 #ifndef XSIZE_INLINE
 # define XSIZE_INLINE _GL_INLINE

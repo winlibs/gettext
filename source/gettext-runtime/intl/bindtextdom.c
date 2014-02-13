@@ -128,7 +128,9 @@ set_binding_values (const char *domainname,
 		    result = (char *) _nl_default_dirname;
 		  else
 		    {
-#if defined _LIBC || defined HAVE_STRDUP
+#ifdef _MSC_VER
+			  result = _strdup (dirname);
+#elif defined _LIBC || defined HAVE_STRDUP
 		      result = strdup (dirname);
 #else
 		      size_t len = strlen (dirname) + 1;
@@ -166,7 +168,9 @@ set_binding_values (const char *domainname,
 	      char *result = binding->codeset;
 	      if (result == NULL || strcmp (codeset, result) != 0)
 		{
-#if defined _LIBC || defined HAVE_STRDUP
+#ifdef _MSC_VER
+		  result = _strdup (codeset);
+#elif defined _LIBC || defined HAVE_STRDUP
 		  result = strdup (codeset);
 #else
 		  size_t len = strlen (codeset) + 1;
@@ -222,7 +226,11 @@ set_binding_values (const char *domainname,
 	      else
 		{
 		  char *result;
-#if defined _LIBC || defined HAVE_STRDUP
+#ifdef _MSC_VER
+			  result = _strdup (dirname);
+			  if (__builtin_expect (result == NULL, 0))
+				goto failed_dirname;
+#elif defined _LIBC || defined HAVE_STRDUP
 		  result = strdup (dirname);
 		  if (__builtin_expect (result == NULL, 0))
 		    goto failed_dirname;
@@ -250,8 +258,11 @@ set_binding_values (const char *domainname,
 	  if (codeset != NULL)
 	    {
 	      char *result;
-
-#if defined _LIBC || defined HAVE_STRDUP
+#ifdef _MSC_VER
+			  result = _strdup (codeset);
+			  if (__builtin_expect (result == NULL, 0))
+				goto failed_codeset;
+#elif defined _LIBC || defined HAVE_STRDUP
 	      result = strdup (codeset);
 	      if (__builtin_expect (result == NULL, 0))
 		goto failed_codeset;

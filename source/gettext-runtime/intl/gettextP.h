@@ -191,8 +191,12 @@ struct loaded_domain
   /* Cache of charset conversions of the translated strings.  */
   struct converted_domain *conversions;
   size_t nconversions;
+  /* Anything before msvc8 is too stupid for the macro used here */
+#if defined _MSC_VER && _MSC_VER < 1400
+  gl_rwlock_t conversions_lock;
+#else
   gl_rwlock_define (, conversions_lock)
-
+#endif
   const struct expression *plural;
   unsigned long int nplurals;
 };

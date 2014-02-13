@@ -38,6 +38,7 @@
 #else
 # ifdef _MSC_VER
 #  include <malloc.h>
+#  include <io.h> /* open() doesn't magically appear, people */
 #  define alloca _alloca
 # else
 #  if defined HAVE_ALLOCA_H || defined _LIBC
@@ -825,7 +826,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
     goto out;
 
   /* Try to open the addressed file.  */
-  fd = open (domain_file->filename, O_RDONLY | O_BINARY);
+  fd = _open (domain_file->filename, O_RDONLY | O_BINARY);
   if (fd == -1)
     goto out;
 
@@ -836,7 +837,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 #else
       __builtin_expect (fstat (fd, &st) != 0, 0)
 #endif
-      || __builtin_expect ((size = (size_t) st.st_size) != st.st_size, 0)
+      || __builtin_expect ((size = (size_t) st.st_size) != (size_t) st.st_size, 0)
       || __builtin_expect (size < sizeof (struct mo_file_header), 0))
     /* Something went wrong.  */
     goto out;
@@ -871,7 +872,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
       read_ptr = (char *) data;
       do
 	{
-	  long int nb = (long int) read (fd, read_ptr, to_read);
+	  long int nb = (long int) _read (fd, read_ptr, to_read);
 	  if (nb <= 0)
 	    {
 #ifdef EINTR
@@ -885,7 +886,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 	}
       while (to_read > 0);
 
-      close (fd);
+      _close (fd);
       fd = -1;
     }
 
@@ -1287,7 +1288,7 @@ _nl_load_domain (struct loaded_l10nfile *domain_file,
 
  out:
   if (fd != -1)
-    close (fd);
+    _close (fd);
 
   domain_file->decided = 1;
 

@@ -290,6 +290,15 @@ libintl_asprintf (char **resultp, const char *format, ...)
 
 #include <wchar.h>
 
+/* VC6, 7, 7.1 are broken with msvcrt.dll so we copy this right out of the headers */
+#if defined _MSC_VER && _MSC_VER < 1400
+inline wchar_t *wmemcpy(wchar_t *_S1, const wchar_t *_S2, size_t _N)
+        {wchar_t *_Su1 = _S1;
+        for (; 0 < _N; ++_Su1, ++_S2, --_N)
+                *_Su1 = *_S2;
+        return (_S1); }
+#endif
+
 #define WIDE_CHAR_VERSION 1
 
 #include "wprintf-parse.h"

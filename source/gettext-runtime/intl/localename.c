@@ -2780,6 +2780,12 @@ gl_locale_name_default (void)
      context, because message catalogs are not specific to a single
      codeset.  */
 
+/* MSVC9 defines SUBLANG_SINDHI_PAKISTAN incorrectly */
+#if defined _MSC_VER && _MSC_VER > 1400
+# undef SUBLANG_SINDHI_PAKISTAN
+# define SUBLANG_SINDHI_PAKISTAN 0x01
+#endif
+
 # if HAVE_CFLOCALECOPYCURRENT || HAVE_CFPREFERENCESCOPYAPPVALUE
   /* Mac OS X 10.2 or newer */
   {

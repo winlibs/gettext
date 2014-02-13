@@ -124,7 +124,11 @@ _nl_find_domain (const char *dirname, char *locale,
   alias_value = _nl_expand_alias (locale);
   if (alias_value != NULL)
     {
-#if defined _LIBC || defined HAVE_STRDUP
+#if _MSC_VER
+	  locale = _strdup (alias_value);
+      if (locale == NULL)
+	return NULL;
+#elif defined _LIBC || defined HAVE_STRDUP
       locale = strdup (alias_value);
       if (locale == NULL)
 	return NULL;

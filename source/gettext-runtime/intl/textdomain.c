@@ -90,7 +90,9 @@ TEXTDOMAIN (const char *domainname)
       /* If the following malloc fails `_nl_current_default_domain'
 	 will be NULL.  This value will be returned and so signals we
 	 are out of core.  */
-#if defined _LIBC || defined HAVE_STRDUP
+#ifdef _MSC_VER
+		new_domain = _strdup (domainname);
+#elif defined _LIBC || defined HAVE_STRDUP
       new_domain = strdup (domainname);
 #else
       size_t len = strlen (domainname) + 1;
