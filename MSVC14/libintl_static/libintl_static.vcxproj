@@ -93,6 +93,8 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(IntDir)libintl_a_debug.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
       <OutputFile>Debug\libintl_a_debug.lib</OutputFile>
@@ -108,6 +110,8 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(IntDir)libintl_a.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
       <OutputFile>Release\libintl_a.lib</OutputFile>
@@ -128,6 +132,8 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(IntDir)libintl_a_debug.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
       <OutputFile>x64\Debug\libintl_a_debug.lib</OutputFile>
@@ -146,6 +152,8 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
+      <ProgramDataBaseFileName>$(IntDir)libintl_a.pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Lib>
       <OutputFile>x64\Release\libintl_a.lib</OutputFile>

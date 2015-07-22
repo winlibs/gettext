@@ -97,6 +97,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <ProgramDataBaseFileName>$(IntDir)libintl_debug.pdb</ProgramDataBaseFileName>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <OutputFile>Debug\libintl_debug.dll</OutputFile>
@@ -105,7 +106,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
-      <ImportLibrary>$(OutDir)libintl_debug.lib</ImportLibrary>
+      <ImportLibrary>$(IntDir)libintl_debug.lib</ImportLibrary>
+      <ProgramDatabaseFile>$(IntDir)libintl_debug.pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -119,6 +121,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ProgramDataBaseFileName>$(IntDir)libintl.pdb</ProgramDataBaseFileName>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <OutputFile>Release\libintl.dll</OutputFile>
@@ -130,6 +133,7 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
       <ImportLibrary>$(OutDir)libintl.lib</ImportLibrary>
+      <ProgramDatabaseFile>$(IntDir)libintl.pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -147,6 +151,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ProgramDataBaseFileName>$(IntDir)libintl_debug.pdb</ProgramDataBaseFileName>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <OutputFile>x64\Debug\libintl_debug.dll</OutputFile>
@@ -155,8 +160,8 @@
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
-      <ProgramDatabaseFile>$(OutDir)libintl_debug.pdb</ProgramDatabaseFile>
-      <ImportLibrary>$(OutDir)libintl_debug.lib</ImportLibrary>
+      <ProgramDatabaseFile>$(IntDir)libintl_debug.pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(IntDir)libintl_debug.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -173,6 +178,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ProgramDataBaseFileName>$(IntDir)libintl.pdb</ProgramDataBaseFileName>
+      <UndefinePreprocessorDefinitions>UNICODE</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <OutputFile>x64\Release\libintl.dll</OutputFile>
@@ -184,6 +190,7 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX64</TargetMachine>
       <ImportLibrary>$(IntDir)libintl.lib</ImportLibrary>
+      <ProgramDatabaseFile>$(IntDir)libintl.pdb</ProgramDatabaseFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
