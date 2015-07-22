@@ -602,15 +602,22 @@
 /* #undef size_t */
 
 /* Define as a signed type of the same size as size_t. */
-#define ssize_t int
+#ifdef _WIN64
+#define ssize_t __int64
+#else
+#define ssize_t __int32
+#endif
 
 /* Define to rpl_strnlen if the replacement function should be used. */
 #define strnlen rpl_strnlen
 
 /* Define to unsigned long or unsigned long long if <stdint.h> and
    <inttypes.h> don't define. */
-#define uintmax_t unsigned long
-
+#ifdef _WIN64
+#define uintmax_t unsigned __int64
+#else
+#define uintmax_t unsigned __int32
+#endif
 
 #define __libc_lock_t                   gl_lock_t
 #define __libc_lock_define              gl_lock_define
@@ -624,6 +631,7 @@
 #define __libc_lock_init_recursive                gl_recursive_lock_init
 #define __libc_lock_lock_recursive                gl_recursive_lock_lock
 #define __libc_lock_unlock_recursive              gl_recursive_lock_unlock
+#if 0
 #define glthread_in_use  libintl_thread_in_use
 #define glthread_lock_init     libintl_lock_init
 #define glthread_lock_lock     libintl_lock_lock
@@ -641,7 +649,7 @@
 #define glthread_once                 libintl_once
 #define glthread_once_call            libintl_once_call
 #define glthread_once_singlethreaded  libintl_once_singlethreaded
-
+#endif
 
 
 /* On Windows, variables that may be in a DLL must be marked specially.  */
