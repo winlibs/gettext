@@ -1,0 +1,70 @@
+#!/bin/sh
+. "${srcdir=.}/init.sh"; path_prepend_ . ../src
+
+# Test C# support: --add-comments option, string concatenation,
+# strings with embedded expressions.
+
+cat <<\EOF > xg-cs-5.cs
+// This comment will not be extracted.
+Console.WriteLine(GetString("help"));
+//  TRANSLATORS: This is an extracted comment.
+Console.WriteLine(GetString("me"));
+/* Not extracted either. */
+Console.WriteLine(GetString("Hey Jude"));
+/*  TRANSLATORS:
+     Nickname of the Beatles
+*/
+Console.WriteLine(GetString("The Fabulous Four"));
+/* TRANSLATORS: The strings get concatenated.  */
+Console.WriteLine(GetString("there is not enough" +
+" room on a single line for this entire long, " // confusing, eh?
++ "verbose string"));
+// Strings with embedded expressions, a.k.a. interpolated strings.
+Console.WriteLine(GetString($"embedded_1_{foo}_bar"));
+Console.WriteLine(GetString($"embedded_2_{GetString("embedded_2_sub1")}_bar_{GetString("embedded_2_sub2")}_baz"));
+Console.WriteLine(GetString($"embedded_3"));
+EOF
+
+: ${XGETTEXT=xgettext}
+${XGETTEXT} --omit-header --no-location --add-comments=TRANSLATORS: \
+  -d xg-cs-5.tmp xg-cs-5.cs || Exit 1
+LC_ALL=C tr -d '\r' < xg-cs-5.tmp.po > xg-cs-5.po || Exit 1
+
+cat <<\EOF > xg-cs-5.ok
+msgid "help"
+msgstr ""
+
+#. TRANSLATORS: This is an extracted comment.
+msgid "me"
+msgstr ""
+
+msgid "Hey Jude"
+msgstr ""
+
+#. TRANSLATORS:
+#. Nickname of the Beatles
+#.
+msgid "The Fabulous Four"
+msgstr ""
+
+#. TRANSLATORS: The strings get concatenated.
+msgid ""
+"there is not enough room on a single line for this entire long, verbose "
+"string"
+msgstr ""
+
+msgid "embedded_2_sub1"
+msgstr ""
+
+msgid "embedded_2_sub2"
+msgstr ""
+
+msgid "embedded_3"
+msgstr ""
+EOF
+
+: ${DIFF=diff}
+${DIFF} xg-cs-5.ok xg-cs-5.po
+result=$?
+
+exit $result

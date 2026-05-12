@@ -1,0 +1,548 @@
+# Translation of `gettext-runtime' messages to Japanese.
+# Copyright (C) 1999, 2002, 2003, 2006, 2007, 2010, 2013, 2015, 2019, 2020, 2025 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gettext package.
+# Masahito Yamaga <ma@yama-ga.com>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: GNU gettext-runtime 0.26-pre1\n"
+"Report-Msgid-Bugs-To: bug-gettext@gnu.org\n"
+"POT-Creation-Date: 2025-06-28 23:48+0200\n"
+"PO-Revision-Date: 2025-07-05 12:40+0900\n"
+"Last-Translator: Masahito Yamaga <ma@yama-ga.com>\n"
+"Language-Team: Japanese <translation-team-ja@lists.sourceforge.net>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: src/envsubst.c:112 src/gettext.c:138 src/ngettext.c:128
+#: src/printf_gettext.c:111 src/printf_ngettext.c:116
+#, c-format, no-wrap
+msgid ""
+"Copyright (C) %s Free Software Foundation, Inc.\n"
+"License GPLv3+: GNU GPL version 3 or later <%s>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+"Copyright (C) %s Free Software Foundation, Inc.\n"
+"License GPLv3+: GNU GPL version 3 or later <%s>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+"\n"
+"[参考訳]\n"
+"ライセンス GPLv3+: GNU GPL バージョン 3 またはそれ以降 <https://gnu.org/licenses/gpl.html>\n"
+"これはフリー・ソフトウェアです. 改変と再配布は自由です.\n"
+"法で許された範囲内で無保証です.\n"
+
+#: src/envsubst.c:118 src/gettext.c:144 src/ngettext.c:134
+#: src/printf_gettext.c:117 src/printf_ngettext.c:122
+#, c-format
+msgid "Written by %s.\n"
+msgstr "作者 %s.\n"
+
+#. This is a proper name. See the gettext manual, section Names.
+#: src/envsubst.c:118 src/printf_gettext.c:117 src/printf_ngettext.c:122
+msgid "Bruno Haible"
+msgstr "Bruno Haible"
+
+#: src/envsubst.c:127 src/gettext.c:162 src/ngettext.c:146
+#, c-format
+msgid "too many arguments"
+msgstr "引数が多すぎます"
+
+#: src/envsubst.c:138 src/gettext.c:172 src/ngettext.c:158
+#: src/printf_ngettext.c:133
+#, c-format
+msgid "missing arguments"
+msgstr "引数がありません"
+
+#: src/envsubst.c:176 src/gettext.c:249 src/ngettext.c:216
+#: src/printf_gettext.c:165 src/printf_ngettext.c:197
+#, c-format
+msgid "Try '%s --help' for more information.\n"
+msgstr "より多くの情報を得るためには '%s --help' と入力してください.\n"
+
+#: src/envsubst.c:181
+#, c-format, no-wrap
+msgid "Usage: %s [OPTION] [SHELL-FORMAT]\n"
+msgstr "使用法: %s [オプション] [シェル形式]\n"
+
+#: src/envsubst.c:186
+#, c-format, no-wrap
+msgid "Substitutes the values of environment variables.\n"
+msgstr "環境変数の値を代入.\n"
+
+#: src/envsubst.c:190
+#, c-format, no-wrap
+msgid "Operation mode:\n"
+msgstr "オペレーションモード:\n"
+
+#: src/envsubst.c:193
+#, c-format, no-wrap
+msgid "  -v, --variables             output the variables occurring in SHELL-FORMAT\n"
+msgstr "  -v, --variables             シェル形式に現れる変数を出力\n"
+
+#: src/envsubst.c:197 src/gettext.c:280 src/ngettext.c:248
+#: src/printf_gettext.c:188 src/printf_ngettext.c:224
+#, c-format, no-wrap
+msgid "Informative output:\n"
+msgstr "有益な出力:\n"
+
+#: src/envsubst.c:200
+#, c-format, no-wrap
+msgid "  -h, --help                  display this help and exit\n"
+msgstr "  -h, --help                  このヘルプを表示して終了\n"
+
+#: src/envsubst.c:203
+#, c-format, no-wrap
+msgid "  -V, --version               output version information and exit\n"
+msgstr "  -V, --version               バージョン情報を出力して終了\n"
+
+#: src/envsubst.c:207
+#, c-format, no-wrap
+msgid ""
+"In normal operation mode, standard input is copied to standard output,\n"
+"with references to environment variables of the form $VARIABLE or ${VARIABLE}\n"
+"being replaced with the corresponding values.  If a SHELL-FORMAT is given,\n"
+"only those environment variables that are referenced in SHELL-FORMAT are\n"
+"substituted; otherwise all environment variables references occurring in\n"
+"standard input are substituted.\n"
+msgstr ""
+"通常のオペレーションモードでは, 標準入力が標準出力にコピーされ, $VARIABLE\n"
+"または ${VARIABLE} 形式の環境変数を参照し, それぞれの値に置換されます.\n"
+"シェル形式が指定されると, シェル形式で参照される, そのような環境変数だけが\n"
+"代入されますが, そうでない場合は標準入力に現れる全ての環境変数が代入されます.\n"
+
+#: src/envsubst.c:216
+#, c-format, no-wrap
+msgid ""
+"When --variables is used, standard input is ignored, and the output consists\n"
+"of the environment variables that are referenced in SHELL-FORMAT, one per line.\n"
+msgstr ""
+"--variables が使われると, 標準入力は無視され, 出力は 1行ずつシェル形式で\n"
+"参照される環境変数から構成されます.\n"
+
+#. TRANSLATORS: The first placeholder is the web address of the Savannah
+#. project of this package.  The second placeholder is the bug-reporting
+#. email address for this package.  Please add _another line_ saying
+#. "Report translation bugs to <...>\n" with the address for translation
+#. bugs (typically your translation team's web or email address).
+#: src/envsubst.c:225 src/gettext.c:304 src/ngettext.c:269
+#: src/printf_gettext.c:277 src/printf_ngettext.c:313
+#, c-format
+msgid ""
+"Report bugs in the bug tracker at <%s>\n"
+"or by email to <%s>.\n"
+msgstr ""
+"バグレポートは <%s> のバグトラッカーに\n"
+"または <%s> 宛に電子メールで.\n"
+
+#: src/envsubst.c:453
+#, c-format
+msgid "error while reading \"%s\""
+msgstr "\"%s\" 読み込み中のエラー"
+
+#: src/envsubst.c:453
+msgid "standard input"
+msgstr "標準入力"
+
+#. This is a proper name. See the gettext manual, section Names.
+#: src/gettext.c:144 src/ngettext.c:134
+msgid "Ulrich Drepper"
+msgstr "Ulrich Drepper"
+
+#: src/gettext.c:254
+#, c-format, no-wrap
+msgid ""
+"Usage: %s [OPTION] [[TEXTDOMAIN] MSGID]\n"
+"or:    %s [OPTION] -s [MSGID]...\n"
+msgstr ""
+"使用法: %s [オプション] [[TEXTDOMAIN] MSGID]\n"
+"または: %s [オプション] -s [MSGID]...\n"
+
+#: src/gettext.c:260
+#, c-format, no-wrap
+msgid "Display native language translation of a textual message.\n"
+msgstr "原文のメッセージの自国語翻訳を表示.\n"
+
+#: src/gettext.c:263 src/ngettext.c:230 src/printf_gettext.c:179
+#: src/printf_ngettext.c:211
+#, c-format
+msgid "Options and arguments:\n"
+msgstr "オプションと引数:\n"
+
+#: src/gettext.c:266
+#, c-format, no-wrap
+msgid "  -d, --domain=TEXTDOMAIN   retrieve translated messages from TEXTDOMAIN\n"
+msgstr "  -d, --domain=TEXTDOMAIN   TEXTDOMAIN から翻訳されたメッセージを読み出す\n"
+
+#: src/gettext.c:268 src/ngettext.c:235
+#, c-format
+msgid "  -c, --context=CONTEXT     specify context for MSGID\n"
+msgstr "  -c  --context=CONTEXT     MSGID に対するコンテキストを指定\n"
+
+#: src/gettext.c:270 src/ngettext.c:237
+#, c-format
+msgid "  -e                        enable expansion of some escape sequences\n"
+msgstr "  -e                        いくつかのエスケープシーケンスの展開を可能に\n"
+
+#: src/gettext.c:272
+#, c-format
+msgid "  -n                        suppress trailing newline\n"
+msgstr "  -n                        末尾の改行を抑制\n"
+
+#: src/gettext.c:274 src/ngettext.c:239
+#, c-format
+msgid "  -E                        (ignored for compatibility)\n"
+msgstr "  -E                        (互換性のために無視)\n"
+
+#: src/gettext.c:276
+#, c-format
+msgid ""
+"  [TEXTDOMAIN] MSGID        retrieve translated message corresponding\n"
+"                            to MSGID from TEXTDOMAIN\n"
+msgstr ""
+"  [TEXTDOMAIN] MSGID        TEXTDOMAIN から MSGID に一致する翻訳された\n"
+"                            メッセージを読み出す\n"
+
+#: src/gettext.c:282 src/ngettext.c:250 src/printf_gettext.c:190
+#: src/printf_ngettext.c:226
+#, c-format
+msgid "  -h, --help                display this help and exit\n"
+msgstr "  -h, --help                このヘルプを表示して終了\n"
+
+#: src/gettext.c:284 src/ngettext.c:252 src/printf_gettext.c:192
+#: src/printf_ngettext.c:228
+#, c-format
+msgid "  -V, --version             display version information and exit\n"
+msgstr "  -V, --version             バージョン情報を表示して終了\n"
+
+#: src/gettext.c:288
+#, c-format, no-wrap
+msgid ""
+"If the TEXTDOMAIN parameter is not given, the domain is determined from the\n"
+"environment variable TEXTDOMAIN.  If the message catalog is not found in the\n"
+"regular directory, another location can be specified with the environment\n"
+"variable TEXTDOMAINDIR.\n"
+"When used with the -s option the program behaves like the 'echo' command.\n"
+"But it does not simply copy its arguments to stdout.  Instead those messages\n"
+"found in the selected catalog are translated.\n"
+"Standard search directory: %s\n"
+msgstr ""
+"もし TEXTDOMAIN パラメータが指定されなければ, 環境変数 TEXTDOMAIN から\n"
+"ドメインが決まります. もし標準のディレクトリにメッセージカタログが\n"
+"見つからなければ, 環境変数 TEXTDOMAINDIR で指定された場所から探します.\n"
+"-s オプションをつけて使うとプログラムは 'echo' コマンドのように動作します.\n"
+"しかしその引数を単にそのまま標準出力にコピーするわけではありません.\n"
+"選択されたカタログ中に指定されたメッセージがあれば, そのメッセージの代わりに\n"
+"翻訳されたものを表示します.\n"
+"標準の検索ディレクトリ: %s\n"
+
+#: src/ngettext.c:221
+#, c-format, no-wrap
+msgid "Usage: %s [OPTION] [TEXTDOMAIN] MSGID MSGID-PLURAL COUNT\n"
+msgstr "使用法: %s [オプション] [TEXTDOMAIN] MSGID MSGID-PLURAL COUNT\n"
+
+#: src/ngettext.c:226
+#, c-format, no-wrap
+msgid ""
+"Display native language translation of a textual message whose grammatical\n"
+"form depends on a number.\n"
+msgstr "文法上, 形式が数によって異なっている原文メッセージの自国語翻訳を表示.\n"
+
+#: src/ngettext.c:233
+#, c-format, no-wrap
+msgid "  -d, --domain=TEXTDOMAIN   retrieve translated message from TEXTDOMAIN\n"
+msgstr "  -d, --domain=TEXTDOMAIN   TEXTDOMAIN から翻訳されたメッセージを読み出す\n"
+
+#: src/ngettext.c:241
+#, c-format
+msgid "  [TEXTDOMAIN]              retrieve translated message from TEXTDOMAIN\n"
+msgstr "  [TEXTDOMAIN]              TEXTDOMAIN から翻訳されたメッセージを読み出す\n"
+
+#: src/ngettext.c:243
+#, c-format
+msgid "  MSGID MSGID-PLURAL        translate MSGID (singular) / MSGID-PLURAL (plural)\n"
+msgstr "  MSGID MSGID-PLURAL        MSGID (単数形) / MSGID-PLURAL (複数形) を翻訳\n"
+
+#: src/ngettext.c:245 src/printf_ngettext.c:219
+#, c-format
+msgid "  COUNT                     choose singular/plural form based on this value\n"
+msgstr "  COUNT                     この値をもとにした単数形か複数形かを選択\n"
+
+#: src/ngettext.c:256
+#, c-format, no-wrap
+msgid ""
+"If the TEXTDOMAIN parameter is not given, the domain is determined from the\n"
+"environment variable TEXTDOMAIN.  If the message catalog is not found in the\n"
+"regular directory, another location can be specified with the environment\n"
+"variable TEXTDOMAINDIR.\n"
+"Standard search directory: %s\n"
+msgstr ""
+"もし TEXTDOMAIN パラメータが指定されなければ, 環境変数 TEXTDOMAIN から\n"
+"ドメインが決まります. もし標準のディレクトリにメッセージカタログが\n"
+"見つからなければ, 環境変数 TEXTDOMAINDIR で指定された場所から探します.\n"
+"標準の検索ディレクトリ: %s\n"
+
+#: src/printf-command.c:154
+#, c-format
+msgid "In the directive number %zu, the argument number 0 is not a positive integer."
+msgstr "命令番号 %zu では, 引数番号 0 が正の整数ではありません."
+
+#: src/printf-command.c:237
+#, c-format
+msgid "The string ends in the middle of a directive."
+msgstr "文字列が命令の途中で終了しています."
+
+#: src/printf-command.c:242
+#, c-format
+msgid "In the directive number %zu, the character '%c' is not a valid conversion specifier."
+msgstr "命令番号 %zu では, 文字 '%c' は有効な変換指定子ではありません."
+
+#: src/printf-command.c:246
+#, c-format
+msgid "The character that terminates the directive number %zu is not a valid conversion specifier."
+msgstr "命令番号 %zu を終了する文字が有効な変換指定子ではありません."
+
+#: src/printf-command.c:255 src/printf-command.c:259
+#, c-format
+msgid "In the directive number %zu, the flag '%c' is invalid for the conversion '%c'."
+msgstr "命令番号 %zu では, フラグ '%c' は変換 '%c' に対して無効です."
+
+#: src/printf-command.c:278 src/printf-command.c:292
+#, c-format
+msgid "The string refers to arguments both through absolute argument numbers and through unnumbered argument specifications."
+msgstr "文字列が絶対引数番号と番号なし引数指定の両方を使って引数を参照しています."
+
+#: src/printf-command.c:394
+#, c-format
+msgid "The string ends in the middle of an escape sequence."
+msgstr "文字列がエスケープシーケンスの途中で終了しています."
+
+#: src/printf-command.c:402
+#, c-format
+msgid "The escape sequence '%c%c' is unsupported (not in POSIX)."
+msgstr "エスケープシーケンス '%c%c' は未実装 (POSIX にない)."
+
+#: src/printf-command.c:403
+#, c-format
+msgid "The escape sequence '%c%c' is invalid."
+msgstr "エスケープシーケンス '%c%c' は無効."
+
+#: src/printf-command.c:407
+#, c-format
+msgid "This escape sequence is invalid."
+msgstr "このエスケープ シーケンスは無効."
+
+#: src/printf-command.c:455 src/printf-command.c:501 src/printf-command.c:568
+#: src/printf-command.c:638 src/printf-command.c:691
+#, c-format
+msgid "write error"
+msgstr "書き込みエラー"
+
+#: src/printf-command.c:529 src/printf-command.c:556 src/printf-command.c:597
+#: src/printf-command.c:626 src/printf-command.c:679
+#, c-format
+msgid "%s: expected a numeric value"
+msgstr "%s: 数値が必要"
+
+#: src/printf-command.c:550 src/printf-command.c:620 src/printf-command.c:673
+#, c-format
+msgid "%s: value not completely converted"
+msgstr "%s: 値の変換が不完全"
+
+#: src/printf-command.c:717
+#, c-format
+msgid "The translated format string consumes %zu arguments, whereas the original format string consumes only %zu arguments."
+msgstr "翻訳された形式文字列は %zu 個の引数を使いますが, 元の形式文字列が使うのは %zu 個の引数のみです."
+
+#: src/printf-command.c:728
+#, c-format
+msgid "warning: ignoring excess arguments, starting with %s"
+msgstr "警告: 過剰な引数を無視して %s から開始"
+
+#: src/printf_gettext.c:128
+#, c-format
+msgid "missing format string"
+msgstr "形式文字列がありません"
+
+#: src/printf_gettext.c:170
+#, c-format, no-wrap
+msgid "Usage: %s [OPTION] FORMAT [ARGUMENT]...\n"
+msgstr "使用法: %s [オプション] FORMAT [ARGUMENT]\n"
+
+#: src/printf_gettext.c:175
+#, c-format, no-wrap
+msgid ""
+"Produces formatted output, applying the native language translation of FORMAT\n"
+"to the ARGUMENTs.\n"
+msgstr "フォーマットされた出力を生成して ARGUMENT に FORMAT のネイティブ言語翻訳を適用.\n"
+
+#: src/printf_gettext.c:181 src/printf_ngettext.c:213
+#, c-format
+msgid "  -c, --context=CONTEXT     specify context for FORMAT\n"
+msgstr "  -c  --context=CONTEXT     FORMAT に対するコンテキストを指定\n"
+
+#: src/printf_gettext.c:183
+#, c-format
+msgid "  FORMAT                    format string\n"
+msgstr "  FORMAT                    形式文字列\n"
+
+#: src/printf_gettext.c:185 src/printf_ngettext.c:221
+#, c-format
+msgid "  ARGUMENT                  string or numeric argument\n"
+msgstr "  ARGUMENT                  文字列または数値の引数\n"
+
+#: src/printf_gettext.c:196
+#, c-format, no-wrap
+msgid ""
+"The format string consists of\n"
+"  - plain text,\n"
+"  - directives, that start with '%c',\n"
+"  - escape sequences, that start with a backslash.\n"
+msgstr ""
+"形式文字列は次の要素から構成:\n"
+"  - プレーンテキスト\n"
+"  - '%c' で始まる命令\n"
+"  - バックスラッシュで始まるエスケープシーケンス\n"
+
+#: src/printf_gettext.c:204 src/printf_ngettext.c:240
+#, c-format, no-wrap
+msgid ""
+"A directive that consumes an argument\n"
+"  - starts with '%s' or '%s' where %s is a positive integer,\n"
+"  - is optionally followed by any of the characters '%c', '%c', '%c', '%c', '%c',\n"
+"    each of which acts as a flag,\n"
+"  - is optionally followed by a width specification (a nonnegative integer),\n"
+"  - is optionally followed by '%c' and a precision specification (an optional\n"
+"    nonnegative integer),\n"
+"  - is finished by a specifier\n"
+"      - '%c', that prints a character,\n"
+"      - '%c', that prints a string,\n"
+"      - '%c', '%c', that print an integer,\n"
+"      - '%c', '%c', '%c', '%c', that print an unsigned (nonnegative) integer,\n"
+"      - '%c', '%c', that print a floating-point number in scientific notation,\n"
+"      - '%c', '%c', that print a floating-point number without an exponent,\n"
+"      - '%c', '%c', that print a floating-point number in general notation,\n"
+"      - '%c', '%c', that print a floating-point number in hexadecimal notation.\n"
+"Additionally there is the directive '%s', that prints a single '%c'.\n"
+msgstr ""
+"引数を使う命令は以下の通り:\n"
+"  - '%s' または '%s' で始まる (%s は正の整数)\n"
+"  - '%c', '%c', '%c', '%c', '%c' のいずれかの文字がオプションで続く\n"
+"    (それぞれフラグとして機能)\n"
+"  - 幅指定 (非負の整数) がオプションで続く\n"
+"  - '%c' と精度指定 (オプションの非負の整数) がオプションで続く\n"
+"  - 以下の指定子で終わる\n"
+"      - '%c': 文字を出力\n"
+"      - '%c': 文字列を出力\n"
+"      - '%c', '%c': 整数を出力\n"
+"      - '%c', '%c', '%c', '%c': 符号なし (非負) 整数を出力\n"
+"      - '%c', '%c': 科学的記数法で浮動小数点数を出力\n"
+"      - '%c', '%c': 指数なし浮動小数点数を出力\n"
+"      - '%c', '%c': 一般的な表記法で浮動小数点数を出力\n"
+"      - '%c', '%c': 16進表記で浮動小数点数を出力\n"
+"さらに '%s' 命令は単一の '%c' を出力する.\n"
+
+#: src/printf_gettext.c:233 src/printf_ngettext.c:269
+#, c-format, no-wrap
+msgid ""
+"If a directive specifies the argument by its number ('%s' notation),\n"
+"all directives that consume an argument must do so.\n"
+msgstr ""
+"命令が引数を数字 ('%s' 表記) で指定する場合,\n"
+"引数を使うすべての命令も同様に指定する必要があります.\n"
+
+#. TRANSLATORS: Most of the placeholders expand to 2 characters.
+#. The last placeholder expands to 4 characters.
+#: src/printf_gettext.c:240 src/printf_ngettext.c:276
+#, c-format
+msgid ""
+"The escape sequences are:\n"
+"\n"
+"  %s      backslash\n"
+"  %s      alert (BEL)\n"
+"  %s      backspace (BS)\n"
+"  %s      form feed (FF)\n"
+"  %s      new line (LF)\n"
+"  %s      carriage return (CR)\n"
+"  %s      horizontal tab (HT)\n"
+"  %s      vertical tab (VT)\n"
+"  %s    octal number with 1 to 3 octal digits\n"
+msgstr ""
+"エスケープシーケンスは以下の通り:\n"
+"\n"
+"  %s      バックスラッシュ\n"
+"  %s      アラート (BEL)\n"
+"  %s      バックスペース (BS)\n"
+"  %s      改ページ (FF)\n"
+"  %s      改行 (LF)\n"
+"  %s      キャリッジリターン (CR)\n"
+"  %s      水平タブ (HT)\n"
+"  %s      垂直タブ (VT)\n"
+"  %s    1から3桁の8進数\n"
+
+#: src/printf_gettext.c:255 src/printf_ngettext.c:291
+#, c-format
+msgid "Environment variables:\n"
+msgstr "環境変数:\n"
+
+#: src/printf_gettext.c:259 src/printf_ngettext.c:295
+#, c-format, no-wrap
+msgid ""
+"The translation of the format string is looked up in the translation domain\n"
+"given by the environment variable %s.\n"
+msgstr "形式文字列の翻訳は環境変数 %s で指定された翻訳ドメインで検索されます.\n"
+
+#: src/printf_gettext.c:264 src/printf_ngettext.c:300
+#, c-format, no-wrap
+msgid ""
+"It is looked up in the catalogs directory given by the environment variable\n"
+"%s or, if not present, in the default catalogs directory.\n"
+"This binary is configured to use the default catalogs directory:\n"
+"%s\n"
+msgstr ""
+"環境変数 %s で指定されたカタログディレクトリ, また指定されない場合はデフォルトの\n"
+"カタログディレクトリから検索されます.\n"
+"このバイナリがデフォルトで使用するカタログディレクトリ:\n"
+"%s\n"
+
+#: src/printf_ngettext.c:202
+#, c-format, no-wrap
+msgid "Usage: %s [OPTION] FORMAT FORMAT-PLURAL COUNT [ARGUMENT]...\n"
+msgstr "使用法: %s [オプション] FORMAT FORMAT-PLURAL COUNT [ARGUMENT]...\n"
+
+#: src/printf_ngettext.c:207
+#, c-format, no-wrap
+msgid ""
+"Produces formatted output, applying the native language translation of FORMAT\n"
+"and FORMAT-PLURAL, depending on COUNT, to the ARGUMENTs.\n"
+msgstr ""
+"COUNT に応じて FORMAT および FORMAT-PLURAL のネイティブ言語翻訳を\n"
+"ARGUMENT に適用してフォーマットされた出力を生成.\n"
+
+#: src/printf_ngettext.c:215
+#, c-format
+msgid "  FORMAT                    English singular form of format string\n"
+msgstr "  FORMAT                    形式文字列の英語の単数形\n"
+
+#: src/printf_ngettext.c:217
+#, c-format
+msgid "  FORMAT-PLURAL             English plural form of format string\n"
+msgstr "  FORMAT-PLURAL             形式文字列の英語の複数形\n"
+
+#: src/printf_ngettext.c:232
+#, c-format, no-wrap
+msgid ""
+"Each format string consists of\n"
+"  - plain text,\n"
+"  - directives, that start with '%c',\n"
+"  - escape sequences, that start with a backslash.\n"
+msgstr ""
+"各形式文字列は以下の要素で構成:\n"
+"  - プレーンテキスト\n"
+"  - '%c' で始まる命令\n"
+"  - バックスラッシュで始まるエスケープシーケンス\n"

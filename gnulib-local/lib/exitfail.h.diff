@@ -1,0 +1,19 @@
+*** exitfail.h.orig	2024-04-30 14:23:34.917729169 +0200
+--- exitfail.h	2024-04-30 14:23:45.389780892 +0200
+***************
+*** 20,26 ****
+  #endif
+  
+  
+! extern int volatile exit_failure;
+  
+  
+  #ifdef __cplusplus
+--- 20,26 ----
+  #endif
+  
+  
+! extern DLL_VARIABLE int volatile exit_failure;
+  
+  
+  #ifdef __cplusplus

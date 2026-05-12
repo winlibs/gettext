@@ -1,0 +1,26 @@
+Description:
+
+Files:
+
+Depends-on:
+
+configure.ac:
+
+Makefile.am:
+# Needed for the gnulib source code that does '#include "gettext.h"'.
+AM_CPPFLAGS += -I$(top_builddir)/intl
+
+# Parametrization of the 'relocatable' module.
+AM_CPPFLAGS += -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1
+
+# Enable more warning options in this directory.
+AM_CFLAGS += @WARN_CFLAGS@
+
+Include:
+
+License:
+GPL
+
+Maintainer:
+Bruno Haible
+
